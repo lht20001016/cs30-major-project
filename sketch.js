@@ -103,7 +103,6 @@ function draw() {
   minionFunctions();
   showAbilities();
   countCooldown();
-  // showTowers();
   createBullet();
   moveBullet();
   characterStatus();
@@ -364,10 +363,10 @@ class Creep extends GameObject {
       this.hp = 500 + timer * 50;
     }
     if (side === "friendly") {
-      this.speed = width * 0.006;
+      this.speed = width * 0.015;
     }
     if (side === "enemy") {
-      this.speed = width * -0.006;
+      this.speed = width * -0.015;
     }
     this.maxhp = this.hp;
 
@@ -845,25 +844,23 @@ function minionFunctions() {
   if (state === "game") {
     //move minions
     for (let i = 0; i < minions.length; i++) {
-      if (minions[i].hp <= 0) {
-        //kill upon 0hp
-        minions.splice(i, 1);
-      }
       if (! shopSubstate) {
         minions[i].moveAttack();
+        if (minions[i].hp <= 0) {
+          minions.splice(i, 1);
+        }
+        minions[i].show();
       }
-      minions[i].show();
     }
 
-    for (let i = 0; i < enemyMinions.length; i++) {
-      if (enemyMinions[i].hp <= 0) {
-        //kill upon 0hp
-        enemyMinions.splice(i, 1);
-      }
+    for (let k = 0; k < enemyMinions.length; k++) {
       if (! shopSubstate) {
-        enemyMinions[i].moveAttack();
+        enemyMinions[k].moveAttack();
+        if (enemyMinions[k].hp <= 0) {
+          enemyMinions.splice(k, 1);
+        }
       }
-      enemyMinions[i].show();
+      enemyMinions[k].show();
     }
   }
 
@@ -898,18 +895,6 @@ function countCooldown() {
     }
   }
 }
-
-//displays the image of the towers, representing the side which hostile projectiles are launched
-// function showTowers() {
-
-//   if (state === "game") {
-//     image(images.tower, width - 75, 0, 75, 125);
-//     image(images.tower, width - 75, (height - 125) / 4, 75, 125);
-//     image(images.tower, width - 75, (height - 125) / 2, 75, 125);
-//     image(images.tower, width - 75, (height - 125) / 4 * 3, 75, 125);
-//     image(images.tower, width - 75, height - 125, 75, 125);
-//   }
-// }
 
 //responsible for the creation of the bullets
 function createBullet() {

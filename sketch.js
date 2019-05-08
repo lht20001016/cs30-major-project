@@ -813,7 +813,7 @@ function minionsSpawn() {
   if (timer % 30 === 5) {
     spawnMelee();
   }
-  if (timer % 30 === 8) {
+  if (timer % 30 === 7) {
     spawnCannon();
   }
 
@@ -844,23 +844,27 @@ function minionFunctions() {
   if (state === "game") {
     //move minions
     for (let i = 0; i < minions.length; i++) {
-      if (! shopSubstate) {
-        minions[i].moveAttack();
+      if (! shopSubstate && minions[i] !== undefined) {
         if (minions[i].hp <= 0) {
           minions.splice(i, 1);
         }
-        minions[i].show();
+        else {
+          minions[i].moveAttack();
+          minions[i].show();
+        }
       }
     }
 
     for (let k = 0; k < enemyMinions.length; k++) {
-      if (! shopSubstate) {
-        enemyMinions[k].moveAttack();
+      if (! shopSubstate && enemyMinions[k] !== undefined) {
         if (enemyMinions[k].hp <= 0) {
           enemyMinions.splice(k, 1);
         }
+        else {
+          enemyMinions[k].moveAttack();
+          enemyMinions[k].show();
+        }
       }
-      enemyMinions[k].show();
     }
   }
 
@@ -939,6 +943,10 @@ function moveBullet() {
           sound.clickItem.setVolume(0.1);
           sound.clickItem.play();
         }
+      }
+
+      if (bullets[i].x < 0) {
+        bullets.splice(i, 0);
       }
 
     }

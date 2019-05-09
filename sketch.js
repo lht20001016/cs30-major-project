@@ -842,30 +842,34 @@ function spawnCannon() {
 function minionFunctions() {
 
   if (state === "game") {
+
     //move minions
     for (let i = 0; i < minions.length; i++) {
       if (! shopSubstate && minions[i] !== undefined) {
-        if (minions[i].hp <= 0) {
-          minions.splice(i, 1);
-        }
-        else {
-          minions[i].moveAttack();
-          minions[i].show();
-        }
+        minions[i].moveAttack();
+        minions[i].show();
+      }
+    }
+
+    for (let l = 0; l < minions.length; l++) {
+      if (minions[l].hp <= 0) {
+        minions.splice(l, 1);
       }
     }
 
     for (let k = 0; k < enemyMinions.length; k++) {
       if (! shopSubstate && enemyMinions[k] !== undefined) {
-        if (enemyMinions[k].hp <= 0) {
-          enemyMinions.splice(k, 1);
-        }
-        else {
-          enemyMinions[k].moveAttack();
-          enemyMinions[k].show();
-        }
+        enemyMinions[k].moveAttack();
+        enemyMinions[k].show();
       }
     }
+
+    for (let m = 0; m < enemyMinions.length; m++) {
+      if (enemyMinions[m].hp <= 0) {
+        enemyMinions.splice(m , 1);
+      }
+    }
+
   }
 
 }

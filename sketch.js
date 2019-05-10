@@ -376,71 +376,114 @@ class Creep extends GameObject {
 
   moveAttack() {
 
-    if (this.type === "melee" && this.side === "friendly") {
-      if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 1.05) {
-        if (frameCount % 60 === 0) {
+    // if (this.type === "melee" && this.side === "friendly") {
+    //   if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 1.05) {
+    //     if (frameCount % 60 === 0) {
 
-          for (let i = 0; i < enemyMinions.length; i++) {
-            if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
-              enemyMinions[i].hp -= this.damage;
-            }
-            else if (enemyMinions[0].type === "melee") {
-              enemyMinions[0].hp -= this.damage;
-            }
-            else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
-              enemyMinions[i].hp -= this.damage;
-            }
-            else {
-              enemyMinions[0].hp -= this.damage;
-            }
-          }
+    //       for (let i = 0; i < enemyMinions.length; i++) {
+    //         if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
+    //           enemyMinions[i].hp -= this.damage;
+    //         }
+    //         else if (enemyMinions[0].type === "melee") {
+    //           enemyMinions[0].hp -= this.damage;
+    //         }
+    //         else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
+    //           enemyMinions[i].hp -= this.damage;
+    //         }
+    //         else {
+    //           enemyMinions[0].hp -= this.damage;
+    //         }
+    //       }
           
-        }
-      }
-      else {
-        this.x += this.speed;
-      }
-    }
+    //     }
+    //   }
+    //   else {
+    //     this.x += this.speed;
+    //   }
+    // }
 
-    if (this.type === "cannon" && this.side === "friendly") {
-      if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 2.5) {
-        if (frameCount % 60 === 0) {
-          for (let i = 0; i < enemyMinions.length; i++) {
-            if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
-              enemyMinions[i].hp -= this.damage;
-            }
-            else if (enemyMinions[0].type === "melee") {
-              enemyMinions[0].hp -= this.damage;
-            }
-            else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
-              enemyMinions[i].hp -= this.damage;
-            }
-            else {
-              enemyMinions[0].hp -= this.damage;
-            }
-          }
-        }
-      }
-      else {
-        this.x += this.speed;
-      }
-    }
+    // if (this.type === "cannon" && this.side === "friendly") {
+    //   if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 2.5) {
+    //     if (frameCount % 60 === 0) {
+    //       for (let i = 0; i < enemyMinions.length; i++) {
+    //         if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
+    //           enemyMinions[i].hp -= this.damage;
+    //         }
+    //         else if (enemyMinions[0].type === "melee") {
+    //           enemyMinions[0].hp -= this.damage;
+    //         }
+    //         else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
+    //           enemyMinions[i].hp -= this.damage;
+    //         }
+    //         else {
+    //           enemyMinions[0].hp -= this.damage;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   else {
+    //     this.x += this.speed;
+    //   }
+    // }
+
+    // if (this.type === "melee" && this.side === "enemy") {
+    //   if (minions.length > 0 && this.x - minions[0].x <= this.width * 1.05) {
+    //     if (frameCount % 60 === 0) {
+    //       for (let i = 0; i < minions.length; i++) {
+    //         if (minions[i].type === "melee" && minions[i].y === this.y) {
+    //           minions[i].hp -= this.damage;
+    //         }
+    //         else if (minions[0].type === "melee") {
+    //           minions[0].hp -= this.damage;
+    //         }
+    //         else if (minions[i].type === "cannon" && minions[i].y === this.y) {
+    //           minions[i].hp -= this.damage;
+    //         }
+    //         else {
+    //           minions[0].hp -= this.damage;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   else {
+    //     this.x += this.speed;
+    //   }
+    // }
+
+    // if (this.type === "cannon" && this.side === "enemy") {
+    //   if (minions.length > 0 && this.x - minions[0].x <= this.width * 2.5) {
+    //     if (frameCount % 60 === 0) {
+    //       for (let i = 0; i < minions.length; i++) {
+    //         if (minions[i].type === "melee" && minions[i].y === this.y) {
+    //           minions[i].hp -= this.damage;
+    //         }
+    //         else if (minions[0].type === "melee") {
+    //           minions[0].hp -= this.damage;
+    //         }
+    //         else if (minions[i].type === "cannon" && minions[i].y === this.y) {
+    //           minions[i].hp -= this.damage;
+    //         }
+    //         else {
+    //           minions[0].hp -= this.damage;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   else {
+    //     this.x += this.speed;
+    //   }
+    // }
 
     if (this.type === "melee" && this.side === "enemy") {
-      if (minions.length > 0 && this.x - minions[0].x <= this.width * 1.05) {
-        if (frameCount % 60 === 0) {
-          for (let i = 0; i < minions.length; i++) {
-            if (minions[i].type === "melee" && minions[i].y === this.y) {
-              minions[i].hp -= this.damage;
-            }
-            else if (minions[0].type === "melee") {
-              minions[0].hp -= this.damage;
-            }
-            else if (minions[i].type === "cannon" && minions[i].y === this.y) {
-              minions[i].hp -= this.damage;
-            }
-            else {
-              minions[0].hp -= this.damage;
+
+      if (minions.length > 0) { 
+        if (this.x - minions[0].x >= this.width * 1.05) {
+          this.x += this.speed;
+        }
+        else {
+          for (let i = 0; i < 3; i++) {
+            if (minions[i].y === this.y && frameCount % 60 === 0){
+              minions[i].hp -= 20 + 2 * timer;
             }
           }
         }
@@ -448,23 +491,39 @@ class Creep extends GameObject {
       else {
         this.x += this.speed;
       }
+
+    }
+
+    if (this.type === "melee" && this.side === "friendly") {
+
+      if (enemyMinions.length > 0) {
+        if (enemyMinions[0].x - this.x >= this.width * 1.05) {
+          this.x += this.speed;
+        }
+        else {
+          for (let i = 0; i < 3; i++) {
+            if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
+              enemyMinions[i].hp -= 20 + 2 * timer;
+            }
+          }
+        }
+      }
+      else {
+        this.speed += this.speed;
+      }
+
     }
 
     if (this.type === "cannon" && this.side === "enemy") {
-      if (minions.length > 0 && this.x - minions[0].x <= this.width * 2.5) {
-        if (frameCount % 60 === 0) {
-          for (let i = 0; i < minions.length; i++) {
-            if (minions[i].type === "melee" && minions[i].y === this.y) {
-              minions[i].hp -= this.damage;
-            }
-            else if (minions[0].type === "melee") {
-              minions[0].hp -= this.damage;
-            }
-            else if (minions[i].type === "cannon" && minions[i].y === this.y) {
-              minions[i].hp -= this.damage;
-            }
-            else {
-              minions[0].hp -= this.damage;
+
+      if (minions.length > 0) {
+        if (this.x - minions[0].x >= this.width * 2.5) {
+          this.x += this.speed;
+        }
+        else {
+          for (let i = 0; i < 3; i++) {
+            if (minions[i].y === this.y && frameCount % 60 === 0){
+              minions[i].hp -= 30 + 3 * timer;
             }
           }
         }
@@ -472,6 +531,27 @@ class Creep extends GameObject {
       else {
         this.x += this.speed;
       }
+
+    }
+
+    if (this.type === "cannon" && this.side === "friendly") {
+
+      if (enemyMinions.length > 0) {
+        if (enemyMinions[0].x - this.x >= this.width * 2.5) {
+          this.x += this.speed;
+        }
+        else {
+          for (let i = 0; i < 3; i++) {
+            if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
+              enemyMinions[i].hp -= 30 + 3 * timer;
+            }
+          }
+        }
+      }
+      else {
+        this.x += this.speed;
+      }
+      
     }
 
   }
@@ -897,12 +977,6 @@ function minionFunctions() {
   if (state === "game") {
 
     //move minions
-    for (let i = 0; i < minions.length; i++) {
-      if (! shopSubstate && minions[i] !== undefined) {
-        minions[i].moveAttack();
-        minions[i].show();
-      }
-    }
 
     for (let l = 0; l < minions.length; l++) {
       if (minions[l].hp <= 0) {
@@ -910,16 +984,23 @@ function minionFunctions() {
       }
     }
 
-    for (let k = 0; k < enemyMinions.length; k++) {
-      if (! shopSubstate && enemyMinions[k] !== undefined) {
-        enemyMinions[k].moveAttack();
-        enemyMinions[k].show();
+    for (let i = 0; i < minions.length; i++) {
+      if (! shopSubstate && minions[i] !== undefined) {
+        minions[i].moveAttack();
+        minions[i].show();
       }
     }
 
     for (let m = 0; m < enemyMinions.length; m++) {
       if (enemyMinions[m].hp <= 0) {
         enemyMinions.splice(m , 1);
+      }
+    }
+
+    for (let k = 0; k < enemyMinions.length; k++) {
+      if (! shopSubstate && enemyMinions[k] !== undefined) {
+        enemyMinions[k].moveAttack();
+        enemyMinions[k].show();
       }
     }
 

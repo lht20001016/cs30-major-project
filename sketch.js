@@ -978,26 +978,26 @@ function minionFunctions() {
 
     //move minions
 
-    for (let l = 0; l < minions.length; l++) {
+    for (let l = minions.length - 1; l >= 0; l--) {
       if (minions[l].hp <= 0) {
         minions.splice(l, 1);
       }
     }
 
-    for (let i = 0; i < minions.length; i++) {
+    for (let i = minions.length - 1; i >= 0; i--) {
       if (! shopSubstate && minions[i] !== undefined) {
         minions[i].moveAttack();
         minions[i].show();
       }
     }
 
-    for (let m = 0; m < enemyMinions.length; m++) {
+    for (let m = enemyMinions.length - 1; m >= 0; m--) {
       if (enemyMinions[m].hp <= 0) {
         enemyMinions.splice(m , 1);
       }
     }
 
-    for (let k = 0; k < enemyMinions.length; k++) {
+    for (let k = enemyMinions.length - 1; k >= 0; k--) {
       if (! shopSubstate && enemyMinions[k] !== undefined) {
         enemyMinions[k].moveAttack();
         enemyMinions[k].show();
@@ -1059,7 +1059,7 @@ function moveBullet() {
     stroke(0, 0, 255);
 
     //moves each bullet in the array bullets, defined at the beginning, according to the class code above
-    for (let i = 0; i < bullets.length; i++) {
+    for (let i = bullets.length - 1; i >= 0; i--) {
       if (!shopSubstate) {
         bullets[i].move();
       }

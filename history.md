@@ -38,3 +38,13 @@
 - Item Files
 - Game Object Class and Button Class for most Interactive Buttons
 
+#### Minions and Major Bugfix
+##### //14 May 2019//
+
+[Check This Version Here (IN PROGRESS)]()
+
+- Bugfix
+- Restart Game Functions
+- List Operations with Minions and Projectiles
+- Self Automating Minion Combat (Non-Interactable Currently)
+

@@ -1893,6 +1893,7 @@ function resetGame() {
   bullets = [];
   minions = [];
   enemyMinions = [];
+  inventory = [];
 
 }
 

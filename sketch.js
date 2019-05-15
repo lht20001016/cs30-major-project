@@ -376,104 +376,6 @@ class Creep extends GameObject {
 
   moveAttack() {
 
-    // if (this.type === "melee" && this.side === "friendly") {
-    //   if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 1.05) {
-    //     if (frameCount % 60 === 0) {
-
-    //       for (let i = 0; i < enemyMinions.length; i++) {
-    //         if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
-    //           enemyMinions[i].hp -= this.damage;
-    //         }
-    //         else if (enemyMinions[0].type === "melee") {
-    //           enemyMinions[0].hp -= this.damage;
-    //         }
-    //         else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
-    //           enemyMinions[i].hp -= this.damage;
-    //         }
-    //         else {
-    //           enemyMinions[0].hp -= this.damage;
-    //         }
-    //       }
-          
-    //     }
-    //   }
-    //   else {
-    //     this.x += this.speed;
-    //   }
-    // }
-
-    // if (this.type === "cannon" && this.side === "friendly") {
-    //   if (enemyMinions.length > 0 && enemyMinions[0].x - this.x <= this.width * 2.5) {
-    //     if (frameCount % 60 === 0) {
-    //       for (let i = 0; i < enemyMinions.length; i++) {
-    //         if (enemyMinions[i].type === "melee" && enemyMinions[i].y === this.y) {
-    //           enemyMinions[i].hp -= this.damage;
-    //         }
-    //         else if (enemyMinions[0].type === "melee") {
-    //           enemyMinions[0].hp -= this.damage;
-    //         }
-    //         else if (enemyMinions[i].type === "cannon" && enemyMinions[i].y === this.y) {
-    //           enemyMinions[i].hp -= this.damage;
-    //         }
-    //         else {
-    //           enemyMinions[0].hp -= this.damage;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   else {
-    //     this.x += this.speed;
-    //   }
-    // }
-
-    // if (this.type === "melee" && this.side === "enemy") {
-    //   if (minions.length > 0 && this.x - minions[0].x <= this.width * 1.05) {
-    //     if (frameCount % 60 === 0) {
-    //       for (let i = 0; i < minions.length; i++) {
-    //         if (minions[i].type === "melee" && minions[i].y === this.y) {
-    //           minions[i].hp -= this.damage;
-    //         }
-    //         else if (minions[0].type === "melee") {
-    //           minions[0].hp -= this.damage;
-    //         }
-    //         else if (minions[i].type === "cannon" && minions[i].y === this.y) {
-    //           minions[i].hp -= this.damage;
-    //         }
-    //         else {
-    //           minions[0].hp -= this.damage;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   else {
-    //     this.x += this.speed;
-    //   }
-    // }
-
-    // if (this.type === "cannon" && this.side === "enemy") {
-    //   if (minions.length > 0 && this.x - minions[0].x <= this.width * 2.5) {
-    //     if (frameCount % 60 === 0) {
-    //       for (let i = 0; i < minions.length; i++) {
-    //         if (minions[i].type === "melee" && minions[i].y === this.y) {
-    //           minions[i].hp -= this.damage;
-    //         }
-    //         else if (minions[0].type === "melee") {
-    //           minions[0].hp -= this.damage;
-    //         }
-    //         else if (minions[i].type === "cannon" && minions[i].y === this.y) {
-    //           minions[i].hp -= this.damage;
-    //         }
-    //         else {
-    //           minions[0].hp -= this.damage;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   else {
-    //     this.x += this.speed;
-    //   }
-    // }
-
     if (this.type === "melee" && this.side === "enemy") {
 
       if (minions.length > 0) { 
@@ -483,7 +385,7 @@ class Creep extends GameObject {
         else {
           for (let i = 0; i < 3; i++) {
             if (minions[i].y === this.y && frameCount % 60 === 0){
-              minions[i].hp -= 20 + 2 * timer;
+              minions[i].hp -= 15 +  timer;
             }
           }
         }
@@ -503,7 +405,7 @@ class Creep extends GameObject {
         else {
           for (let i = 0; i < 3; i++) {
             if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
-              enemyMinions[i].hp -= 20 + 2 * timer;
+              enemyMinions[i].hp -= 15 + timer;
             }
           }
         }
@@ -523,7 +425,7 @@ class Creep extends GameObject {
         else {
           for (let i = 0; i < 3; i++) {
             if (minions[i].y === this.y && frameCount % 60 === 0){
-              minions[i].hp -= 30 + 3 * timer;
+              minions[i].hp -= 20 + 2 * timer;
             }
           }
         }
@@ -543,7 +445,7 @@ class Creep extends GameObject {
         else {
           for (let i = 0; i < 3; i++) {
             if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
-              enemyMinions[i].hp -= 30 + 3 * timer;
+              enemyMinions[i].hp -= 20 + 2 * timer;
             }
           }
         }
@@ -914,7 +816,7 @@ function determineVelocity() {
 //responsible for moving the characters according to set restrictions (due to in game graphics) and velocities
 function characterMovement() {
 
-  if (!shopSubstate && charpos.x + velocity.x <= width - width / 16 - 75 && state === "game") {
+  if (!shopSubstate && charpos.x + width / 16 + velocity.x <= width && state === "game") {
     charpos.x += velocity.x;
   }
 
@@ -978,22 +880,10 @@ function minionFunctions() {
 
     //move minions
 
-    for (let l = minions.length - 1; l >= 0; l--) {
-      if (minions[l].hp <= 0) {
-        minions.splice(l, 1);
-      }
-    }
-
     for (let i = minions.length - 1; i >= 0; i--) {
       if (! shopSubstate && minions[i] !== undefined) {
         minions[i].moveAttack();
         minions[i].show();
-      }
-    }
-
-    for (let m = enemyMinions.length - 1; m >= 0; m--) {
-      if (enemyMinions[m].hp <= 0) {
-        enemyMinions.splice(m , 1);
       }
     }
 
@@ -1003,6 +893,20 @@ function minionFunctions() {
         enemyMinions[k].show();
       }
     }
+
+    for (let m = enemyMinions.length - 1; m >= 0; m--) {
+      if (enemyMinions[m].hp <= 0) {
+        enemyMinions.splice(m , 1);
+      }
+    }
+
+    for (let l = minions.length - 1; l >= 0; l--) {
+      if (minions[l].hp <= 0) {
+        minions.splice(l, 1);
+      }
+    }
+
+
 
   }
 
@@ -1083,11 +987,14 @@ function moveBullet() {
         }
       }
 
+    }
+
+    for (let i = bullets.length - 1; i >= 0; i--) {
       if (bullets[i].x < 0) {
         bullets.splice(i, 0);
       }
-
     }
+    
   }
 }
 

@@ -3,8 +3,6 @@
 #### Interactive Scene Assignemnt
 ##### 05 March 2019
 
-[Check This Version Here](https://github.com/lht20001016/lht20001016.github.io/tree/11a77654fc610b3b638bc184e6f1d2e1dbb1792b/game)
-
 - Create the Basic Game
 - Create Classes for Bullet
 - Implemented Three Abilities
@@ -13,8 +11,6 @@
 
 #### States Variables Assignment
 ##### 25 March 2019
-
-[Check This Version Here](https://github.com/lht20001016/lht20001016.github.io/tree/b9d44050184da81b17f14409b98da6dab74fde04/game)
 
 - Refactoring Code
 - Quality of Life Improvements 
@@ -32,16 +28,12 @@
 #### Two Dimensional Arrays
 ##### //25 March 2019//
 
-[Check This Version Here (IN PROGRESS)]()
-
 - Shop Screen using 2D Arrays
 - Item Files
 - Game Object Class and Button Class for most Interactive Buttons
 
 #### Minions and Major Bugfix
 ##### //14 May 2019//
-
-[Check This Version Here (IN PROGRESS)]()
 
 - Bugfix
 - Restart Game Functions

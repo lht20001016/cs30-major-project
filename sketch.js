@@ -47,6 +47,7 @@ let timer;
 let abilities;
 let soundOn;
 let soundOff;
+let player;
 let bg;
 let icon;
 let menumusic;
@@ -117,7 +118,7 @@ function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
   volumeControl = true;
-  files = 37;
+  files = 79;
 
 }
 
@@ -166,6 +167,54 @@ function loadFiles() {
     enemyCannon : loadImage("assets/pictures/enemyCannon.png", itemLoaded),
     friendlyMinion : loadImage("assets/pictures/friendlyMinion.png", itemLoaded),
     enemyMinion : loadImage("assets/pictures/enemyMinion.png", itemLoaded),
+  };
+
+  player = {
+    avatar1 : loadImage("assets/pictures/character/avatar1.PNG", itemLoaded),
+    avatar2 : loadImage("assets/pictures/character/avatar2.PNG", itemLoaded),
+    charaa1 : loadImage("assets/pictures/character/charaa1.PNG", itemLoaded),
+    charaa1b : loadImage("assets/pictures/character/charaa1b.PNG", itemLoaded),
+    charaa2 : loadImage("assets/pictures/character/Charaa2.PNG", itemLoaded),
+    charaa2b : loadImage("assets/pictures/character/charaa2b.PNG", itemLoaded),
+    character1 : loadImage("assets/pictures/character/character1.PNG", itemLoaded),
+    character1b : loadImage("assets/pictures/character/character1b.PNG", itemLoaded),
+    character2 : loadImage("assets/pictures/character/character2.PNG", itemLoaded),
+    character2b : loadImage("assets/pictures/character/character2b.PNG", itemLoaded),
+    character3 : loadImage("assets/pictures/character/character3.PNG", itemLoaded),
+    character3b : loadImage("assets/pictures/character/character3b.PNG", itemLoaded),
+    charaltform1 : loadImage("assets/pictures/character/charaltform1.PNG", itemLoaded),
+    charaltform1b : loadImage("assets/pictures/character/charaltform1b.PNG", itemLoaded),
+    charaltform2 : loadImage("assets/pictures/character/charaltform2.PNG", itemLoaded),
+    charaltform2b : loadImage("assets/pictures/character/charaltform2b.PNG", itemLoaded),
+    charaltform3 : loadImage("assets/pictures/character/charaltform3.PNG", itemLoaded),
+    charaltform3b : loadImage("assets/pictures/character/charaltform3b.PNG", itemLoaded),
+    charcast1 : loadImage("assets/pictures/character/charcast1.PNG", itemLoaded),
+    charcast1b : loadImage("assets/pictures/character/charcast1b.PNG", itemLoaded),
+    chartcast2 : loadImage("assets/pictures/character/characst2.PNG", itemLoaded),
+    charcast2b : loadImage("assets/pictures/character/charcast2b.PNG", itemLoaded),
+    charcast3 : loadImage("assets/pictures/character/charcast3.PNG", itemLoaded),
+    charcast3b : loadImage("assets/pictures/character/charcast3b.PNG", itemLoaded),
+    chardash1 : loadImage("assets/pictures/character/chardash1.PNG", itemLoaded),
+    chardash1b : loadImage("assets/pictures/character/chardash1b.PNG", itemLoaded),
+    chardash2 : loadImage("assets/pictures/character/chardash2.PNG", itemLoaded),
+    chardash2b : loadImage("assets/pictures/character/chardash2b.PNG", itemLoaded),
+    charq1 : loadImage("assets/pictures/character/charq1.PNG", itemLoaded),
+    charq1b : loadImage("assets/pictures/character/charq1b.PNG", itemLoaded),
+    charq2 : loadImage("assets/pictures/character/charq2.PNG", itemLoaded),
+    charq2b : loadImage("assets/pictures/character/charq2b.PNG", itemLoaded),
+    charrun1 : loadImage("assets/pictures/character/charrun1.PNG", itemLoaded),
+    charrun1b : loadImage("assets/pictures/character/charrun1b.PNG", itemLoaded),
+    charrun2 : loadImage("assets/pictures/character/charrun2.PNG", itemLoaded),
+    charrun2b : loadImage("assets/pictures/character/charrun2b.PNG", itemLoaded),
+    charrun3 : loadImage("assets/pictures/character/charrun3.PNG", itemLoaded),
+    charrun3b : loadImage("assets/pictures/character/charrun3b.PNG", itemLoaded),
+    protectile1 : loadImage("assets/pictures/character/projectile1.PNG", itemLoaded),
+    projectile1b : loadImage("assets/pictures/character/projectile1b.PNG", itemLoaded),
+    projectile2 : loadImage("assets/pictures/character/projectile2.PNG", itemLoaded),
+    projectile2b : loadImage("assets/pictures/character/projectile2b.PNG", itemLoaded),
+    projectile3 : loadImage("assets/pictures/character/projectile3.PNG", itemLoaded),
+    projectile3b : loadImage("assets/pictures/character/projectile3b.PNG", itemLoaded),
+
   };
 
 }
@@ -790,7 +839,9 @@ function gameMode() {
 function characterPosition() {
 
   if (state === "game") {
-    image(images.character, charpos.x, charpos.y, width / 16, height / 8);
+
+    image(player.character1b, charpos.x, charpos.y, width / 16, height / 8);
+
   }
 
 }

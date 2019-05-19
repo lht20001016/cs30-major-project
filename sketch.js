@@ -54,6 +54,7 @@ let menumusic;
 let difficulty;
 let globalMouseToggle;
 let globalMouse;
+let openInGameShop;
 let stats;
 let price;
 let translatecount;
@@ -232,40 +233,40 @@ function loadItems() {
   items = {
 
     //item creation separated by categories
-    infinityEdge : new Item("Infinity Edge", width * 0.15, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/infinityEdge.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 1),
-    essenceReaver : new Item("Essence Reaver", width * 0.225, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/essenceReaver.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 2),
-    stormRazor : new Item("Storm Razor", width * 0.3, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/stormRazor.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 3),
-    starfireSpellblade : new Item("Starfire Spellbalde", width * 0.375, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/starfireSpellblade.jpg"),"assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 4),
-    lastWhisper : new Item("Last Whisper", width * 0.45, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/lastWhisper.png"),"assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 5),
-    frostMourne : new Item("Frost Mourne", width * 0.525, height * 0.10, width * 0.05, width * 0.05, loadImage("assets/pictures/items/frostMourne.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 6),
+    infinityEdge : new Item("Infinity Edge", width * 0.15, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/infinityEdge.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 1),
+    essenceReaver : new Item("Essence Reaver", width * 0.225, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/essenceReaver.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 2),
+    stormRazor : new Item("Storm Razor", width * 0.3, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/stormRazor.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 3),
+    starfireSpellblade : new Item("Starfire Spellbalde", width * 0.375, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/starfireSpellblade.jpg"),"assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 4),
+    lastWhisper : new Item("Last Whisper", width * 0.45, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/lastWhisper.png"),"assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 5),
+    frostMourne : new Item("Frost Mourne", width * 0.525, height * 0.05, width * 0.05, width * 0.05, loadImage("assets/pictures/items/frostMourne.png"), "assets/cursors/startgame.cur", [25, 104, 232], [93, 152, 247], 6),
 
-    rapidFirecannon : new Item("Rapid Firecannon", width * 0.15, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/rapidFirecannon.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 7),
-    thoridal : new Item("Thori'dal, Star's Fury", width * 0.225, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thoridal.jpg"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 8),
-    staticShiv : new Item("Statikk Shiv", width * 0.3, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/staticShiv.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 9),
-    runnansHurricane : new Item("Runnan's Hurricane", width * 0.375, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/runnansHurricane.png"),"assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 10),
-    phantomDancer : new Item("Phantom Dancer", width * 0.45, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/phantomDancer.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 11),
-    nashorsTooth : new Item("Nashor's Tooth", width * 0.525, height * 0.25, width * 0.05, width * 0.05, loadImage("assets/pictures/items/nashorsTooth.png"),"assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 12),
+    rapidFirecannon : new Item("Rapid Firecannon", width * 0.15, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/rapidFirecannon.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 7),
+    thoridal : new Item("Thori'dal, Star's Fury", width * 0.225, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thoridal.jpg"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 8),
+    staticShiv : new Item("Statikk Shiv", width * 0.3, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/staticShiv.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 9),
+    runnansHurricane : new Item("Runnan's Hurricane", width * 0.375, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/runnansHurricane.png"),"assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 10),
+    phantomDancer : new Item("Phantom Dancer", width * 0.45, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/phantomDancer.png"), "assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 11),
+    nashorsTooth : new Item("Nashor's Tooth", width * 0.525, height * 0.2, width * 0.05, width * 0.05, loadImage("assets/pictures/items/nashorsTooth.png"),"assets/cursors/startgame.cur", [221, 239, 57], [93, 152, 247], 12),
 
-    ludensEcho : new Item("Luden's Echo", width * 0.15, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/ludensEcho.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 13),
-    rabadonsDeathcap : new Item("Rabadon's Deathcap", width * 0.225, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/rabadonsDeathcap.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 14),
-    voidStaff : new Item("Void Staff", width * 0.3, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/voidStaff.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 15),
-    lichBane : new Item("Lich Bane", width * 0.375, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/lichBane.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 16),
-    liandrysTorment : new Item("Liandry's Torment", width * 0.45, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/liandrysTorment.png"),"assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 17),
-    hextechGunblade : new Item("Hextech Gunblade", width * 0.525, height * 0.4, width * 0.05, width * 0.05, loadImage("assets/pictures/items/hextechGunblade.png"),"assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 18),
+    ludensEcho : new Item("Luden's Echo", width * 0.15, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/ludensEcho.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 13),
+    rabadonsDeathcap : new Item("Rabadon's Deathcap", width * 0.225, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/rabadonsDeathcap.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 14),
+    voidStaff : new Item("Void Staff", width * 0.3, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/voidStaff.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 15),
+    lichBane : new Item("Lich Bane", width * 0.375, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/lichBane.png"), "assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 16),
+    liandrysTorment : new Item("Liandry's Torment", width * 0.45, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/liandrysTorment.png"),"assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 17),
+    hextechGunblade : new Item("Hextech Gunblade", width * 0.525, height * 0.35, width * 0.05, width * 0.05, loadImage("assets/pictures/items/hextechGunblade.png"),"assets/cursors/startgame.cur", [177, 30, 191], [93, 152, 247], 18),
 
-    deadmansPlate : new Item("Dead Man's Plate", width * 0.15, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/deadmansPlate.png"), "assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 19),
-    randuinsOmen : new Item("Randuin's Omen", width * 0.225, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/randuinsOmen.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 20),
-    thornMail : new Item("Thornmail", width * 0.3, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thornMail.png"), "assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 21),
-    sunfireCape : new Item("Sunfire Cape", width * 0.375, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/sunfireCape.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 22),
-    zhonyasHourglass : new Item("Zhonya's Hourglass", width * 0.45, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/zhonyasHourglass.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 23),
-    thunderFury : new Item("Thunderfury", width * 0.525, height * 0.55, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thunderFury.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 24),
+    deadmansPlate : new Item("Dead Man's Plate", width * 0.15, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/deadmansPlate.png"), "assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 19),
+    randuinsOmen : new Item("Randuin's Omen", width * 0.225, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/randuinsOmen.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 20),
+    thornMail : new Item("Thornmail", width * 0.3, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thornMail.png"), "assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 21),
+    sunfireCape : new Item("Sunfire Cape", width * 0.375, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/sunfireCape.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 22),
+    zhonyasHourglass : new Item("Zhonya's Hourglass", width * 0.45, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/zhonyasHourglass.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 23),
+    thunderFury : new Item("Thunderfury", width * 0.525, height * 0.5, width * 0.05, width * 0.05, loadImage("assets/pictures/items/thunderFury.png"),"assets/cursors/startgame.cur", [214, 80, 23], [93, 152, 247], 24),
 
-    abyssalMask : new Item("Abyssal Mask", width * 0.15, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/abyssalMask.png"),"assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 25),
-    spiritVisage : new Item("Spirit Visage", width * 0.225, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/spiritVisage.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 26),
-    adaptiveHelm : new Item("Adaptive Helm", width * 0.3, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/adaptiveHelm.png"),"assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 27),
-    bansheesVeil : new Item("Banshee's Veil", width * 0.375, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/bansheesVeil.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 28),
-    hexDrinker : new Item("Hex Drinker", width * 0.45, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/hexDrinker.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 29),
-    trinityForce : new Item("Trinity Force", width * 0.525, height * 0.7, width * 0.05, width * 0.05, loadImage("assets/pictures/items/trinityForce.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 30),
+    abyssalMask : new Item("Abyssal Mask", width * 0.15, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/abyssalMask.png"),"assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 25),
+    spiritVisage : new Item("Spirit Visage", width * 0.225, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/spiritVisage.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 26),
+    adaptiveHelm : new Item("Adaptive Helm", width * 0.3, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/adaptiveHelm.png"),"assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 27),
+    bansheesVeil : new Item("Banshee's Veil", width * 0.375, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/bansheesVeil.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 28),
+    hexDrinker : new Item("Hex Drinker", width * 0.45, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/hexDrinker.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 29),
+    trinityForce : new Item("Trinity Force", width * 0.525, height * 0.65, width * 0.05, width * 0.05, loadImage("assets/pictures/items/trinityForce.png"), "assets/cursors/startgame.cur", [94, 44, 135], [93, 152, 247], 30),
 
   };
 
@@ -549,6 +550,7 @@ function createButtons() {
     shopToMenu, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
   gameoverToMenuButton = new Button(width * 0.15, height * 0.85, width * 0.7, height * 0.1, "Return To Menu", 36, 0, 
     gmToMenu, [0, 255, 255], [0, 77, 255], "assets/cursors/gotomenu.cur");
+  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], openInGameShopMenu, [36, 78, 125], [26, 86, 206], "assets/cursors/shop.cur");
 
 }
 
@@ -584,6 +586,27 @@ function gmToMenu() {
   if (volumeControl) {
     sound.startgame.play();
   }
+}
+
+function openInGameShopMenu() {
+
+  shopSubstate = !shopSubstate;
+  if (!shopSubstate) {
+    currentItem = 0;
+    if (volumeControl) {
+      sound.closestore.setVolume(0.1);
+      sound.closestore.play();
+    }
+  }
+  else if (shopSubstate && volumeControl) {
+    sound.openstore.setVolume(0.1);
+    sound.openstore.play();
+  }
+  destinationpos = {
+    x : charpos.x,
+    y : charpos.y,
+  };
+
 }
 
 //assign initial values and default stats to variables
@@ -1235,7 +1258,7 @@ function gold() {
 
   //gold
   fill(36, 78, 145);
-  rect(width * 0.603, height * 0.9675, width * 0.099, height * 0.025);
+  openInGameShop.run();
   image(images.gold, width * 0.625, height * 0.97, width * 0.016, height * 0.02);
   textSize(width / 120);
   stroke(206, 2552, 0);
@@ -1365,7 +1388,7 @@ function inGameShopDisplay() {
   if (shopSubstate && state === "game") {
 
     fill(154, 191, 167);
-    rect(width * 0.13, height * 0.08, width * 0.7, height * 0.8);
+    rect(width * 0.13, height * 0.02, width * 0.7, height * 0.8);
 
     for (let y = 0; y < 6; y++) {
       for (let x = 0; x < 5; x++) {
@@ -1376,7 +1399,7 @@ function inGameShopDisplay() {
     textSize(64);
     fill(111, 242, 24);
     stroke(15, 66, 32);
-    text("shop", width * 0.7, height * 0.13);
+    text("shop", width * 0.7, height * 0.06);
 
   } 
 }
@@ -1398,7 +1421,7 @@ function itemDetails() {
 
   //Display the item information when selected
   if (currentItem !== 0 && shopSubstate) {
-    purchaseButton = new Button(width * 0.6, height * 0.8, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
+    purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
       purchaseItem, [11, 232, 176], [45, 142, 118], "assets/cursors/shop.cur");
     image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
     purchaseButton.run();
@@ -2175,7 +2198,6 @@ function keyTyped() {
         sound.openstore.setVolume(0.1);
         sound.openstore.play();
       }
-
     }
 
     if (key === "c" && state === "game") {

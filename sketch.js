@@ -106,9 +106,9 @@ function draw() {
   countCooldown();
   createBullet();
   moveBullet();
-  characterStatus();
   inGameShopDisplay();
   itemDetails();
+  characterStatus();
   gameOverYet();
 
 }
@@ -118,7 +118,7 @@ function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
   volumeControl = true;
-  files = 79;
+  files = 88;
 
 }
 
@@ -144,7 +144,6 @@ function loadFiles() {
   };
 
   images = {
-    character : loadImage("assets/pictures/character.PNG", itemLoaded),
     tower : loadImage("assets/pictures/tower.png", itemLoaded),
     flash : loadImage("assets/pictures/flash.jpg", itemLoaded),
     barrier : loadImage("assets/pictures/barrier.jpg", itemLoaded),
@@ -190,7 +189,7 @@ function loadFiles() {
     charaltform3b : loadImage("assets/pictures/character/charaltform3b.PNG", itemLoaded),
     charcast1 : loadImage("assets/pictures/character/charcast1.PNG", itemLoaded),
     charcast1b : loadImage("assets/pictures/character/charcast1b.PNG", itemLoaded),
-    chartcast2 : loadImage("assets/pictures/character/characst2.PNG", itemLoaded),
+    chartcast2 : loadImage("assets/pictures/character/charcast2.PNG", itemLoaded),
     charcast2b : loadImage("assets/pictures/character/charcast2b.PNG", itemLoaded),
     charcast3 : loadImage("assets/pictures/character/charcast3.PNG", itemLoaded),
     charcast3b : loadImage("assets/pictures/character/charcast3b.PNG", itemLoaded),
@@ -214,6 +213,14 @@ function loadFiles() {
     projectile2b : loadImage("assets/pictures/character/projectile2b.PNG", itemLoaded),
     projectile3 : loadImage("assets/pictures/character/projectile3.PNG", itemLoaded),
     projectile3b : loadImage("assets/pictures/character/projectile3b.PNG", itemLoaded),
+    qicon : loadImage("assets/pictures/character/qicon.png", itemLoaded),
+    rqicon : loadImage("assets/pictures/character/rqicon.png", itemLoaded),
+    wicon : loadImage("assets/pictures/character/wicon.png", itemLoaded),
+    rwicon : loadImage("assets/pictures/character/rwicon.jpg", itemLoaded),
+    eicon : loadImage("assets/pictures/character/eicon.png", itemLoaded),
+    reicon : loadImage("assets/pictures/character/reicon.png", itemLoaded),
+    ricon : loadImage("assets/pictures/character/ricon.jpg", itemLoaded),
+    overlay : loadImage("assets/pictures/character/overlay.png", itemLoaded),
 
   };
 
@@ -840,7 +847,7 @@ function characterPosition() {
 
   if (state === "game") {
 
-    image(player.character1b, charpos.x, charpos.y, width / 16, height / 8);
+    image(player.character3b, charpos.x, charpos.y, width / 16, height / 8);
 
   }
 
@@ -1060,6 +1067,8 @@ function characterStatus() {
       stats.health += stats.hpregen;
     }
 
+    levelUp();
+
     //failsafe of stats
     if (stats.mana <= 0) {
       stats.mana = 0;
@@ -1071,6 +1080,10 @@ function characterStatus() {
     if (stats.health >= stats.maxhp) {
       stats.health = stats.maxhp;
     }
+    
+    // image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
+
+    blankbars();
 
     healthbar();
 
@@ -1078,145 +1091,22 @@ function characterStatus() {
 
     expbar();
 
-    lvlandgold();
+    gold();
 
     itemDisplay();
 
     statsMenu();
 
+    image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
+
+    iteminfodisplay();
+
   }
 
 }
 
-//hp bar
-function healthbar(){
-
-  stroke(0);
-  strokeWeight(2.5);
+function levelUp() {
   
-  if (stats.health / stats.maxhp >= 0.6) {
-    fill(13, 91, 2);
-  }
-  else if (stats.health / stats.maxhp >= 0.3) {
-    fill(73, 63, 2);
-  }
-  else {
-    fill(112, 16, 16);
-  }
-  beginShape();
-  vertex(0, height * 0.95);
-  vertex(width * 0.27, height * 0.95);
-  vertex(width * 0.3, height);
-  vertex(0, height);
-  endShape();
-
-  if (stats.health / stats.maxhp >= 0.6) {
-    fill(3, 186, 28);
-  }
-  else if (stats.health / stats.maxhp >= 0.3) {
-    fill(219, 186, 2);
-  }
-  else {
-    fill(219, 49, 2);
-  }
-  noStroke();
-  beginShape();
-  vertex(0, height * 0.95);
-  vertex(width * 0.27 * (stats.health / stats.maxhp), height * 0.95);
-  vertex(width * 0.27 * (stats.health / stats.maxhp) + width * 0.03, height);
-  vertex(0, height);
-  endShape();
-  strokeWeight(1);
-  stroke(255);
-  fill(0);
-  text(floor(stats.health), width * 0.11, height * 0.975);
-  text("/", width * 0.15, height * 0.975);
-  text(stats.maxhp, width * 0.2, height * 0.975);
-
-}
-
-//mana bar
-function manabar() {
-
-  stroke(0);
-  strokeWeight(2.5);
-  fill(5, 26, 104);
-  beginShape();
-  vertex(0, height * 0.93);
-  vertex(width * 0.18, height * 0.93);
-  vertex(width * 0.2, height * 0.95);
-  vertex(0, height * 0.95);
-  endShape();
-
-  fill(2, 36, 209);
-  noStroke();
-  beginShape();
-  vertex(0, height * 0.93);
-  vertex(width * 0.18 * (stats.mana / stats.maxmana), height * 0.93);
-  if (stats.mana !== 0) {
-    vertex(width * 0.18 * (stats.mana / stats.maxmana) + width * 0.02, height * 0.95);
-  }
-  else {
-    vertex(0, height * 0.95);
-  }
-  vertex(0, height * 0.95);
-  endShape();
-
-  strokeWeight(1);
-  stroke(255);
-  fill(0);
-  textSize(18);
-  text(floor(stats.mana), width * 0.05, height * 0.94);
-  text("/", width * 0.1, height * 0.94);
-  text(stats.maxmana, width * 0.13, height * 0.94);
-
-}
-
-//experience bar
-function expbar() {
-
-  stroke(0);
-  strokeWeight(2.5);
-  noFill();
-  beginShape();
-  vertex(0, height * 0.915);
-  vertex(width * 0.13, height * 0.915);
-  vertex(width * 0.15, height * 0.93);
-  vertex(0, height * 0.93);
-  endShape();
-  
-  fill(0, 255, 140);
-  noStroke();
-  beginShape();
-  vertex(0, height * 0.915);
-  vertex(width * 0.13 * (stats.xp / stats.lvlupxp), height * 0.915);
-  if (stats.xp !== 0) {
-    vertex(width * 0.13 * (stats.xp / stats.lvlupxp) + width * 0.02, height * 0.93);
-  }
-  else {
-    vertex(0, height * 0.93);
-  }
-  vertex(0, height * 0.93);
-  endShape();
-
-}
-
-//level and gold indicators and level up growth stats
-function lvlandgold() {
-
-  //gold
-  fill(255, 255, 0);
-  image(images.gold, width * 0.05, height * 0.88, height * 0.03, height * 0.03);
-  text(stats.gold, width * 0.085, height * 0.895);
-  if (!shopSubstate && frameCount % 60 === 0) {
-    stats.gold += 5;
-  }
-
-  //level up
-  fill(255);
-  textSize(26);
-  text("Lvl. " + stats.lvl, width * 0.0225, height * 0.8975);
-
   if (stats.xp >= stats.lvlupxp) {
     stats.xp -= stats.lvlupxp;
     stats.lvlupxp += 50;
@@ -1238,30 +1128,175 @@ function lvlandgold() {
 
 }
 
+function blankbars() {
+
+  noStroke();
+  fill(51, 61, 79);
+
+  for (let i = 0; i < 3; i++) {
+    rect(width * 0.60248 + i * width * 0.026, height * 0.88, width * 0.025, height * 0.04145);
+  }
+
+  for (let k = 3; k < 6; k++) {
+    rect(width * 0.60248 + (k - 3) * width * 0.026, height * 0.922, width * 0.025, height * 0.04145);
+  }
+
+}
+
+//hp bar
+function healthbar(){
+
+  stroke(0);
+  strokeWeight(2.5);
+  
+  if (stats.health / stats.maxhp >= 0.6) {
+    fill(13, 91, 2);
+  }
+  else if (stats.health / stats.maxhp >= 0.3) {
+    fill(73, 63, 2);
+  }
+  else {
+    fill(112, 16, 16);
+  }
+  rect(width * 0.349, height * 0.96, width * 0.236, height * 0.015);
+
+  if (stats.health / stats.maxhp >= 0.6) {
+    fill(3, 186, 28);
+  }
+  else if (stats.health / stats.maxhp >= 0.3) {
+    fill(219, 186, 2);
+  }
+  else {
+    fill(219, 49, 2);
+  }
+  noStroke();
+  rect(width * 0.349, height * 0.96, width * 0.236 * (stats.health / stats.maxhp), height * 0.015);
+  strokeWeight(1);
+  stroke(255);
+  fill(0);
+  textSize(width / 120);
+  text(floor(stats.health) + " / " + stats.maxhp, width * 0.465, height * 0.969);
+
+}
+
+//mana bar
+function manabar() {
+
+  stroke(0);
+  strokeWeight(2.5);
+  fill(5, 26, 104);
+  rect(width * 0.349, height * 0.975, width * 0.236, height * 0.015);
+
+  fill(2, 36, 209);
+  noStroke();
+  rect(width * 0.349, height * 0.975, width * 0.236 * (stats.mana / stats.maxmana), height * 0.015);
+
+  strokeWeight(1);
+  stroke(255);
+  fill(0);
+  textSize(width / 120);
+  text(floor(stats.mana) + " / " + stats.maxmana, width * 0.465, height * 0.989);
+
+}
+
+//experience bar
+function expbar() {
+
+  // stroke(0);
+  // strokeWeight(2.5);
+  // noFill();
+  // beginShape();
+  // vertex(0, height * 0.915);
+  // vertex(width * 0.13, height * 0.915);
+  // vertex(width * 0.15, height * 0.93);
+  // vertex(0, height * 0.93);
+  // endShape();
+  
+  // fill(0, 255, 140);
+  // noStroke();
+  // beginShape();
+  // vertex(0, height * 0.915);
+  // vertex(width * 0.13 * (stats.xp / stats.lvlupxp), height * 0.915);
+  // if (stats.xp !== 0) {
+  //   vertex(width * 0.13 * (stats.xp / stats.lvlupxp) + width * 0.02, height * 0.93);
+  // }
+  // else {
+  //   vertex(0, height * 0.93);
+  // }
+  // vertex(0, height * 0.93);
+  // endShape();
+
+  void 0;
+
+}
+
+//level and gold indicators and level up growth stats
+function gold() {
+
+  //gold
+  fill(36, 78, 145);
+  rect(width * 0.603, height * 0.9675, width * 0.099, height * 0.025);
+  image(images.gold, width * 0.625, height * 0.97, width * 0.016, height * 0.02);
+  textSize(width / 120);
+  stroke(206, 2552, 0);
+  fill(0);
+  text(stats.gold, width * 0.66, height * 0.98);
+  if (!shopSubstate && frameCount % 60 === 0) {
+    stats.gold += 5;
+  }
+
+}
+
 //display of items after purchase
 function itemDisplay() {
-  
-  //item display, separate loops are for text priority over icons
-  for (let itemcount = 0; itemcount < inventory.length; itemcount++) {
-    image(inventory[itemcount].icon, width * 0.32 + itemcount * width * 0.04, height * 0.95, height * 0.05, height * 0.05);
+
+  for (let itemcount = 0; itemcount < inventory.length && itemcount < 3; itemcount++) {
+    image(inventory[itemcount].icon, width * 0.60248 + itemcount * width * 0.026, height * 0.88, width * 0.025, height * 0.04145);
   }
-  
-  for (let itemcount = 0; itemcount < inventory.length; itemcount++) {
-    if (mouseX >= width * 0.32 + itemcount * width * 0.04 && mouseX <= width * 0.32 + itemcount * width * 0.04 + height * 0.05 && mouseY >= height * 0.95 && mouseY <= height) {
+
+  for (let itemcount = 3; itemcount < inventory.length && itemcount < 6; itemcount++) {
+    image(inventory[itemcount].icon, width * 0.60248 + (itemcount - 3) * width * 0.026, height * 0.922, width * 0.025, height * 0.04145);
+  }
+
+}
+
+function iteminfodisplay() {
+
+  for (let itemcount = 0; itemcount < inventory.length && itemcount < 3; itemcount++) {
+    if (mouseX >= width * 0.60248 + itemcount * width * 0.026 && mouseX <= width * 0.60248 + itemcount * width * 0.026 + height * 0.0415 && mouseY >= height * 0.88 && mouseY <= height * 0.92145) {
       fill(0, 0, 0, 75);
       noStroke();
-      rect(mouseX - width * 0.02, mouseY - height * 0.17, width * 0.15, height * 0.17, 25);
+      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.17, 25);
       fill(255);
-      textSize(18);
+      textSize(width / 100);
       currentItem = inventory[itemcount].itemID;
-      text(inventory[itemcount].name, mouseX + width * 0.05, mouseY - height * 0.14);
-      textSize(12);
-      text(texts.effect1, mouseX + width * 0.055, mouseY - height * 0.12);
-      text(texts.effect2, mouseX + width * 0.055, mouseY - height * 0.10);
-      text(texts.effect3, mouseX + width * 0.055, mouseY - height * 0.08);
-      text(texts.effect4, mouseX + width * 0.055, mouseY - height * 0.06);
-      text(texts.effect5, mouseX + width * 0.055, mouseY - height * 0.04);
-      text(texts.effect6, mouseX + width * 0.055, mouseY - height * 0.02);
+      text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
+      textSize(width / 120);
+      text(texts.effect1, mouseX, mouseY - height * 0.12);
+      text(texts.effect2, mouseX, mouseY - height * 0.10);
+      text(texts.effect3, mouseX, mouseY - height * 0.08);
+      text(texts.effect4, mouseX, mouseY - height * 0.06);
+      text(texts.effect5, mouseX, mouseY - height * 0.04);
+      text(texts.effect6, mouseX, mouseY - height * 0.02);
+    }
+  }
+
+  for (let itemcount = 3; itemcount < inventory.length && itemcount < 6; itemcount++) {
+    if (mouseX >= width * 0.60248 + (itemcount - 3) * width * 0.026 && mouseX <= width * 0.60228 + (itemcount - 3) * width * 0.026 + height * 0.0415 && mouseY >= height * 0.922 && mouseY <= height * 0.96345) {
+      fill(0, 0, 0, 75);
+      noStroke();
+      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.17, 25);
+      fill(255);
+      textSize(width / 100);
+      currentItem = inventory[itemcount].itemID;
+      text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
+      textSize(width / 120);
+      text(texts.effect1, mouseX, mouseY - height * 0.12);
+      text(texts.effect2, mouseX, mouseY - height * 0.10);
+      text(texts.effect3, mouseX, mouseY - height * 0.08);
+      text(texts.effect4, mouseX, mouseY - height * 0.06);
+      text(texts.effect5, mouseX, mouseY - height * 0.04);
+      text(texts.effect6, mouseX, mouseY - height * 0.02);
     }
   }
 

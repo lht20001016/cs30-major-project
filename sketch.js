@@ -119,7 +119,7 @@ function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
   volumeControl = true;
-  files = 88;
+  files = 89;
 
 }
 
@@ -167,6 +167,7 @@ function loadFiles() {
     enemyCannon : loadImage("assets/pictures/enemyCannon.png", itemLoaded),
     friendlyMinion : loadImage("assets/pictures/friendlyMinion.png", itemLoaded),
     enemyMinion : loadImage("assets/pictures/enemyMinion.png", itemLoaded),
+    titlepic : loadImage("assets/pictures/gamename.png", itemLoaded),
   };
 
   player = {
@@ -389,6 +390,10 @@ class Item extends GameObject {
     }
     else {
       stroke(this.borderColor);
+    }
+
+    if (mouseX >= this.x && mouseY >= this.y && mouseX <= this.x + this.width && mouseY <= this.y + this.height) {
+      cursor("assets/cursors/gotomenu.cur");
     }
 
     rect(this.x, this.y, this.width, this.height);
@@ -706,12 +711,7 @@ function showMenus() {
 
     textAlign(CENTER, CENTER);
     rectMode(CORNER);
-    textSize(36);
-    stroke(50, 0, 255);
-    fill(0, 255, 255);
-    text("Let The Bullets Fly", width / 2, height / 8);
-    textSize(24);
-    text("The objective of this game is to avoid the incoming bullets at all costs. Good Luck!", width / 2, height / 5);
+    image(images.titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
     
     stroke(0, 0, 255);
     noFill();

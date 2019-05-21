@@ -171,8 +171,8 @@ function loadFiles() {
   };
 
   player = {
-    avatar1 : loadImage("assets/pictures/character/avatar1.PNG", itemLoaded),
-    avatar2 : loadImage("assets/pictures/character/avatar2.PNG", itemLoaded),
+    avatar1 : loadImage("assets/pictures/character/charfacecrop1.gif", itemLoaded),
+    avatar2 : loadImage("assets/pictures/character/charfacecrop2.gif", itemLoaded),
     charaa1 : loadImage("assets/pictures/character/charaa1.PNG", itemLoaded),
     charaa1b : loadImage("assets/pictures/character/charaa1b.PNG", itemLoaded),
     charaa2 : loadImage("assets/pictures/character/Charaa2.PNG", itemLoaded),
@@ -870,7 +870,15 @@ function characterPosition() {
 
   if (state === "game") {
 
-    image(player.character3b, charpos.x, charpos.y, width / 16, height / 8);
+    if (stats.lvl < 6) {
+      image(player.character1b, charpos.x, charpos.y, width / 16, height / 8);
+    }
+    else if (stats.lvl >= 6 && stats.lvl < 12) {
+      image(player.character2b, charpos.x, charpos.y, width / 16, height / 8);
+    }
+    else if (stats.lvl >= 12) {
+      image(player.character3b, charpos.x, charpos.y, width / 16, height / 8);
+    }
 
   }
 
@@ -1114,6 +1122,8 @@ function characterStatus() {
 
     expbar();
 
+    charpic();
+
     gold();
 
     itemDisplay();
@@ -1130,7 +1140,7 @@ function characterStatus() {
 
 function levelUp() {
   
-  if (stats.xp >= stats.lvlupxp) {
+  if (stats.xp >= stats.lvlupxp && stats.lvl <= 17) {
     stats.xp -= stats.lvlupxp;
     stats.lvlupxp += 50;
     stats.lvl += 1;
@@ -1163,6 +1173,9 @@ function blankbars() {
   for (let k = 3; k < 6; k++) {
     rect(width * 0.60248 + (k - 3) * width * 0.026, height * 0.922, width * 0.025, height * 0.04145);
   }
+
+  noStroke();
+  rect(width * 0.315, height * 0.875, width * 0.03, height * 0.1);
 
 }
 
@@ -1225,31 +1238,23 @@ function manabar() {
 //experience bar
 function expbar() {
 
-  // stroke(0);
-  // strokeWeight(2.5);
-  // noFill();
-  // beginShape();
-  // vertex(0, height * 0.915);
-  // vertex(width * 0.13, height * 0.915);
-  // vertex(width * 0.15, height * 0.93);
-  // vertex(0, height * 0.93);
-  // endShape();
-  
-  // fill(0, 255, 140);
-  // noStroke();
-  // beginShape();
-  // vertex(0, height * 0.915);
-  // vertex(width * 0.13 * (stats.xp / stats.lvlupxp), height * 0.915);
-  // if (stats.xp !== 0) {
-  //   vertex(width * 0.13 * (stats.xp / stats.lvlupxp) + width * 0.02, height * 0.93);
-  // }
-  // else {
-  //   vertex(0, height * 0.93);
-  // }
-  // vertex(0, height * 0.93);
-  // endShape();
+  fill(153, 15, 221);
+  noStroke();
+  rectMode(CORNERS);
+  rect(width * 0.315, height * 0.975, width * 0.345, height * 0.975 - height * 0.1 * (stats.xp / stats.lvlupxp));
+  rectMode(CORNER);
 
-  void 0;
+}
+
+function charpic() {
+  
+
+  if (stats.lvl < 6) {
+    image(player.avatar1, width * 0.27, height * 0.88, width * 0.065, height * 0.1);
+  }
+  else {
+    image(player.avatar2, width * 0.27, height * 0.88, width * 0.065, height * 0.1);
+  }
 
 }
 
@@ -1399,7 +1404,7 @@ function inGameShopDisplay() {
     textSize(64);
     fill(111, 242, 24);
     stroke(15, 66, 32);
-    text("shop", width * 0.7, height * 0.06);
+    text("Shop", width * 0.7, height * 0.08);
 
   } 
 }

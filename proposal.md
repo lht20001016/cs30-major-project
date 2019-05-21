@@ -8,6 +8,8 @@ The goal for this Major Project is to create a 2-D fighting game featuring a div
 
 [Source of inspiration for some characters and their respective backstories](https://play.na.leagueoflegends.com/en_PL)
 
+[Play The Game Here](https://lht20001016.github.io/cs30-major-project/)
+
 
 ## Need to Have List
 

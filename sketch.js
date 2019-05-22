@@ -58,6 +58,7 @@ let openInGameShop;
 let stats;
 let price;
 let translatecount;
+let rmode;
 let texts;
 let images;
 let sound;
@@ -119,7 +120,7 @@ function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
   volumeControl = true;
-  files = 89;
+  files = 90;
 
 }
 
@@ -223,6 +224,7 @@ function loadFiles() {
     reicon : loadImage("assets/pictures/character/reicon.png", itemLoaded),
     ricon : loadImage("assets/pictures/character/ricon.jpg", itemLoaded),
     overlay : loadImage("assets/pictures/character/overlay.png", itemLoaded),
+    statsicon : loadImage("assets/pictures/character/statsicon.gif", itemLoaded),
 
   };
 
@@ -623,6 +625,7 @@ function loadData() {
   translatecount = 0;
   tstatus = false;
   loadCount = 0;
+  rmode = false;
   statsToggle = false;
   stats = {
     health : 500,
@@ -1130,7 +1133,11 @@ function characterStatus() {
 
     statsMenu();
 
+    abilityicons();
+
     image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
+
+    levelDisplay();
 
     iteminfodisplay();
 
@@ -1275,6 +1282,18 @@ function gold() {
 
 }
 
+function levelDisplay() {
+
+  noStroke();
+  fill(0);
+  ellipse(width * 0.3215, height * 0.975, width * 0.0165, height * 0.0275);
+  stroke(255);
+  fill(50, 231, 255);
+  text(stats.lvl, width * 0.32125, height * 0.975);
+  image(player.statsicon, width * 0.275, height * 0.96, width * 0.0168, height * 0.028);
+
+}
+
 //display of items after purchase
 function itemDisplay() {
 
@@ -1386,6 +1405,35 @@ function statsMenu() {
   text(stats.cdr, width * -0.04, height * 0.575);
   
   pop();
+}
+
+function abilityicons() {
+
+  let qability;
+  let wability;
+  let eability;
+  let rability;
+
+  if (!rmode) {
+    qability = player.qicon;
+    wability = player.wicon;
+    eability = player.eicon;
+  }
+
+  else if (rmode) {
+    qability = player.rqicon;
+    wability = player.rwicon;
+    eability = player.reicon;
+  }
+
+  rability= player.ricon;
+
+  image(qability, width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
+  image(wability, width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
+  image(eability, width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
+  image(rability, width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
+  
+
 }
 
 //function that runs the items previously loaded
@@ -1951,6 +1999,7 @@ function resetGame() {
   translatecount = 0;
   tstatus = false;
   statsToggle = false;
+  rmode = false;
   stats = {
     health : 500,
     maxhp : 500,
@@ -2033,6 +2082,18 @@ function mousePressed() {
       sound.click.setVolume(0.1);
       sound.click.play();
     }
+  }
+
+  if (state === "game") {
+
+    if (mouseX >= width * 0.275 && mouseX <= width * 0.291 && mouseY >= height * 0.96 && mouseY <= height * 0.987) {
+      statsToggle = ! statsToggle;
+      destinationpos = {
+        x : charpos.x,
+        y : charpos.y,
+      };
+    }
+
   }
 
   //Sound Control

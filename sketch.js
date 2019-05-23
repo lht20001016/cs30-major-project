@@ -35,6 +35,7 @@ let purchaseButton;
 let files;
 let state;
 let currentItem;
+let currentSummoner;
 let tstatus;
 let inGameShop;
 let statsToggle;
@@ -49,6 +50,7 @@ let soundOn;
 let soundOff;
 let player;
 let bg;
+let summoners;
 let icon;
 let menumusic;
 let difficulty;
@@ -84,6 +86,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   loadData();
   loadItems();
+  loadSummoners();
   loadFiles(createButtons());
 
 }
@@ -281,6 +284,20 @@ function loadItems() {
     [items.abyssalMask, items.spiritVisage, items.adaptiveHelm, items.bansheesVeil, items.hexDrinker, items.trinityForce]];
 
 }  
+
+function loadSummoners() {
+
+  summoners = {
+
+    ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, images.ignite,"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
+    exhaust : new Summoners (width * 0.6, height * 0.1, width * 0.1, height * 0.2, images.exhaust, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
+    heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, images.heal, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
+    barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, images.barrier, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
+    flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, images. flash, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
+
+  };
+
+}
   
 //Superclass that encompasses the basic coordinates
 class GameObject {
@@ -384,7 +401,6 @@ class Item extends GameObject {
     strokeWeight(7.5);
 
     if(this.itemID === currentItem) {
-      // stroke(64, 76, 55);
       stroke(0, 255, 255);
     }
     else if (this.mouse) {
@@ -546,6 +562,53 @@ class Creep extends GameObject {
 
   }
 
+}
+
+class Summoners extends GameObject {
+  constructor(x, y, width, height, picture, hoverCursor, borderColor, hoverBorderColor, summonerID) {
+    super(x, y, width, height);
+    this.icon = picture;
+    this.hoverCursor = hoverCursor;
+    this.borderColor = borderColor;
+    this.hoverBorderColor = hoverBorderColor;
+    this.summonerID = summonerID;
+  }
+
+  //Function used to call when displaying the shop/all the items
+  run() {
+    this.checkMouse(); 
+
+    noFill();
+    strokeWeight(7.5);
+
+    if(this.itemID === currentItem) {
+      stroke(0, 255, 255);
+    }
+    else if (this.mouse) {
+      stroke(this.hoverBorderColor);
+    }
+    else {
+      stroke(this.borderColor);
+    }
+
+    if (mouseX >= this.x && mouseY >= this.y && mouseX <= this.x + this.width && mouseY <= this.y + this.height) {
+      cursor("assets/cursors/gotomenu.cur");
+    }
+
+    rect(this.x, this.y, this.width, this.height);
+
+    image(this.icon, this.x, this.y, this.width, this.height);
+
+    if(this.mouse && mouseIsPressed && !globalMouse) {
+      globalMouseToggle = 1;
+      currentSummoner = this.summonerID;
+      if (volumeControl) {
+        sound.clickItem.setVolume(0.1);
+        sound.clickItem.play();
+      }
+    }
+
+  }
 }
 
 //function called when all the loading is done, initializing buttons
@@ -2318,5 +2381,6 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   createButtons();
   loadItems();
+  loadSummoners();
 
 }

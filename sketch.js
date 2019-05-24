@@ -41,6 +41,7 @@ let inGameShop;
 let statsToggle;
 let shopSubstate;
 let volumeControl;
+let titlepic;
 let charpos;
 let velocity;
 let destinationpos;
@@ -122,8 +123,9 @@ function draw() {
 function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
+  titlepic = loadImage("assets/pictures/gamename.png", itemLoaded);
   volumeControl = true;
-  files = 90;
+  files = 89;
 
 }
 
@@ -171,7 +173,6 @@ function loadFiles() {
     enemyCannon : loadImage("assets/pictures/enemyCannon.png", itemLoaded),
     friendlyMinion : loadImage("assets/pictures/friendlyMinion.png", itemLoaded),
     enemyMinion : loadImage("assets/pictures/enemyMinion.png", itemLoaded),
-    titlepic : loadImage("assets/pictures/gamename.png", itemLoaded),
   };
 
   player = {
@@ -289,11 +290,11 @@ function loadSummoners() {
 
   summoners = {
 
-    ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, images.ignite,"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
-    exhaust : new Summoners (width * 0.6, height * 0.1, width * 0.1, height * 0.2, images.exhaust, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
-    heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, images.heal, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
-    barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, images.barrier, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
-    flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, images. flash, "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
+    ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/ignite.png"),"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
+    exhaust : new Summoners (width * 0.6, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/exhaust.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
+    heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/heal.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
+    barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/barrier.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
+    flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/flash.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
 
   };
 
@@ -636,6 +637,7 @@ function openShop() {
 //button function that closes the shop
 function shopToMenu() {
   state = "menu";
+  currentSummoner = 0;
   if (volumeControl) {
     sound.closestore.setVolume(0.05);
     sound.closestore.play();
@@ -685,6 +687,7 @@ function loadData() {
   state = "menu";
   shopSubstate = false;
   currentItem = 0;
+  currentSummoner = 0;
   translatecount = 0;
   tstatus = false;
   loadCount = 0;
@@ -777,7 +780,7 @@ function showMenus() {
 
     textAlign(CENTER, CENTER);
     rectMode(CORNER);
-    image(images.titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
+    image(titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
     
     stroke(0, 0, 255);
     noFill();
@@ -819,67 +822,73 @@ function showShop() {
 
     shopToMenuButton.run();
 
-    noFill();
-    strokeWeight(10);
-    if (mouseX >= width * 0.1 && mouseX <= width * 0.2 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      cursor("assets/cursors/shop.cur");
-    }
-    if (icon.flash) {
-      stroke(0, 255, 255);
-    }
-    else {
-      stroke(53, 0, 96);
-    }
-    rect(width * 0.1, height * 0.1, width * 0.1, height * 0.2);
-    image(images.flash, width * 0.1, height * 0.1, width * 0.1, height * 0.2);
+    summoners.ignite.run();
+    summoners.heal.run();
+    summoners.exhaust.run();
+    summoners.barrier.run();
+    summoners.flash.run();
 
-    if (mouseX >= width * 0.225 && mouseX <= width * 0.325 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      cursor("assets/cursors/shop.cur");
-    }
-    if (icon.heal) {
-      stroke(0, 255, 255);
-    }
-    else {
-      stroke(53, 0, 96);
-    }
-    rect(width * 0.225, height * 0.1, width * 0.1, height * 0.2);
-    image(images.heal, width * 0.225, height * 0.1, width * 0.1, height * 0.2);
+    // noFill();
+    // strokeWeight(10);
+    // if (mouseX >= width * 0.1 && mouseX <= width * 0.2 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
+    //   cursor("assets/cursors/shop.cur");
+    // }
+    // if (icon.flash) {
+    //   stroke(0, 255, 255);
+    // }
+    // else {
+    //   stroke(53, 0, 96);
+    // }
+    // rect(width * 0.1, height * 0.1, width * 0.1, height * 0.2);
+    // image(images.flash, width * 0.1, height * 0.1, width * 0.1, height * 0.2);
 
-    if (mouseX >= width * 0.35 && mouseX <= width * 0.45 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      cursor("assets/cursors/shop.cur");
-    }
-    if (icon.barrier) {
-      stroke(0, 255, 255);
-    }
-    else {
-      stroke(53, 0, 96);
-    }
-    rect(width * 0.35, height * 0.1, width * 0.1, height * 0.2);
-    image(images.barrier, width * 0.35, height * 0.1, width * 0.1, height * 0.2);
+    // if (mouseX >= width * 0.225 && mouseX <= width * 0.325 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
+    //   cursor("assets/cursors/shop.cur");
+    // }
+    // if (icon.heal) {
+    //   stroke(0, 255, 255);
+    // }
+    // else {
+    //   stroke(53, 0, 96);
+    // }
+    // rect(width * 0.225, height * 0.1, width * 0.1, height * 0.2);
+    // image(images.heal, width * 0.225, height * 0.1, width * 0.1, height * 0.2);
 
-    if (mouseX >= width * 0.475 && mouseX <= width * 0.575 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      cursor("assets/cursors/shop.cur");
-    }
-    if (icon.ignite) {
-      stroke(0, 255, 255);
-    }
-    else {
-      stroke(53, 0, 96);
-    }
-    rect(width * 0.475, height * 0.1, width * 0.1, height * 0.2);
-    image(images.ignite, width * 0.475, height * 0.1, width * 0.1, height * 0.2);
+    // if (mouseX >= width * 0.35 && mouseX <= width * 0.45 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
+    //   cursor("assets/cursors/shop.cur");
+    // }
+    // if (icon.barrier) {
+    //   stroke(0, 255, 255);
+    // }
+    // else {
+    //   stroke(53, 0, 96);
+    // }
+    // rect(width * 0.35, height * 0.1, width * 0.1, height * 0.2);
+    // image(images.barrier, width * 0.35, height * 0.1, width * 0.1, height * 0.2);
 
-    if (mouseX >= width * 0.6 && mouseX <= width * 0.7 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      cursor("assets/cursors/shop.cur");
-    }
-    if (icon.exhaust) {
-      stroke(0, 255, 255);
-    }
-    else {
-      stroke(53, 0, 96);
-    }
-    rect(width * 0.6, height * 0.1, width * 0.1, height * 0.2);
-    image(images.exhaust, width * 0.6, height * 0.1, width * 0.1, height * 0.2);
+    // if (mouseX >= width * 0.475 && mouseX <= width * 0.575 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
+    //   cursor("assets/cursors/shop.cur");
+    // }
+    // if (icon.ignite) {
+    //   stroke(0, 255, 255);
+    // }
+    // else {
+    //   stroke(53, 0, 96);
+    // }
+    // rect(width * 0.475, height * 0.1, width * 0.1, height * 0.2);
+    // image(images.ignite, width * 0.475, height * 0.1, width * 0.1, height * 0.2);
+
+    // if (mouseX >= width * 0.6 && mouseX <= width * 0.7 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
+    //   cursor("assets/cursors/shop.cur");
+    // }
+    // if (icon.exhaust) {
+    //   stroke(0, 255, 255);
+    // }
+    // else {
+    //   stroke(53, 0, 96);
+    // }
+    // rect(width * 0.6, height * 0.1, width * 0.1, height * 0.2);
+    // image(images.exhaust, width * 0.6, height * 0.1, width * 0.1, height * 0.2);
     
   }
 
@@ -1038,15 +1047,15 @@ function minionFunctions() {
     for (let i = minions.length - 1; i >= 0; i--) {
       if (! shopSubstate && minions[i] !== undefined) {
         minions[i].moveAttack();
-        minions[i].show();
       }
+      minions[i].show();
     }
 
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
       if (! shopSubstate && enemyMinions[k] !== undefined) {
         enemyMinions[k].moveAttack();
-        enemyMinions[k].show();
       }
+      enemyMinions[k].show();
     }
 
     for (let m = enemyMinions.length - 1; m >= 0; m--) {

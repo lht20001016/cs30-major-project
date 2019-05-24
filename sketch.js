@@ -84,7 +84,8 @@ function preload() {
 //set up variables and play sounds files to begin game
 function setup() {
 
-  createCanvas(windowWidth, windowHeight);
+  let mainCanvas = createCanvas(windowWidth, windowHeight);
+  mainCanvas.position(0, 0);
   loadData();
   loadItems();
   loadSummoners();

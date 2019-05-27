@@ -32,6 +32,10 @@ let openShopButton;
 let shopToMenuButton;
 let gameoverToMenuButton;
 let purchaseButton;
+let selectSummoner;
+let selectSummoner2;
+let summonerD;
+let summonerF;
 let files;
 let state;
 let currentItem;
@@ -366,10 +370,10 @@ class Button extends GameObject {
     rect(this.x, this.y, this.width, this.height);
     noFill();
     stroke(this.hoverColor);
+    strokeWeight(2);
     rect(this.x, this.y, this.width, this.height);
 
     fill(this.textColor);
-    stroke(this.hoverColor);
     strokeWeight(1);
     textSize(this.textSize);
     text(this.buttonText, this.x + this.width / 2, this.y + this.height / 2);
@@ -582,8 +586,8 @@ class Summoners extends GameObject {
     noFill();
     strokeWeight(7.5);
 
-    if(this.itemID === currentItem) {
-      stroke(0, 255, 255);
+    if(this.summonerID === currentSummoner) {
+      stroke(186, 20, 161);
     }
     else if (this.mouse) {
       stroke(this.hoverBorderColor);
@@ -689,6 +693,8 @@ function loadData() {
   currentItem = 0;
   currentSummoner = 0;
   translatecount = 0;
+  summonerD = 5;
+  summonerF = 3;
   tstatus = false;
   loadCount = 0;
   rmode = false;
@@ -828,71 +834,35 @@ function showShop() {
     summoners.barrier.run();
     summoners.flash.run();
 
-    // noFill();
-    // strokeWeight(10);
-    // if (mouseX >= width * 0.1 && mouseX <= width * 0.2 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-    //   cursor("assets/cursors/shop.cur");
-    // }
-    // if (icon.flash) {
-    //   stroke(0, 255, 255);
-    // }
-    // else {
-    //   stroke(53, 0, 96);
-    // }
-    // rect(width * 0.1, height * 0.1, width * 0.1, height * 0.2);
-    // image(images.flash, width * 0.1, height * 0.1, width * 0.1, height * 0.2);
+    if (currentSummoner !== 0) {
 
-    // if (mouseX >= width * 0.225 && mouseX <= width * 0.325 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-    //   cursor("assets/cursors/shop.cur");
-    // }
-    // if (icon.heal) {
-    //   stroke(0, 255, 255);
-    // }
-    // else {
-    //   stroke(53, 0, 96);
-    // }
-    // rect(width * 0.225, height * 0.1, width * 0.1, height * 0.2);
-    // image(images.heal, width * 0.225, height * 0.1, width * 0.1, height * 0.2);
+      selectSummoner = new Button(width * 0.6, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, 
+        selecttoD, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
 
-    // if (mouseX >= width * 0.35 && mouseX <= width * 0.45 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-    //   cursor("assets/cursors/shop.cur");
-    // }
-    // if (icon.barrier) {
-    //   stroke(0, 255, 255);
-    // }
-    // else {
-    //   stroke(53, 0, 96);
-    // }
-    // rect(width * 0.35, height * 0.1, width * 0.1, height * 0.2);
-    // image(images.barrier, width * 0.35, height * 0.1, width * 0.1, height * 0.2);
+      selectSummoner2 = new Button(width * 0.8, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, 
+        selecttoF, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
 
-    // if (mouseX >= width * 0.475 && mouseX <= width * 0.575 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-    //   cursor("assets/cursors/shop.cur");
-    // }
-    // if (icon.ignite) {
-    //   stroke(0, 255, 255);
-    // }
-    // else {
-    //   stroke(53, 0, 96);
-    // }
-    // rect(width * 0.475, height * 0.1, width * 0.1, height * 0.2);
-    // image(images.ignite, width * 0.475, height * 0.1, width * 0.1, height * 0.2);
+      selectSummoner.run();
+      selectSummoner2.run();
 
-    // if (mouseX >= width * 0.6 && mouseX <= width * 0.7 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-    //   cursor("assets/cursors/shop.cur");
-    // }
-    // if (icon.exhaust) {
-    //   stroke(0, 255, 255);
-    // }
-    // else {
-    //   stroke(53, 0, 96);
-    // }
-    // rect(width * 0.6, height * 0.1, width * 0.1, height * 0.2);
-    // image(images.exhaust, width * 0.6, height * 0.1, width * 0.1, height * 0.2);
+    }
     
   }
 
   strokeWeight(1);
+}
+
+function selecttoD() {
+
+  summonerD = currentSummoner;
+
+}
+
+function selecttoF() {
+
+
+  summonerF = currentSummoner;
+
 }
 
 //images responsible for displaying the control of sound

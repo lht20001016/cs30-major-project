@@ -367,10 +367,11 @@ class Button extends GameObject {
       fill(this.hoverColor);
       cursor(this.hoverCursor);
     }
+    noStroke();
     rect(this.x, this.y, this.width, this.height);
     noFill();
     stroke(this.hoverColor);
-    strokeWeight(2);
+    strokeWeight(3);
     rect(this.x, this.y, this.width, this.height);
 
     fill(this.textColor);
@@ -625,13 +626,20 @@ function createButtons() {
     shopToMenu, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
   gameoverToMenuButton = new Button(width * 0.15, height * 0.85, width * 0.7, height * 0.1, "Return To Menu", 36, 0, 
     gmToMenu, [0, 255, 255], [0, 77, 255], "assets/cursors/gotomenu.cur");
-  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], openInGameShopMenu, [36, 78, 125], [26, 86, 206], "assets/cursors/shop.cur");
+  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], 
+    openInGameShopMenu, [36, 78, 125], [26, 86, 206], "assets/cursors/shop.cur");
+  selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, 
+    selecttoD, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
+  selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, 
+    selecttoF, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
+
 
 }
 
 //button function that opens the shop
 function openShop() {
   state = "shop";
+  currentSummoner = 0;
   if (volumeControl) {
     sound.openstore.setVolume(0.05);
     sound.openstore.play();
@@ -682,6 +690,19 @@ function openInGameShopMenu() {
     x : charpos.x,
     y : charpos.y,
   };
+
+}
+
+function selecttoD() {
+
+  summonerD = currentSummoner;
+
+}
+
+function selecttoF() {
+
+
+  summonerF = currentSummoner;
 
 }
 
@@ -836,33 +857,71 @@ function showShop() {
 
     if (currentSummoner !== 0) {
 
-      selectSummoner = new Button(width * 0.6, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, 
-        selecttoD, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
 
-      selectSummoner2 = new Button(width * 0.8, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, 
-        selecttoF, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
+      texts.effect1 = "";
+      texts.effect2 = "";
+      texts.effect3 = "";
+      texts.effect4 = "";
+      texts.effect5 = "";
+      texts.effect6 = "";
+      texts.additionaltexts = "";
+      texts.additionaltexts2 = "";
+    
+      summonerInfo();
+
+      //menu
+      fill(232, 199, 227);
+      strokeWeight(5);
+      rect(width * 0.6, height * 0.02, width * 0.3, height * 0.8);
+  
+      textSize(55);
+      fill(209, 20, 180);
+      stroke(86, 5, 74);
+      text("Summoner Spell", width * 0.75, height * 0.08);
+
+      noStroke();
+      fill(0);
+      textSize(36);
+      textStyle(BOLD);
+    
+      textSize(20);
+      textStyle(NORMAL);
+      text(texts.effect1, width * 0.7, height * 0.45);
+      text(texts.effect2, width * 0.7, height * 0.48);
+      text(texts.effect3, width * 0.7, height * 0.51);
+      text(texts.effect4, width * 0.7, height * 0.54);
+      text(texts.effect5, width * 0.7, height * 0.57);
+      text(texts.effect6, width * 0.7, height * 0.6);
+      textStyle(ITALIC);
+      text(texts.additionaltexts, width * 0.7, height * 0.65);
+      text(texts.additionaltexts2, width * 0.7, height * 0.68);
 
       selectSummoner.run();
       selectSummoner2.run();
-
+      
     }
-    
+     
   }
 
   strokeWeight(1);
 }
 
-function selecttoD() {
-
-  summonerD = currentSummoner;
-
-}
-
-function selecttoF() {
-
-
-  summonerF = currentSummoner;
-
+function summonerInfo() {
+  if (currentSummoner === 1) {
+    texts.effect1 = "ignite";
+  }
+  if (currentSummoner === 2) {
+    texts.effect1 = "exhaust";
+  }
+  if (currentSummoner === 3) {
+    texts.effect1 = "heal";
+  }
+  if (currentSummoner === 4) {
+    texts.effect1 = "barrier";
+  }
+  if (currentSummoner === 5) {
+    texts.effect1 = "flash";
+  }
 }
 
 //images responsible for displaying the control of sound
@@ -1502,43 +1561,45 @@ function inGameShopDisplay() {
 //Containts the information of all the items and displays it in shop
 function itemDetails() {
 
-  //empty strings as templates
-  texts.effect1 = "";
-  texts.effect2 = "";
-  texts.effect3 = "";
-  texts.effect4 = "";
-  texts.effect5 = "";
-  texts.effect6 = "";
-  texts.additionaltexts = "";
-  texts.additionaltexts2 = "";
+  if (state === "game") {
 
-  itemInfo();
+    texts.effect1 = "";
+    texts.effect2 = "";
+    texts.effect3 = "";
+    texts.effect4 = "";
+    texts.effect5 = "";
+    texts.effect6 = "";
+    texts.additionaltexts = "";
+    texts.additionaltexts2 = "";
 
-  //Display the item information when selected
-  if (currentItem !== 0 && shopSubstate) {
-    purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
-      purchaseItem, [11, 232, 176], [45, 142, 118], "assets/cursors/shop.cur");
-    image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
-    purchaseButton.run();
-    noStroke();
-    fill(0);
-    textSize(36);
-    textStyle(BOLD);
-    text(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].name, width * 0.7, height * 0.24);
-  }
+    itemInfo();
 
-  if (shopSubstate) {
-    textSize(20);
-    textStyle(NORMAL);
-    text(texts.effect1, width * 0.7, height * 0.45);
-    text(texts.effect2, width * 0.7, height * 0.48);
-    text(texts.effect3, width * 0.7, height * 0.51);
-    text(texts.effect4, width * 0.7, height * 0.54);
-    text(texts.effect5, width * 0.7, height * 0.57);
-    text(texts.effect6, width * 0.7, height * 0.6);
-    textStyle(ITALIC);
-    text(texts.additionaltexts, width * 0.7, height * 0.65);
-    text(texts.additionaltexts2, width * 0.7, height * 0.68);
+    //Display the item information when selected
+    if (currentItem !== 0 && shopSubstate) {
+      purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
+        purchaseItem, [11, 232, 176], [45, 142, 118], "assets/cursors/shop.cur");
+      image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
+      purchaseButton.run();
+      noStroke();
+      fill(0);
+      textSize(36);
+      textStyle(BOLD);
+      text(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].name, width * 0.7, height * 0.24);
+    }
+
+    if (shopSubstate) {
+      textSize(20);
+      textStyle(NORMAL);
+      text(texts.effect1, width * 0.7, height * 0.45);
+      text(texts.effect2, width * 0.7, height * 0.48);
+      text(texts.effect3, width * 0.7, height * 0.51);
+      text(texts.effect4, width * 0.7, height * 0.54);
+      text(texts.effect5, width * 0.7, height * 0.57);
+      text(texts.effect6, width * 0.7, height * 0.6);
+      textStyle(ITALIC);
+      text(texts.additionaltexts, width * 0.7, height * 0.65);
+      text(texts.additionaltexts2, width * 0.7, height * 0.68);
+    }
   }
 
 
@@ -1552,7 +1613,6 @@ function itemInfo() {
     texts.effect2 = "Critical Strike Chance + 30%";
     texts.effect3 = "Critical Strike Damage + 20%";
     texts.additionaltexts = "MASSIVELY enhance critical strikes";
-    price = 4000;
   }
   if (currentItem === 2) {
     texts.effect1 = "Damage + 70";

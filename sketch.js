@@ -35,7 +35,10 @@ let purchaseButton;
 let selectSummoner;
 let selectSummoner2;
 let summonerD;
+let summonerDicon;
 let summonerF;
+let summonerFicon;
+let allSummoners;
 let files;
 let state;
 let currentItem;
@@ -50,7 +53,7 @@ let charpos;
 let velocity;
 let destinationpos;
 let timer;
-let abilities;
+let invins;
 let soundOn;
 let soundOff;
 let player;
@@ -89,10 +92,10 @@ function preload() {
 function setup() {
 
   createCanvas(windowWidth, windowHeight);
-  loadData();
   loadItems();
   loadSummoners();
-  loadFiles(createButtons());
+  loadFiles();
+  loadData(createButtons());
 
 }
 
@@ -112,8 +115,6 @@ function draw() {
   characterMovement();
   updateTimer();
   minionFunctions();
-  showAbilities();
-  countCooldown();
   createBullet();
   moveBullet();
   inGameShopDisplay();
@@ -294,13 +295,15 @@ function loadSummoners() {
 
   summoners = {
 
-    ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/ignite.png"),"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
-    exhaust : new Summoners (width * 0.6, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/exhaust.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
-    heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/heal.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
-    barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/barrier.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
-    flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, loadImage("assets/pictures/flash.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
+    ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/ignite.wav"), loadImage("assets/pictures/ignite.png"),"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
+    exhaust : new Summoners (width * 0.1, height * 0.4, width * 0.1, height * 0.2, loadSound("assets/sounds/exhaust.wav"), loadImage("assets/pictures/exhaust.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
+    heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/heal.wav"), loadImage("assets/pictures/heal.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
+    barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/barrier.wav"), loadImage("assets/pictures/barrier.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
+    flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/flashsound.wav"), loadImage("assets/pictures/flash.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
 
   };
+
+  allSummoners = [summoners.ignite, summoners.exhaust, summoners.heal, summoners.barrier, summoners.flash];
 
 }
   
@@ -571,9 +574,10 @@ class Creep extends GameObject {
 }
 
 class Summoners extends GameObject {
-  constructor(x, y, width, height, picture, hoverCursor, borderColor, hoverBorderColor, summonerID) {
+  constructor(x, y, width, height, sound, picture, hoverCursor, borderColor, hoverBorderColor, summonerID) {
     super(x, y, width, height);
     this.icon = picture;
+    this.sound = sound;
     this.hoverCursor = hoverCursor;
     this.borderColor = borderColor;
     this.hoverBorderColor = hoverBorderColor;
@@ -609,8 +613,8 @@ class Summoners extends GameObject {
       globalMouseToggle = 1;
       currentSummoner = this.summonerID;
       if (volumeControl) {
-        sound.clickItem.setVolume(0.1);
-        sound.clickItem.play();
+        this.sound.setVolume(0.1);
+        this.sound.play();
       }
     }
 
@@ -632,7 +636,6 @@ function createButtons() {
     selecttoD, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
   selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, 
     selecttoF, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
-
 
 }
 
@@ -695,14 +698,52 @@ function openInGameShopMenu() {
 
 function selecttoD() {
 
-  summonerD = currentSummoner;
+  if (currentSummoner === summonerF) {
+    let temp = summonerDicon;
+    summonerDicon = summonerFicon;
+    summonerFicon = temp;
+    summonerF = summonerD;
+    summonerD = currentSummoner;
+  }
+
+  else {
+    for (let i = 0; i < allSummoners.length; i++) {
+      if (allSummoners[i].summonerID === currentSummoner) {
+        summonerDicon = allSummoners[i].icon;
+      }
+    }
+    summonerD = currentSummoner;
+  }
+
+  if (volumeControl) {
+    sound.buyItem.setVolume(0.1);
+    sound.buyItem.play();
+  }
 
 }
 
 function selecttoF() {
 
+  if (currentSummoner === summonerD) {
+    let temp = summonerFicon;
+    summonerFicon = summonerDicon;
+    summonerDicon = temp;
+    summonerD = summonerF;
+    summonerF = currentSummoner;
+  }
 
-  summonerF = currentSummoner;
+  else {
+    for (let i = 0; i < allSummoners.length; i++) {
+      if (allSummoners[i].summonerID === currentSummoner) {
+        summonerFicon = allSummoners[i].icon;
+      }
+    }
+    summonerF = currentSummoner;
+  }
+  if (volumeControl) {
+    sound.buyItem.setVolume(0.1);
+    sound.buyItem.play();
+  }
 
 }
 
@@ -715,8 +756,11 @@ function loadData() {
   currentSummoner = 0;
   translatecount = 0;
   summonerD = 5;
+  summonerDicon = images.flash;
   summonerF = 3;
+  summonerFicon = images.heal;
   tstatus = false;
+  invins = false;
   loadCount = 0;
   rmode = false;
   statsToggle = false;
@@ -762,21 +806,6 @@ function loadData() {
   velocity = {
     x : 0,
     y : 0,
-  };
-  abilities ={
-    flashs : false,
-    barriers : false,
-    ignites : false,
-    heals : false,
-    exhausts : false,
-    invincibilitys : false,
-  };
-  icon = {
-    flash : false,
-    heal : false,
-    exhaust : false,
-    ignite : false,
-    barrier : false,
   };
   timer = 0;
   difficulty = 2500;
@@ -872,11 +901,11 @@ function showShop() {
       //menu
       fill(232, 199, 227);
       strokeWeight(5);
+      stroke(86, 5, 74);
       rect(width * 0.6, height * 0.02, width * 0.3, height * 0.8);
   
       textSize(55);
       fill(209, 20, 180);
-      stroke(86, 5, 74);
       text("Summoner Spell", width * 0.75, height * 0.08);
 
       noStroke();
@@ -896,8 +925,15 @@ function showShop() {
       text(texts.additionaltexts, width * 0.7, height * 0.65);
       text(texts.additionaltexts2, width * 0.7, height * 0.68);
 
-      selectSummoner.run();
-      selectSummoner2.run();
+      if (summonerD !== currentSummoner) {
+        selectSummoner.run();
+      }
+      if (summonerF !== currentSummoner) {
+        selectSummoner2.run();
+      }
+
+      image(summonerDicon, width * 0.625, height * 0.5, width * 0.1, height * 0.18);
+      image(summonerFicon, width * 0.775, height * 0.5, width * 0.1, height * 0.18);
       
     }
      
@@ -920,7 +956,14 @@ function summonerInfo() {
     texts.effect1 = "barrier";
   }
   if (currentSummoner === 5) {
-    texts.effect1 = "flash";
+    texts.effect1 = "flash1";
+    texts.effect2 = "flash2";
+    texts.effect3 = "flash3";
+    texts.effect4 = "flash4";
+    texts.effect5 = "flash5";
+    texts.effect6 = "flash6";
+    texts.additionaltexts = "flash7";
+    texts.additionaltexts2 = "flash8";
   }
 }
 
@@ -1105,36 +1148,6 @@ function minionFunctions() {
 
 }
 
-//responsible for showing the availability of the in-game abilities
-function showAbilities() {
-  if (state ==="game") {
-    if (abilities.flashs) {
-      image(images.flash, width / 15 * 13, height / 10 * 9, 60, 60);
-    }
-
-    if (abilities.barriers) {
-      image(images.barrier, width / 15 * 11, height / 10 * 9, 60, 60);
-    }
-  }
-}
-
-//responsible for keeping track of the ability cooldowns in-game
-function countCooldown() {
-  if (state === "game") {
-    if (! abilities.flashs && timer - abilities.flashcd >= 30) {
-      abilities.flashs = true;
-    }
-
-    if (! abilities.barriers && timer - abilities.barriercd >= 2) {
-      abilities.invincibilitys = false;
-    }
-
-    if (! abilities.barriers && timer - abilities.barriercd >= 60) {
-      abilities.barriers = true;
-    }
-  }
-}
-
 //responsible for the creation of the bullets
 function createBullet() {
 
@@ -1171,7 +1184,7 @@ function moveBullet() {
       bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + width / 16 && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + height / 8 ||
       bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + width / 16 && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + height / 8 ||
       bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + width / 16 && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + height / 8) &&
-       ! abilities.invincibilitys) {
+       ! invins) {
         stats.health -= 50;
         bullets.splice(i, 1);
         if (volumeControl){
@@ -2145,14 +2158,6 @@ function resetGame() {
     x : 0,
     y : 0,
   };
-  abilities ={
-    flashs : false,
-    barriers : false,
-    ignites : false,
-    heals : false,
-    exhausts : false,
-    invincibilitys : false,
-  };
   timer = 0;
   difficulty = 2500;
   bullets = [];
@@ -2206,145 +2211,6 @@ function mousePressed() {
     }
   }
 
-  //Loading Screen Summoner Spell Buttons
-  if (state === "shop") {
-
-    //flash
-    if (mouseX >= width * 0.1 && mouseX <= width * 0.2 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      if (!icon.flash) {
-        icon = {
-          flash : true,
-          heal : false,
-          exhaust : false,
-          ignite : false,
-          barrier : false,
-        };
-        if (volumeControl) {
-          sound.flash.setVolume(0.1);
-          sound.flash.play();
-        }
-      }
-      else if (icon.flash) {
-        icon.flash = false;
-        if (volumeControl) {
-          sound.closestore.setVolume(0.1);
-          sound.closestore.play();
-        }
-      }
-    }
-  
-    //heal
-    else if (mouseX >= width * 0.225 && mouseX <= width * 0.325 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      if (!icon.heal) {
-        icon = {
-          flash : false,
-          heal : true,
-          exhaust : false,
-          ignite : false,
-          barrier : false,
-        };
-        if (volumeControl) {
-          sound.heal.setVolume(0.1);
-          sound.heal.play();
-        }
-      }
-      else if (icon.heal) {
-        icon.heal = false;
-        if (volumeControl) {
-          sound.closestore.setVolume(0.1);
-          sound.closestore.play();
-        }
-      }
-    }
-  
-    //barrier
-    else if (mouseX >= width * 0.35 && mouseX <= width * 0.45 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      if (!icon.barrier) {
-        icon = {
-          flash : false,
-          heal : false,
-          exhaust : false,
-          ignite : false,
-          barrier : true,
-        };
-        if (volumeControl) {
-          sound.barrier.setVolume(0.1);
-          sound.barrier.play();
-        }
-      }
-      else if (icon.barrier) {
-        icon.barrier = false;
-        if (volumeControl) {
-          sound.closestore.setVolume(0.1);
-          sound.closestore.play();
-        }
-      }
-    }
-  
-    //ignite
-    else if (mouseX >= width * 0.475 && mouseX <= width * 0.575 && mouseY >= height * 0.1 && mouseY <= height * 0.3) {
-      if (!icon.ignite) {
-        icon = {
-          flash : false,
-          heal : false,
-          exhaust : false,
-          ignite : true,
-          barrier : false,
-        };
-        if (volumeControl) {
-          sound.ignite.setVolume(0.1);
-          sound.ignite.play();
-        }
-      }
-      else if (icon.ignite) {
-        icon.ignite = false;
-        if (volumeControl) {
-          sound.closestore.setVolume(0.1);
-          sound.closestore.play();
-        }
-      }
-    }
-  
-    //exhaust
-    else if (mouseX >= width * 0.6 && mouseX <= width * 0.7 && mouseY >= height * 0.1 && mouseY <= height * 0.3 ) {
-      if (!icon.exhaust) {
-        icon = {
-          flash : false,
-          heal : false,
-          exhaust : true,
-          ignite : false,
-          barrier : false,
-        };
-        if (volumeControl) {
-          sound.exhaust.setVolume(0.1);
-          sound.exhaust.play();
-        }
-      }
-      else if (icon.exhaust) {
-        icon.exhaust = false;
-        if (volumeControl) {
-          sound.closestore.setVolume(0.1);
-          sound.closestore.play();
-        }
-      }
-    }
-
-    //deselect if click elsewhere
-    else if (icon.flash || icon.heal || icon.barrier || icon.ignite || icon.exhaust) {
-      icon = {
-        flash : false,
-        heal : false,
-        exhaust : false,
-        ignite : false,
-        barrier : false,
-      };
-      if (volumeControl) {
-        sound.closestore.setVolume(0.1);
-        sound.closestore.play();
-      }
-    }
-  }
-
 }
 
 //responsible for the use of abilities upon keytyped
@@ -2372,44 +2238,6 @@ function keyTyped() {
       statsToggle = ! statsToggle;
     }
   
-    //flash
-    if (key === "d" && abilities.flashs) {
-      if (volumeControl) {
-        sound.flash.setVolume(0.1);
-        sound.flash.play();
-      }
-      abilities.flashs = false;
-      abilities.flashcd = timer;
-
-      if (mouseX <= width - width / 16 - 75){
-        charpos.x = mouseX;
-      }
-    
-      else {
-        charpos.x = width - width / 16 - 75;
-      }
-
-      if (mouseY <= height - height / 8) {
-        charpos.y = mouseY;
-      }
-
-      else {
-        charpos.y = height - height / 8;
-      }
-      destinationpos.x = charpos.x;
-      destinationpos.y = charpos.y;
-    }
-
-    //barrier
-    if (key === "f" && abilities.barriers) {
-      if (volumeControl) {
-        sound.barrier.setVolume(0.1);
-        sound.barrier.play();
-      }
-      abilities.barriers = false;
-      abilities.barriercd = timer;
-      abilities.invincibilitys = true;
-    }
   }
 
 }

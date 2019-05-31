@@ -26,6 +26,17 @@
 //Varying Cursors
 //Many other features, see game and code
 
+//STILL TO DO
+// - COMBAT AND LEVELING SYSTEM
+// - UPDATE CURSORS
+// - ABILITY DESCRPITION
+// - GAME DISCRIPTION
+// - BACKGROUND AND AESTHETICS
+// - CHARACTER ABILITY
+// - BALANCE ITEMS
+// - WIN CON?
+
+
 //define variables to be used
 let loadCount;
 let openShopButton;
@@ -130,7 +141,7 @@ function setAssets() {
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png", itemLoaded);
   volumeControl = true;
-  files = 89;
+  files = 90;
 
 }
 
@@ -144,7 +155,7 @@ function loadFiles() {
     barrier : loadSound("assets/sounds/barrier.wav", itemLoaded),
     ignite : loadSound("assets/sounds/ignite.wav", itemLoaded),
     heal : loadSound("assets/sounds/heal.wav", itemLoaded),
-    exhaust : loadSound("assets/sounds/exhaust.wav", itemLoaded),
+    clarity : loadSound("assets/sounds/clarity.mp3", itemLoaded),
     openstore : loadSound("assets/sounds/openstore.wav", itemLoaded),
     closestore : loadSound("assets/sounds/closestore.wav", itemLoaded),
     startgame : loadSound("assets/sounds/startgame.wav", itemLoaded),
@@ -161,7 +172,7 @@ function loadFiles() {
     barrier : loadImage("assets/pictures/barrier.jpg", itemLoaded),
     heal : loadImage("assets/pictures/heal.png", itemLoaded),
     ignite : loadImage("assets/pictures/ignite.png", itemLoaded),
-    exhaust : loadImage("assets/pictures/exhaust.png", itemLoaded),
+    clarity : loadImage("assets/pictures/clarity.png", itemLoaded),
     gold : loadImage("assets/pictures/gold.png", itemLoaded),
     ad : loadImage("assets/pictures/ad.PNG", itemLoaded),
     ap : loadImage("assets/pictures/ap.PNG", itemLoaded),
@@ -234,6 +245,7 @@ function loadFiles() {
     ricon : loadImage("assets/pictures/character/ricon.jpg", itemLoaded),
     overlay : loadImage("assets/pictures/character/overlay.png", itemLoaded),
     statsicon : loadImage("assets/pictures/character/statsicon.gif", itemLoaded),
+    passiveicon : loadImage("assets/pictures/character/passive.jpg", itemLoaded),
 
   };
 
@@ -296,14 +308,14 @@ function loadSummoners() {
   summoners = {
 
     ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/ignite.wav"), loadImage("assets/pictures/ignite.png"),"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
-    exhaust : new Summoners (width * 0.1, height * 0.4, width * 0.1, height * 0.2, loadSound("assets/sounds/exhaust.wav"), loadImage("assets/pictures/exhaust.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
+    clarity : new Summoners (width * 0.1, height * 0.4, width * 0.1, height * 0.2, loadSound("assets/sounds/clarity.mp3"), loadImage("assets/pictures/clarity.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
     heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/heal.wav"), loadImage("assets/pictures/heal.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
     barrier  :new Summoners (width * 0.35, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/barrier.wav"), loadImage("assets/pictures/barrier.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 4),
     flash : new Summoners (width * 0.1, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/flashsound.wav"), loadImage("assets/pictures/flash.jpg"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 5),
 
   };
 
-  allSummoners = [summoners.ignite, summoners.exhaust, summoners.heal, summoners.barrier, summoners.flash];
+  allSummoners = [summoners.ignite, summoners.clarity, summoners.heal, summoners.barrier, summoners.flash];
 
 }
   
@@ -660,7 +672,7 @@ function shopToMenu() {
   icon = {
     flash : false,
     heal : false,
-    exhaust : false,
+    clarity : false,
     ignite : false,
     barrier : false,
   };
@@ -880,7 +892,7 @@ function showShop() {
 
     summoners.ignite.run();
     summoners.heal.run();
-    summoners.exhaust.run();
+    summoners.clarity.run();
     summoners.barrier.run();
     summoners.flash.run();
 
@@ -915,15 +927,30 @@ function showShop() {
     
       textSize(20);
       textStyle(NORMAL);
-      text(texts.effect1, width * 0.7, height * 0.45);
-      text(texts.effect2, width * 0.7, height * 0.48);
-      text(texts.effect3, width * 0.7, height * 0.51);
-      text(texts.effect4, width * 0.7, height * 0.54);
-      text(texts.effect5, width * 0.7, height * 0.57);
-      text(texts.effect6, width * 0.7, height * 0.6);
-      textStyle(ITALIC);
-      text(texts.additionaltexts, width * 0.7, height * 0.65);
-      text(texts.additionaltexts2, width * 0.7, height * 0.68);
+      textSize(48);
+      stroke(86, 5, 74);
+      if (currentSummoner === 1) {
+        fill(226, 20, 20);
+      }
+      else if (currentSummoner === 2) {
+        fill(32, 76, 252);
+      }
+      else if (currentSummoner === 3) {
+        fill(39, 181, 3);
+      }
+      else if (currentSummoner === 4) {
+        fill(255, 258, 53);
+      }
+      else if (currentSummoner === 5) {
+        fill(223, 252, 5);
+      }
+      text(texts.effect1, width * 0.749, height * 0.17);
+      textSize(24);
+      noStroke();
+      fill(0);
+      text(texts.effect2, width * 0.749, height * 0.25);
+      text(texts.effect3, width * 0.749, height * 0.3);
+      text(texts.effect4, width * 0.749, height * 0.35);
 
       if (summonerD !== currentSummoner) {
         selectSummoner.run();
@@ -944,26 +971,32 @@ function showShop() {
 
 function summonerInfo() {
   if (currentSummoner === 1) {
-    texts.effect1 = "ignite";
+    texts.effect1 = "Ignite";
+    texts.effect2 = "Igintes an enemy, dealing a burst of";
+    texts.effect3 = "initial damage and burns over time";
+    texts.effect4 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 2) {
-    texts.effect1 = "exhaust";
+    texts.effect1 = "clarity";
+    texts.effect2 = "Quickly restore some mana";
+    texts.effect4 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 3) {
-    texts.effect1 = "heal";
+    texts.effect1 = "Heal";
+    texts.effect2 = "Quickly heals your character";
+    texts.effect4 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 4) {
-    texts.effect1 = "barrier";
+    texts.effect1 = "Barrier";
+    texts.effect2 = "Reduces all incomming damage for a";
+    texts.effect3 = "brief duration";
+    texts.effect4 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 5) {
-    texts.effect1 = "flash1";
-    texts.effect2 = "flash2";
-    texts.effect3 = "flash3";
-    texts.effect4 = "flash4";
-    texts.effect5 = "flash5";
-    texts.effect6 = "flash6";
-    texts.additionaltexts = "flash7";
-    texts.additionaltexts2 = "flash8";
+    texts.effect1 = "Flash";
+    texts.effect2 = "Blinks your character a distance";
+    texts.effect3 = "towards the cursor";
+    texts.effect4 = "Cooldown: 30 seconds";
   }
 }
 
@@ -1248,6 +1281,8 @@ function characterStatus() {
     statsMenu();
 
     abilityicons();
+    
+    summonericons();
 
     image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
 
@@ -1542,11 +1577,19 @@ function abilityicons() {
 
   rability= player.ricon;
 
+  image(player.passiveicon, width * 0.35, height * 0.8825, width * 0.0245, height * 0.04);
   image(qability, width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
   image(wability, width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
   image(eability, width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
   image(rability, width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
   
+
+}
+
+function summonericons() {
+
+  image(summonerDicon, width * 0.532, height * 0.8825, width * 0.024, height * 0.0393);
+  image(summonerFicon, width * 0.5605, height * 0.8825, width * 0.024, height * 0.0393);
 
 }
 
@@ -1767,9 +1810,11 @@ function itemInfo() {
   if (currentItem === 19) {
     texts.effect1 = "Armor + 40";
     texts.effect2 = "Health + 400";
-    texts.effect3 = "You Gain Increased Speed Based on Missing Health";
-    texts.effect4 = "up to a Maximum of 30";
-    texts.additionaltexts = "There is one way you are getting this armor from me...";
+    texts.effect3 = "You Gain Increased Speed Based";
+    texts.effect4 = "on Missing Health";
+    texts.effect5 = "(Up to a Maximum of 30)";
+    texts.additionaltexts = "There is one way you are";
+    texts.additionaltexts2 = "getting this armor from me...";
     price = 3500;
   }
   if (currentItem === 20) {

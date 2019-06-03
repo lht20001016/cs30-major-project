@@ -1286,9 +1286,13 @@ function characterStatus() {
 
     image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
 
+    cooldowns();
+
     levelDisplay();
 
     iteminfodisplay();
+
+    abilityInfoDisplay();
 
   }
 
@@ -1319,16 +1323,17 @@ function levelUp() {
 
 function blankbars() {
 
-  noStroke();
+  stroke(0, 97, 255);
+  strokeWeight(3);
   fill(51, 61, 79);
 
-  for (let i = 0; i < 3; i++) {
-    rect(width * 0.60248 + i * width * 0.026, height * 0.88, width * 0.025, height * 0.04145);
-  }
-
-  for (let k = 3; k < 6; k++) {
-    rect(width * 0.60248 + (k - 3) * width * 0.026, height * 0.922, width * 0.025, height * 0.04145);
-  }
+  rect(width * 0.6019, height * 0.88, width * 0.024, height * 0.038);
+  rect(width * 0.62855, height * 0.88, width * 0.024, height * 0.038);
+  rect(width * 0.65475, height * 0.88, width * 0.024, height * 0.038);
+  rect(width * 0.60185, height * 0.92175, width * 0.024, height * 0.038);
+  rect(width * 0.62811, height * 0.92175, width * 0.024, height * 0.038);
+  rect(width * 0.65495, height * 0.92175, width * 0.024, height * 0.038);
+  
 
   noStroke();
   rect(width * 0.315, height * 0.875, width * 0.03, height * 0.1);
@@ -1431,6 +1436,23 @@ function gold() {
 
 }
 
+function cooldowns() {
+
+  stroke(0, 97, 255);
+  fill(51, 61, 79);
+  rect(width * 0.38275, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.420185, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
+
+  // fill(40, 222, 255);
+  // rect(width * 0.38275, height * 0.9383, width * 0.02385, height * 0.008);
+  // rect(width * 0.420185, height * 0.9383, width * 0.02385, height * 0.008);
+  // rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
+  // rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
+
+}
+
 function levelDisplay() {
 
   noStroke();
@@ -1496,6 +1518,44 @@ function iteminfodisplay() {
     }
   }
 
+}
+
+function abilityInfoDisplay() {
+
+  fill(0, 0, 0, 64);
+  stroke(0, 97, 255);
+  rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+
+  texts.effect1 = "Steel Tempest";
+  texts.effect2 = "Q ability does somethihng";
+  texts.effect3 = "this is another line of effects";
+  texts.effect4 = "aseriewrfewr";
+  texts.effect5 = "43twaf32321q";
+  texts.effect6 = "passive / active";
+
+  abilityDesc();
+
+  fill(255);
+  strokeWeight(2);
+  textSize(48);
+  textAlign(LEFT);
+  text(texts.effect1, width * 0.31, height * 0.575);
+  textSize(18);
+  stroke(0);
+  strokeWeight(1);
+  text(texts.effect2, width * 0.31, height * 0.64);
+  text(texts.effect3, width * 0.31, height * 0.67);
+  text(texts.effect4, width * 0.31, height * 0.7);
+  text(texts.effect5, width * 0.31, height * 0.73);
+  textStyle(ITALIC);
+  text(texts.effect6, width * 0.57, height * 0.77);
+  textAlign(CENTER);
+    
+
+}
+
+function abilityDesc() {
+  void 0;
 }
 
 //stats menu display (AD, AP, SPEED, MR, ARMOR, ARMORPEN, MAGICPEN, HPREGEN, MANAREGEN, CRIT, CDR)

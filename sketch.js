@@ -1524,23 +1524,25 @@ function abilityInfoDisplay() {
 
   fill(0, 0, 0, 64);
   stroke(0, 97, 255);
-  rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
 
-  texts.effect1 = "Steel Tempest";
-  texts.effect2 = "Q ability does somethihng";
-  texts.effect3 = "this is another line of effects";
-  texts.effect4 = "aseriewrfewr";
-  texts.effect5 = "43twaf32321q";
-  texts.effect6 = "passive / active";
+  texts.effect1 = "";
+  texts.effect2 = "";
+  texts.effect3 = "";
+  texts.effect4 = "";
+  texts.effect5 = "";
+  texts.effect6 = "";
+  texts.additionaltexts = "";
+  texts.additionaltexts2 = "";
 
   abilityDesc();
 
   fill(255);
   strokeWeight(2);
-  textSize(48);
+  textSize(width / 50);
   textAlign(LEFT);
+  textStyle(NORMAL);
   text(texts.effect1, width * 0.31, height * 0.575);
-  textSize(18);
+  textSize(width / 123);
   stroke(0);
   strokeWeight(1);
   text(texts.effect2, width * 0.31, height * 0.64);
@@ -1548,14 +1550,121 @@ function abilityInfoDisplay() {
   text(texts.effect4, width * 0.31, height * 0.7);
   text(texts.effect5, width * 0.31, height * 0.73);
   textStyle(ITALIC);
-  text(texts.effect6, width * 0.57, height * 0.77);
+  text(texts.effect6, width * 0.6, height * 0.58);
+  text(texts.additionaltexts, width * 0.585, height * 0.77);
+  text(texts.additionaltexts2, width * 0.31, height * 0.77);
   textAlign(CENTER);
     
 
 }
 
 function abilityDesc() {
-  void 0;
+
+  if(mouseX >= width * 0.35 && mouseX <= width * 0.3745 && mouseY >= height * 0.8825 && mouseY <= height * 0.9225) {
+
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    texts.effect1 = "Path of the Exiled";
+    texts.effect2 = "As you level up, gain additional effects:";
+    texts.effect3 = "Level 6: Increase your speed by 20 and Mystic Shot fires an additional projectile";
+    texts.effect4 = "Level 12: Reduce all damage taken by 10% and Mystic Shot fires an additional projectile";
+    texts.effect5 = "Level 16: Increase all damage dealt by 10%";
+    texts.effect6 = "Passive Ability";  
+    texts.additionaltexts2 = "Does it matter where the path leads to? Frankly, I don't care";
+
+  }
+
+  if(mouseX >= width * 0.3785 && mouseX <= width * 0.4110 && mouseY >= height * 0.8825 && mouseY <= height * 0.935) {
+
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    if (!rmode) {
+      texts.effect1 = "Redemption";
+      texts.effect2 = "Strikes in front of your character, dealing damage equal to Attack Damage * 1.1 + 5";
+      texts.effect3 = "Slaying an enemy has a chance to absorb their soul, increasing your Attack Damage by 1";
+      texts.effect6 = "Active Ability";  
+      texts.additionaltexts = "Cooldown: 5 seconds";
+      texts.additionaltexts2 = "Redemption is earned through culling, not prayers";
+    }
+    else {
+      texts.effect1 = "Judgment";
+      texts.effect2 = "Strikes in front of your character, dealing TRUE damage equal to Attack Damage * 1.5";
+      texts.effect3 = "Slaying an enemy absorbs their soul, increasing your Attack Damage by 1";
+      texts.effect6 = "Active Ability";  
+      texts.additionaltexts = "Cooldown: 3 seconds";
+      texts.additionaltexts2 = "When judgment arrives, it is too late";
+    }
+
+  }
+
+  if(mouseX >= width * 0.417 && mouseX <= width * 0.4495 && mouseY >= height * 0.8825 && mouseY <= height * 0.935) {
+
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    if (!rmode) {
+      texts.effect1 = "Mystic Shot";
+      let temp;
+      if (stats.lvl <= 5) {
+        temp = "an projectile of pure energy,";
+      }
+      else if (stats.lvl >= 12) {
+        temp = "three projectiles of pure energy,";
+      }
+      else {
+        temp = "two projectiles of pure energy,";
+      }
+      texts.effect2 = "Fires " + temp + " enemies hit takes damage equal to 20 + 0.2 * Ability Power";
+      texts.effect3 = "(Can Critically Strike)";
+      texts.effect6 = "Active Ability";
+      texts.additionaltexts = "Cooldown: 20 seconds";
+      texts.additionaltexts2 = "Purer than the holy fire and stronger than the sacred blade";
+    }
+    else {
+      texts.effect1 = "Orbs of Agony";
+      texts.effect2 = "Fires three orbs from your character, enemies hit takes damage equal to 30 + 0.5 * Ability Power";
+      texts.effect3 = "(Can Critically Strike)";
+      texts.effect4 = "Passive: Gain + 10% Critical Strike Chance";
+      texts.effect6 = "Active Ability";
+      texts.additionaltexts = "Cooldown: 8 seconds";
+      texts.additionaltexts2 = "Sometimes, it's better to suffer";
+    }
+
+  }
+
+  if(mouseX >= width * 0.4545 && mouseX <= width * 0.487 && mouseY >= height * 0.8825 && mouseY <= height * 0.935) {
+
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    if (!rmode) {
+      texts.effect1 = "Angelic Shift";
+      texts.effect2 = "Shift across space with immense speed, cutting through all enemies in your path";
+      texts.effect3 = "The speed of the dash scales with your number of wings. Enemies in your path takes";
+      texts.effect4 = "10 + 0.1 * Ability Power + 0.15 * Attack Damage damage";
+      texts.effect6 = "Active Ability";
+      texts.additionaltexts = "Cooldown: 10 seconds";
+      texts.additionaltexts2 = "Take it as I was never here, just be grateful for what was left";
+    }
+    else {
+      texts.effect1 = "Wanderer's Strike";
+      texts.effect2 = "Shift across space with immense speed, cutting through all enemies in your path";
+      texts.effect3 = "Enemies in your path takes 25 + 0.2 * Ability Power + 0.25 * Attack Damage damage";
+      texts.effect6 = "Active Ability";
+      texts.additionaltexts = "Cooldown: 5 seconds";
+      texts.additionaltexts2 = "Take it as I was never here, just be grateful for what was left";
+    }
+
+  }
+
+  if(mouseX >= width * 0.492 && mouseX <= width * 0.5245 && mouseY >= height * 0.8825 && mouseY <= height * 0.935) {
+
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    texts.effect1 = "Tempest";
+    texts.effect2 = "Transcend into your ultimate form, gaining additional stats and effects for 20 seconds:";
+    texts.effect3 = "Q - Judgment: Cooldown drastically reduced, deals bonus damage as TRUE damage";
+    texts.effect4 = "W - Orbs of Agony: Cooldown drastically reduced, expose enemies, they take increased damage";
+    texts.effect5 = "E - Wanderer's Strike: Cooldown drastically reduced, deals increased damage";
+    texts.effect6 = "Ultimate Ability";
+    texts.additionaltexts = "Cooldown: 60 seconds"; 
+    texts.additionaltexts2 = "Do not fear me, fear the nothing after I am gone"; 
+
+  }
+
 }
 
 //stats menu display (AD, AP, SPEED, MR, ARMOR, ARMORPEN, MAGICPEN, HPREGEN, MANAREGEN, CRIT, CDR)
@@ -1585,11 +1694,11 @@ function statsMenu() {
   }
   
   //stat menu with the values and icons
-  fill(0, 0, 0, 75);
-  noStroke();
-  rect(width * - 0.1, height* 0.15, width * 0.1, height * 0.45, 50);
+  fill(0, 0, 0, 150);
+  stroke(0, 97, 255);
+  rect(width * - 0.1, height* 0.15, width * 0.1, height * 0.45, 20);
   fill(255);
-  textSize(28);
+  textSize(width / 60);
   image(images.ad, width * -0.085, height * 0.16, height * 0.03, height * 0.03);
   text(stats.ad, width * -0.04, height * 0.175);
   image(images.ap, width * -0.085, height * 0.20, height * 0.03, height * 0.03);

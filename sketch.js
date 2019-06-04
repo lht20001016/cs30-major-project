@@ -1,31 +1,3 @@
-// Let The bullets Fly (States Variables Edition)
-// Kyle Luo
-// March 25, 2019
-//
-// update notes for Grid Based Assignment (April 24, 2019): (to history.md pending)
-// 2d arrays to create shop, introduced gold system
-// health and mana system / stat calculations (combat and damage still to come, already being tested with bullets)
-// introduced stats
-// deleted velocity ratio introduced speed
-// Initialize variables to avoid undefined values being written or read
-// NOTE: pregame summor spells untouched
-// inventory array complete with hover information
-// pop out menu from the left side indicating stats, hoverinfo still to come
-// basic stats now work properly, abilities still to come
-// introduced level system, level up and stat growth works as intended, although no xp mechanic is yet implemented
-// introduced mana, health, and xp bar, see HUD at bottom left corner
-// Stat icon PNG are capitalized causing the 404 problem?
-//
-// NOTE: Although there exist parts of code that remain for the purpose of game functionality (mostly talking about the towers and bullets, to maintain the game runnable), they will be wored on ASAP
-// ALSO NOTE: I was not able to get the separate file thing worked out to the effect that I wanted to so I'll tall to you after break to get help. Please let me know how I can fix the walls of text for item effects.
-//
-//extra for experts----------------------------------------------------------------------
-//Callback Functions
-//Extending Classes
-//Disable Rightclicks
-//Varying Cursors
-//Many other features, see game and code
-
 //STILL TO DO
 // - COMBAT AND LEVELING SYSTEM
 // - UPDATE CURSORS
@@ -810,6 +782,8 @@ function loadData() {
   charpos = {
     x : width / 2,
     y : height / 2,
+    width : 0.044,
+    height : 0.09,
   };
   destinationpos = {
     x : charpos.x,
@@ -1050,15 +1024,21 @@ function characterPosition() {
 
   if (state === "game") {
 
+    let playerdisplay;
+
     if (stats.lvl < 6) {
-      image(player.character1b, charpos.x, charpos.y, width / 16, height / 8);
+      playerdisplay = player.character1b;
     }
     else if (stats.lvl >= 6 && stats.lvl < 12) {
-      image(player.character2b, charpos.x, charpos.y, width / 16, height / 8);
+      playerdisplay = player.character2b;
     }
     else if (stats.lvl >= 12) {
-      image(player.character3b, charpos.x, charpos.y, width / 16, height / 8);
+      playerdisplay = player.character3b;
     }
+
+    charpos.width = width * 0.044;
+    charpos.height = height * 0.09;
+    image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
   }
 
@@ -1085,11 +1065,11 @@ function determineVelocity() {
 //responsible for moving the characters according to set restrictions (due to in game graphics) and velocities
 function characterMovement() {
 
-  if (!shopSubstate && charpos.x + width / 16 + velocity.x <= width && state === "game") {
+  if (!shopSubstate && charpos.x + charpos.width + velocity.x <= width && state === "game") {
     charpos.x += velocity.x;
   }
 
-  if (!shopSubstate && charpos.y + velocity.y <= height - height / 8 && state === "game") {
+  if (!shopSubstate && charpos.y + velocity.y <= height - charpos.height && state === "game") {
     charpos.y += velocity.y;
   }
 
@@ -1213,10 +1193,10 @@ function moveBullet() {
       }
 
       //gameover if the bullet is colliding with the character
-      if ((bullets[i].x - 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x - 0.5 * bullets[i].diameter <= charpos.x + width / 16 && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + height / 8 ||
-      bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + width / 16 && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + height / 8 ||
-      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + width / 16 && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + height / 8 ||
-      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + width / 16 && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + height / 8) &&
+      if ((bullets[i].x - 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x - 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
+      bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
+      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + charpos.height ||
+      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + charpos.height) &&
        ! invins) {
         stats.health -= 50;
         bullets.splice(i, 1);
@@ -1542,7 +1522,7 @@ function abilityInfoDisplay() {
   textAlign(LEFT);
   textStyle(NORMAL);
   text(texts.effect1, width * 0.31, height * 0.575);
-  textSize(width / 123);
+  textSize(width / 110);
   stroke(0);
   strokeWeight(1);
   text(texts.effect2, width * 0.31, height * 0.64);
@@ -1569,7 +1549,7 @@ function abilityDesc() {
     texts.effect4 = "Level 12: Reduce all damage taken by 10% and Mystic Shot fires an additional projectile";
     texts.effect5 = "Level 16: Increase all damage dealt by 10%";
     texts.effect6 = "Passive Ability";  
-    texts.additionaltexts2 = "Does it matter where the path leads to? Frankly, I don't care";
+    texts.additionaltexts2 = "Where does the path leads to? Frankly, I don't care";
 
   }
 
@@ -1610,16 +1590,16 @@ function abilityDesc() {
       else {
         temp = "two projectiles of pure energy,";
       }
-      texts.effect2 = "Fires " + temp + " enemies hit takes damage equal to 20 + 0.2 * Ability Power";
-      texts.effect3 = "(Can Critically Strike)";
+      texts.effect2 = "Fires " + temp + " enemies hit takes damage equal to";
+      texts.effect3 = "20 + 0.2 * Ability Power (Can Critically Strike)";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: 20 seconds";
       texts.additionaltexts2 = "Purer than the holy fire and stronger than the sacred blade";
     }
     else {
       texts.effect1 = "Orbs of Agony";
-      texts.effect2 = "Fires three orbs from your character, enemies hit takes damage equal to 30 + 0.5 * Ability Power";
-      texts.effect3 = "(Can Critically Strike)";
+      texts.effect2 = "Fires three orbs from your character, enemies hit takes damage equal to";
+      texts.effect3 = "30 + 0.5 * Ability Power (Can Critically Strike)";
       texts.effect4 = "Passive: Gain + 10% Critical Strike Chance";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: 8 seconds";
@@ -1634,8 +1614,8 @@ function abilityDesc() {
     if (!rmode) {
       texts.effect1 = "Angelic Shift";
       texts.effect2 = "Shift across space with immense speed, cutting through all enemies in your path";
-      texts.effect3 = "The speed of the dash scales with your number of wings. Enemies in your path takes";
-      texts.effect4 = "10 + 0.1 * Ability Power + 0.15 * Attack Damage damage";
+      texts.effect3 = "The speed of the dash scales with your number of wings. Enemies in your path";
+      texts.effect4 = "takes 10 + 0.1 * Ability Power + 0.15 * Attack Damage damage";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: 10 seconds";
       texts.additionaltexts2 = "Take it as I was never here, just be grateful for what was left";
@@ -1655,10 +1635,10 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     texts.effect1 = "Tempest";
-    texts.effect2 = "Transcend into your ultimate form, gaining additional stats and effects for 20 seconds:";
-    texts.effect3 = "Q - Judgment: Cooldown drastically reduced, deals bonus damage as TRUE damage";
-    texts.effect4 = "W - Orbs of Agony: Cooldown drastically reduced, expose enemies, they take increased damage";
-    texts.effect5 = "E - Wanderer's Strike: Cooldown drastically reduced, deals increased damage";
+    texts.effect2 = "Transcend into your ultimate form, empower your abilities for 20 seconds:";
+    texts.effect3 = "Q - Judgment: Cooldown reduced, deals bonus damage as TRUE damage";
+    texts.effect4 = "W - Orbs of Agony: Cooldown reduced, ememies hit takes increased damage";
+    texts.effect5 = "E - Wanderer's Strike: Cooldown reduced, deals increased damage";
     texts.effect6 = "Ultimate Ability";
     texts.additionaltexts = "Cooldown: 60 seconds"; 
     texts.additionaltexts2 = "Do not fear me, fear the nothing after I am gone"; 
@@ -1861,7 +1841,8 @@ function itemInfo() {
     texts.effect1 = "Damage + 50";
     texts.effect2 = "Ability Power + 80";
     texts.effect3 = "Mana + 400";
-    texts.effect4 = "Deals Increased Damaged to Low Health Targets";
+    texts.effect4 = "Deals Increased Damaged to";
+    texts.effect5 = "Low Health Targets";
     texts.additionaltexts = "The lost blade of the Archangel";
     price = 3600;
   }

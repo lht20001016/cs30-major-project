@@ -22,6 +22,11 @@ let summonerDicon;
 let summonerF;
 let summonerFicon;
 let allSummoners;
+let currentTime;
+let castTime;
+let cds;
+let cdcharge;
+let castability;
 let files;
 let state;
 let currentItem;
@@ -100,6 +105,7 @@ function draw() {
   minionFunctions();
   createBullet();
   moveBullet();
+  castingAbilities();
   inGameShopDisplay();
   itemDetails();
   characterStatus();
@@ -176,8 +182,6 @@ function loadFiles() {
     character2b : loadImage("assets/pictures/character/character2b.PNG", itemLoaded),
     character3 : loadImage("assets/pictures/character/character3.PNG", itemLoaded),
     character3b : loadImage("assets/pictures/character/character3b.PNG", itemLoaded),
-    charaltform1 : loadImage("assets/pictures/character/charaltform1.PNG", itemLoaded),
-    charaltform1b : loadImage("assets/pictures/character/charaltform1b.PNG", itemLoaded),
     charaltform2 : loadImage("assets/pictures/character/charaltform2.PNG", itemLoaded),
     charaltform2b : loadImage("assets/pictures/character/charaltform2b.PNG", itemLoaded),
     charaltform3 : loadImage("assets/pictures/character/charaltform3.PNG", itemLoaded),
@@ -218,6 +222,8 @@ function loadFiles() {
     overlay : loadImage("assets/pictures/character/overlay.png", itemLoaded),
     statsicon : loadImage("assets/pictures/character/statsicon.gif", itemLoaded),
     passiveicon : loadImage("assets/pictures/character/passive.jpg", itemLoaded),
+    qsound : loadSound("assets/sounds/qsound.wav", itemLoaded),
+    rqsound : loadSound("assets/sounds/rqsound.wav", itemLoaded),
 
   };
 
@@ -743,6 +749,30 @@ function loadData() {
   summonerDicon = images.flash;
   summonerF = 3;
   summonerFicon = images.heal;
+  castability = {
+    q : false,
+    w : false,
+    e : false,
+    r : false,
+  },
+  cds = {
+    q : 5,
+    w : 20,
+    e : 10,
+    r : 60,
+  };
+  cdcharge = {
+    q : 5,
+    w : 20,
+    e : 10,
+    r : 60,
+  };
+  castTime = {
+    q : 650,
+    w : 200,
+    e : 200,
+    r : 50,
+  };
   tstatus = false;
   invins = false;
   loadCount = 0;
@@ -1025,18 +1055,96 @@ function characterPosition() {
   if (state === "game") {
 
     let playerdisplay;
+    let direction = "forward";
 
-    if (stats.lvl < 6) {
-      playerdisplay = player.character1b;
+    if (destinationpos.x >= charpos.x) {
+      direction = "forward";
     }
-    else if (stats.lvl >= 6 && stats.lvl < 12) {
-      playerdisplay = player.character2b;
-    }
-    else if (stats.lvl >= 12) {
-      playerdisplay = player.character3b;
+    else if (destinationpos.x < charpos.x) {
+      direction = "backward";
     }
 
-    charpos.width = width * 0.044;
+    if (direction === "forward") {
+
+      if (stats.lvl < 6) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa1b;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1b;
+        }
+        else {
+          playerdisplay = player.character1b;
+        }
+      }
+      
+      else if (stats.lvl >= 6 && stats.lvl < 12) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa2b;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1b;
+        }
+        else {
+          playerdisplay = player.character2b;
+        }
+      }
+
+      else if (stats.lvl >= 12) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa2b;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1b;
+        }
+        else {
+          playerdisplay = player.character3b;
+        }
+      }
+
+    }
+
+    else if (direction === "backward") {
+
+      if (stats.lvl < 6) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa1;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1;
+        }
+        else {
+          playerdisplay = player.character1;
+        }
+      }
+
+      else if (stats.lvl >= 6 && stats.lvl < 12) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa2;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1;
+        }
+        else {
+          playerdisplay = player.character2;
+        }
+      }
+
+      else if (stats.lvl >= 12) {
+        if (castability.q && ! rmode) {
+          playerdisplay = player.charaa2;
+        }
+        else if (castability.q && rmode) {
+          playerdisplay = player.charq1;
+        }
+        else {
+          playerdisplay = player.character3;
+        }
+      }
+
+    }
+
+    charpos.width = width * 0.053;
     charpos.height = height * 0.09;
     image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
@@ -1065,11 +1173,11 @@ function determineVelocity() {
 //responsible for moving the characters according to set restrictions (due to in game graphics) and velocities
 function characterMovement() {
 
-  if (!shopSubstate && charpos.x + charpos.width + velocity.x <= width && state === "game") {
+  if (!shopSubstate && charpos.x + charpos.width + velocity.x <= width && state === "game" && ! castability.q && ! castability.w && ! castability.e && ! castability.r) {
     charpos.x += velocity.x;
   }
 
-  if (!shopSubstate && charpos.y + velocity.y <= height - charpos.height && state === "game") {
+  if (!shopSubstate && charpos.y + velocity.y <= height - charpos.height && state === "game" && ! castability.q && ! castability.w && ! castability.e && ! castability.r) {
     charpos.y += velocity.y;
   }
 
@@ -1215,6 +1323,22 @@ function moveBullet() {
     }
     
   }
+}
+
+function castingAbilities() {
+
+  if (state === "game") {
+    if (castability.q) {
+      if (millis() - currentTime <= castTime.q) {
+        void 0;
+        //insert q ability here
+      }
+      if (millis() - currentTime > castTime.q) {
+        castability.q = false;
+      }
+    }
+  }
+
 }
 
 //one the major functions that tracks the stats and status of the character in game and manages how they interact during gameplay
@@ -1425,12 +1549,44 @@ function cooldowns() {
   rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
   rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
 
-  // fill(40, 222, 255);
-  // rect(width * 0.38275, height * 0.9383, width * 0.02385, height * 0.008);
-  // rect(width * 0.420185, height * 0.9383, width * 0.02385, height * 0.008);
-  // rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
-  // rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
+  fill(40, 222, 255);
+  rect(width * 0.38275, height * 0.9383, width * 0.02385 * (cdcharge.q / cds.q), height * 0.008);
+  rect(width * 0.420185, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
 
+  rechargeAbilities();
+
+}
+
+function rechargeAbilities() {
+  if (cdcharge.q > cds.q) {
+    cdcharge.q === cds.q;
+  }
+  else {
+    cdcharge.q += 1 / 60;
+  }
+
+  if (cdcharge.w > cds.w) {
+    cdcharge.w === cds.w;
+  }
+  else {
+    cdcharge.w += 1/60;
+  }
+
+  if (cdcharge.e > cds.e) {
+    cdcharge.e === cds.e;
+  }
+  else {
+    cdcharge.e += 1/60;
+  }
+
+  if (cdcharge.r > cds.r) {
+    cdcharge.r === cds.r;
+  }
+  else {
+    cdcharge.r += 1/60;
+  }
 }
 
 function levelDisplay() {
@@ -1531,7 +1687,7 @@ function abilityInfoDisplay() {
   text(texts.effect5, width * 0.31, height * 0.73);
   textStyle(ITALIC);
   text(texts.effect6, width * 0.6, height * 0.58);
-  text(texts.additionaltexts, width * 0.585, height * 0.77);
+  text(texts.additionaltexts, width * 0.5775, height * 0.77);
   text(texts.additionaltexts2, width * 0.31, height * 0.77);
   textAlign(CENTER);
     
@@ -2310,6 +2466,18 @@ function resetGame() {
   tstatus = false;
   statsToggle = false;
   rmode = false;
+  castTime = {
+    q : 650,
+    w : 200,
+    e : 200,
+    r : 50,
+  };
+  cds = {
+    q : 5,
+    w : 20,
+    e : 10,
+    r : 60,
+  };
   stats = {
     health : 500,
     maxhp : 500,
@@ -2377,7 +2545,7 @@ function mousePressed() {
   }
 
   //Move Commands
-  if (!shopSubstate && state === "game") {
+  if (!shopSubstate && state === "game" && ! castability.q && ! castability.w && ! castability.e && ! castability.r) {
     destinationpos.x = mouseX;
     destinationpos.y = mouseY;
     if (volumeControl) {
@@ -2432,8 +2600,36 @@ function keyTyped() {
     if (key === "c" && state === "game") {
       statsToggle = ! statsToggle;
     }
+
+    if (key === "q") {
+      if (cdcharge.q < cds.q || castability.w || castability.e || castability.r) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else {
+        castability.q = true;
+        cdcharge.q = 0;
+        if (rmode && volumeControl) {
+          player.rqsound.setVolume(0.6);
+          player.rqsound.play();
+        }
+        else if (! rmode && volumeControl) {
+          player.qsound.setVolume(1.0);
+          player.qsound.play();
+        }
+        castq();
+      }
+    }
   
   }
+
+}
+
+function castq() {
+
+  currentTime = millis();
 
 }
 

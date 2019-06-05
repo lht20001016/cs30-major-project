@@ -41,6 +41,7 @@ let charpos;
 let velocity;
 let destinationpos;
 let timer;
+let rtimer;
 let invins;
 let soundOn;
 let soundOff;
@@ -119,7 +120,7 @@ function setAssets() {
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png", itemLoaded);
   volumeControl = true;
-  files = 90;
+  files = 88;
 
 }
 
@@ -188,7 +189,7 @@ function loadFiles() {
     charaltform3b : loadImage("assets/pictures/character/charaltform3b.PNG", itemLoaded),
     charcast1 : loadImage("assets/pictures/character/charcast1.PNG", itemLoaded),
     charcast1b : loadImage("assets/pictures/character/charcast1b.PNG", itemLoaded),
-    chartcast2 : loadImage("assets/pictures/character/charcast2.PNG", itemLoaded),
+    charcast2 : loadImage("assets/pictures/character/charcast2.PNG", itemLoaded),
     charcast2b : loadImage("assets/pictures/character/charcast2b.PNG", itemLoaded),
     charcast3 : loadImage("assets/pictures/character/charcast3.PNG", itemLoaded),
     charcast3b : loadImage("assets/pictures/character/charcast3b.PNG", itemLoaded),
@@ -196,8 +197,6 @@ function loadFiles() {
     chardash1b : loadImage("assets/pictures/character/chardash1b.PNG", itemLoaded),
     chardash2 : loadImage("assets/pictures/character/chardash2.PNG", itemLoaded),
     chardash2b : loadImage("assets/pictures/character/chardash2b.PNG", itemLoaded),
-    charq1 : loadImage("assets/pictures/character/charq1.PNG", itemLoaded),
-    charq1b : loadImage("assets/pictures/character/charq1b.PNG", itemLoaded),
     charq2 : loadImage("assets/pictures/character/charq2.PNG", itemLoaded),
     charq2b : loadImage("assets/pictures/character/charq2b.PNG", itemLoaded),
     charrun1 : loadImage("assets/pictures/character/charrun1.PNG", itemLoaded),
@@ -745,6 +744,7 @@ function loadData() {
   currentItem = 0;
   currentSummoner = 0;
   translatecount = 0;
+  rtimer = -500;
   summonerD = 5;
   summonerDicon = images.flash;
   summonerF = 3;
@@ -1067,11 +1067,14 @@ function characterPosition() {
     if (direction === "forward") {
 
       if (stats.lvl < 6) {
-        if (castability.q && ! rmode) {
+        if (castability.q) {
           playerdisplay = player.charaa1b;
         }
-        else if (castability.q && rmode) {
-          playerdisplay = player.charq1b;
+        else if (castability.w) {
+          playerdisplay = player.charcast1b;
+        }
+        else if (castability.e) {
+          playerdisplay = player.chardash1b;
         }
         else {
           playerdisplay = player.character1b;
@@ -1083,7 +1086,22 @@ function characterPosition() {
           playerdisplay = player.charaa2b;
         }
         else if (castability.q && rmode) {
-          playerdisplay = player.charq1b;
+          playerdisplay = player.charq2b;
+        }
+        else if (castability.w && ! rmode) {
+          playerdisplay = player.charcast2b;
+        }
+        else if (castability.w && rmode) {
+          playerdisplay = player.charaltform2b;
+        }
+        else if (castability.e && ! rmode) {
+          playerdisplay = player.chardash1b;
+        }
+        else if (castability.e && rmode) {
+          playerdisplay = player.chardash2b;
+        }
+        else if (rmode) {
+          playerdisplay = player.charaltform2b;
         }
         else {
           playerdisplay = player.character2b;
@@ -1095,7 +1113,22 @@ function characterPosition() {
           playerdisplay = player.charaa2b;
         }
         else if (castability.q && rmode) {
-          playerdisplay = player.charq1b;
+          playerdisplay = player.charq2b;
+        }
+        else if (castability.w && ! rmode) {
+          playerdisplay = player.charcast3b;
+        }
+        else if (castability.w && rmode) {
+          playerdisplay = player.charaltform3b;
+        }
+        else if (castability.e && ! rmode) {
+          playerdisplay = player.chardash1b;
+        }
+        else if (castability.e && rmode) {
+          playerdisplay = player.chardash2b;
+        }
+        else if (rmode) {
+          playerdisplay = player.charaltform3b;
         }
         else {
           playerdisplay = player.character3b;
@@ -1110,8 +1143,11 @@ function characterPosition() {
         if (castability.q && ! rmode) {
           playerdisplay = player.charaa1;
         }
-        else if (castability.q && rmode) {
-          playerdisplay = player.charq1;
+        else if (castability.w) {
+          playerdisplay = player.charcast1;
+        }
+        else if (castability.e) {
+          playerdisplay = player.chardash1;
         }
         else {
           playerdisplay = player.character1;
@@ -1123,7 +1159,22 @@ function characterPosition() {
           playerdisplay = player.charaa2;
         }
         else if (castability.q && rmode) {
-          playerdisplay = player.charq1;
+          playerdisplay = player.charq2;
+        }
+        else if (castability.w && ! rmode) {
+          playerdisplay = player.charcast2;
+        }
+        else if (castability.w && rmode) {
+          playerdisplay = player.charaltform2;
+        }
+        else if (castability.e && ! rmode) {
+          playerdisplay = player.chardash1;
+        }
+        else if (castability.e && rmode) {
+          playerdisplay = player.chardash2;
+        }
+        else if (rmode) {
+          playerdisplay = player.charaltform2;
         }
         else {
           playerdisplay = player.character2;
@@ -1135,7 +1186,22 @@ function characterPosition() {
           playerdisplay = player.charaa2;
         }
         else if (castability.q && rmode) {
-          playerdisplay = player.charq1;
+          playerdisplay = player.charq2;
+        }
+        else if (castability.w && ! rmode) {
+          playerdisplay = player.charcast3;
+        }
+        else if (castability.w && rmode) {
+          playerdisplay = player.charaltform3;
+        }
+        else if (castability.e && ! rmode) {
+          playerdisplay = player.chardash1;
+        }
+        else if (castability.e && rmode) {
+          playerdisplay = player.chardash2;
+        }
+        else if (rmode) {
+          playerdisplay = player.charaltform3;
         }
         else {
           playerdisplay = player.character3;
@@ -1144,8 +1210,8 @@ function characterPosition() {
 
     }
 
-    charpos.width = width * 0.053;
-    charpos.height = height * 0.09;
+    charpos.width = width * 0.065;
+    charpos.height = height * 0.11;
     image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
   }
@@ -1196,6 +1262,9 @@ function updateTimer() {
     if (!shopSubstate && frameCount % 60 === 0) {
       timer++;
       minionsSpawn();
+      if (rmode) {
+        rtimer++;
+      }
     }
   }
 }
@@ -1328,6 +1397,7 @@ function moveBullet() {
 function castingAbilities() {
 
   if (state === "game") {
+
     if (castability.q) {
       if (millis() - currentTime <= castTime.q) {
         void 0;
@@ -1335,8 +1405,52 @@ function castingAbilities() {
       }
       if (millis() - currentTime > castTime.q) {
         castability.q = false;
+        destinationpos.x = charpos.x;
+        destinationpos.y = charpos.y;
       }
     }
+
+    if (castability.w) {
+      if (millis() - currentTime <= castTime.w) {
+        void 0;
+        //insert w ability in another function
+      }
+      if (millis() - currentTime > castTime.w) {
+        castability.w = false;
+        destinationpos.x = charpos.x;
+        destinationpos.y = charpos.y;
+      }
+    }
+
+    if (castability.e) {
+      if (millis() - currentTime <= castTime.e) {
+        void 0;
+        //insert e ability here
+      }
+      if (millis() - currentTime > castTime.e) {
+        castability.e = false;
+        destinationpos.x = charpos.x;
+        destinationpos.y = charpos.y;
+      }
+    }
+
+    if (castability.r) {
+      if (millis() - currentTime <= castTime.e) {
+        // insert r effects in another function
+        rmode = true;
+      }
+      if (millis() - currentTime > castTime.e) {
+        castability.r = false;
+        destinationpos.x = charpos.x;
+        destinationpos.y = charpos.y;
+      }
+    }
+
+    if (millis() - rtimer >= 20000) {
+      rmode = false;
+      rtimer = -500;
+    }
+
   }
 
 }
@@ -1551,9 +1665,9 @@ function cooldowns() {
 
   fill(40, 222, 255);
   rect(width * 0.38275, height * 0.9383, width * 0.02385 * (cdcharge.q / cds.q), height * 0.008);
-  rect(width * 0.420185, height * 0.9383, width * 0.02385, height * 0.008);
-  rect(width * 0.4582, height * 0.9383, width * 0.02385, height * 0.008);
-  rect(width * 0.495775, height * 0.9383, width * 0.02385, height * 0.008);
+  rect(width * 0.420185, height * 0.9383, width * 0.02385 * (cdcharge.w / cds.w), height * 0.008);
+  rect(width * 0.4582, height * 0.9383, width * 0.02385 * (cdcharge.e / cds.e), height * 0.008);
+  rect(width * 0.495775, height * 0.9383, width * 0.02385 * (cdcharge.r / cds.r), height * 0.008);
 
   rechargeAbilities();
 
@@ -2466,6 +2580,7 @@ function resetGame() {
   tstatus = false;
   statsToggle = false;
   rmode = false;
+  rtimer = -500;
   castTime = {
     q : 650,
     w : 200,
@@ -2609,6 +2724,8 @@ function keyTyped() {
         }
       }
       else {
+        destinationpos.x = mouseX;
+        destinationpos.y = mouseY;
         castability.q = true;
         cdcharge.q = 0;
         if (rmode && volumeControl) {
@@ -2619,15 +2736,91 @@ function keyTyped() {
           player.qsound.setVolume(1.0);
           player.qsound.play();
         }
-        castq();
+        cast();
       }
     }
-  
+
+    if (key === "w") {
+      if (cdcharge.w < cds.w || castability.q || castability.e || castability.r) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else {
+        destinationpos.x = mouseX;
+        destinationpos.y = mouseY;
+        castability.w = true;
+        cdcharge.w = 0;
+        // if (rmode && volumeControl) {
+        //   player.rqsound.setVolume(0.6);
+        //   player.rqsound.play();
+        // }
+        // else if (! rmode && volumeControl) {
+        //   player.qsound.setVolume(1.0);
+        //   player.qsound.play();
+        // }
+        //addsound
+        cast();
+      }
+    }
+
+    if (key === "e") {
+      if (cdcharge.e < cds.e || castability.q || castability.w || castability.r) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else {
+        destinationpos.x = mouseX;
+        destinationpos.y = mouseY;
+        castability.e = true;
+        cdcharge.e = 0;
+        // if (rmode && volumeControl) {
+        //   player.rqsound.setVolume(0.6);
+        //   player.rqsound.play();
+        // }
+        // else if (! rmode && volumeControl) {
+        //   player.qsound.setVolume(1.0);
+        //   player.qsound.play();
+        // }
+        //addsound
+        cast();
+      }
+    }
+
+    if (key === "r") {
+      if (cdcharge.r < cds.r || castability.q || castability.w || castability.e) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else {
+        destinationpos.x = mouseX;
+        destinationpos.y = mouseY;
+        castability.r = true;
+        cdcharge.r = 0;
+        // if (rmode && volumeControl) {
+        //   player.rqsound.setVolume(0.6);
+        //   player.rqsound.play();
+        // }
+        // else if (! rmode && volumeControl) {
+        //   player.qsound.setVolume(1.0);
+        //   player.qsound.play();
+        // }
+        //addsound
+        cast();
+        rtimer = millis();
+      }
+    }
+
   }
 
 }
 
-function castq() {
+function cast() {
 
   currentTime = millis();
 

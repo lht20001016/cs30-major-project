@@ -1284,17 +1284,23 @@ function characterPosition() {
 //responsible for determining the relative velocity of the character's movement relative to its destination
 function determineVelocity() {
 
-  let speedstat;
-  if (150 - stats.speed > 50) {
-    speedstat = stats.speed;
+  let x;
+  let y;
+  let theta;
+  // negative x means backward movement
+  x = destinationpos.x - charpos.x;
+  // negative y means upward movement
+  y = destinationpos.y - charpos.y;
+  theta = atan(x / y);
+  velocity = {
+    x : abs(width * 0.002 * sin(theta)) * (1 + stats.speed / 100),
+    y : abs(width * 0.002 * cos(theta)) * (1 + stats.speed / 100),
+  };
+  if (x < 0) {
+    velocity.x = velocity.x * -1;
   }
-  else {
-    speedstat = 100;
-  }
-
-  if (charpos.x !== destinationpos.x && state === "game") {
-    velocity.x = (destinationpos.x - charpos.x) / (150 - speedstat);
-    velocity.y = (destinationpos.y - charpos.y) / (150 - speedstat);
+  if (y < 0) {
+    velocity.y = velocity.y * -1;
   }
 
 }
@@ -1498,10 +1504,6 @@ function castingAbilities() {
     }
 
     if (castability.w) {
-      if (millis() - currentTime <= castTime.w) {
-        void 0;
-        //insert w ability in another function
-      }
       if (millis() - currentTime > castTime.w) {
         castability.w = false;
         destinationpos.x = charpos.x;
@@ -1511,7 +1513,8 @@ function castingAbilities() {
 
     if (castability.e) {
       if (millis() - currentTime <= castTime.e) {
-        void 0;
+        charpos.x += dashvelocity.x;
+        charpos.y += dashvelocity.y;
       }
       if (millis() - currentTime > castTime.e) {
         castability.e = false;
@@ -1521,11 +1524,9 @@ function castingAbilities() {
     }
 
     if (castability.r) {
-      if (millis() - currentTime <= castTime.e) {
-        rmode = true;
-      }
       if (millis() - currentTime > castTime.e) {
         castability.r = false;
+        rmode = true;
         destinationpos.x = charpos.x;
         destinationpos.y = charpos.y;
       }
@@ -2876,7 +2877,9 @@ function keyTyped() {
         }
       }
       else {
-        stats.mana -= abilitycosts.q;
+        if (! rmode) {
+          stats.mana -= abilitycosts.q;
+        }
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.q = true;
@@ -2901,7 +2904,9 @@ function keyTyped() {
         }
       }
       else {
-        stats.mana -= abilitycosts.w;
+        if (! rmode) {
+          stats.mana -= abilitycosts.w;
+        }
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.w = true;
@@ -2929,11 +2934,32 @@ function keyTyped() {
         }
       }
       else {
-        stats.mana -= abilitycosts.e;
+        if (! rmode) {
+          stats.mana -= abilitycosts.e;
+        }
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.e = true;
         cdcharge.e = 0;
+        let x;
+        let y;
+        let theta;
+        // negative x means backward dash
+        x = destinationpos.x - charpos.x;
+        // negative y means upward dash
+        y = destinationpos.y - charpos.y;
+        theta = atan(x / y);
+        dashvelocity = {
+          x : abs(width * 0.005 * sin(theta)),
+          y : abs(width * 0.005 * cos(theta)),
+        };
+        if (x < 0) {
+          dashvelocity.x = dashvelocity.x * -1;
+        }
+        if (y < 0) {
+          dashvelocity.y = dashvelocity.y * -1;
+        }
+
         if (volumeControl) {
           player.esound.setVolume(0.6);
           player.esound.play();

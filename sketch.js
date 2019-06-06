@@ -70,6 +70,9 @@ let minions = [];
 let enemyMinions = [];
 let bolts = [];
 
+let direction;
+let playerdisplay;
+
 //preload assets
 function preload() {
 
@@ -347,9 +350,9 @@ class Bullet {
 }
 
 class Bolt extends GameObject {
-  constructor(x, y, width, height, type, direction, damage, magicpenetration) {
+  constructor(x, y, width, height, type, orientation, damage, magicpenetration) {
     super(x, y, width, height);
-    if (direction === 1) {
+    if (orientation === 1) {
       this.direction = "forward";
       if (type === 1) {
         this.image = player.projectile1;
@@ -362,7 +365,7 @@ class Bolt extends GameObject {
       }
     }
 
-    if (direction === 0) {
+    if (orientation === 0) {
       this.direction = "backward";
       if (type === 1) {
         this.image = player.projectile1b;
@@ -1117,10 +1120,7 @@ function characterPosition() {
 
   if (state === "game") {
 
-    let playerdisplay;
-    let direction = "forward";
-
-    if (destinationpos.x >= charpos.x) {
+    if (destinationpos.x > charpos.x) {
       direction = "forward";
     }
     else if (destinationpos.x < charpos.x) {
@@ -1301,6 +1301,12 @@ function determineVelocity() {
   }
   if (y < 0) {
     velocity.y = velocity.y * -1;
+  }
+  if (abs(velocity.x) < 1) {
+    velocity.x = 0;
+  }
+  if (abs(velocity.y) < 1) {
+    velocity.y = 0;
   }
 
 }

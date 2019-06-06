@@ -27,8 +27,10 @@ let castTime;
 let cds;
 let cdcharge;
 let castability;
+let dashvelocity;
 let files;
 let state;
+let abilitycosts;
 let currentItem;
 let currentSummoner;
 let tstatus;
@@ -66,6 +68,7 @@ let inventory = [];
 let bullets = [];
 let minions = [];
 let enemyMinions = [];
+let bolts = [];
 
 //preload assets
 function preload() {
@@ -105,7 +108,7 @@ function draw() {
   updateTimer();
   minionFunctions();
   createBullet();
-  moveBullet();
+  moveProjectiles();
   castingAbilities();
   inGameShopDisplay();
   itemDetails();
@@ -118,9 +121,9 @@ function draw() {
 function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
-  titlepic = loadImage("assets/pictures/gamename.png", itemLoaded);
+  titlepic = loadImage("assets/pictures/gamename.png");
   volumeControl = true;
-  files = 88;
+  files = 95;
 
 }
 
@@ -205,12 +208,12 @@ function loadFiles() {
     charrun2b : loadImage("assets/pictures/character/charrun2b.PNG", itemLoaded),
     charrun3 : loadImage("assets/pictures/character/charrun3.PNG", itemLoaded),
     charrun3b : loadImage("assets/pictures/character/charrun3b.PNG", itemLoaded),
-    protectile1 : loadImage("assets/pictures/character/projectile1.PNG", itemLoaded),
+    projectile1 : loadImage("assets/pictures/character/projectile1.PNG", itemLoaded),
     projectile1b : loadImage("assets/pictures/character/projectile1b.PNG", itemLoaded),
     projectile2 : loadImage("assets/pictures/character/projectile2.PNG", itemLoaded),
     projectile2b : loadImage("assets/pictures/character/projectile2b.PNG", itemLoaded),
-    projectile3 : loadImage("assets/pictures/character/projectile3.PNG", itemLoaded),
-    projectile3b : loadImage("assets/pictures/character/projectile3b.PNG", itemLoaded),
+    projectile3 : loadImage("assets/pictures/character/projectile3b.PNG", itemLoaded),
+    projectile3b : loadImage("assets/pictures/character/projectile3.PNG", itemLoaded),
     qicon : loadImage("assets/pictures/character/qicon.png", itemLoaded),
     rqicon : loadImage("assets/pictures/character/rqicon.png", itemLoaded),
     wicon : loadImage("assets/pictures/character/wicon.png", itemLoaded),
@@ -221,9 +224,15 @@ function loadFiles() {
     overlay : loadImage("assets/pictures/character/overlay.png", itemLoaded),
     statsicon : loadImage("assets/pictures/character/statsicon.gif", itemLoaded),
     passiveicon : loadImage("assets/pictures/character/passive.jpg", itemLoaded),
+    passive1icon : loadImage("assets/pictures/character/passive1.png", itemLoaded),
+    passive2icon : loadImage("assets/pictures/character/passive2.png", itemLoaded),
     qsound : loadSound("assets/sounds/qsound.wav", itemLoaded),
     rqsound : loadSound("assets/sounds/rqsound.wav", itemLoaded),
-
+    wsound1 : loadSound("assets/sounds/projectile1.wav", itemLoaded),
+    wsound2 : loadSound("assets/sounds/projectile2.wav", itemLoaded),
+    wsound3 : loadSound("assets/sounds/projectile3.wav", itemLoaded),
+    esound : loadSound("assets/sounds/esound.wav", itemLoaded),
+    rsound : loadSound("assets/sounds/rsound.wav", itemLoaded),
   };
 
 }
@@ -333,6 +342,53 @@ class Bullet {
   display() {
     fill(0, 255 ,255);
     ellipse(this.x, this.y, this.diameter, this.diameter);
+  }
+
+}
+
+class Bolt extends GameObject {
+  constructor(x, y, width, height, type, direction, damage, magicpenetration) {
+    super(x, y, width, height);
+    if (direction === 1) {
+      this.direction = "forward";
+      if (type === 1) {
+        this.image = player.projectile1;
+      }
+      if (type === 2) {
+        this.image = player.projectile2;
+      }
+      if (type === 3) {
+        this.image = player.projectile3;
+      }
+    }
+
+    if (direction === 0) {
+      this.direction = "backward";
+      if (type === 1) {
+        this.image = player.projectile1b;
+      }
+      if (type === 2) {
+        this.image = player.projectile2b;
+      }
+      if (type === 3) {
+        this.image = player.projectile3b;
+      }
+    }
+    this.damage = damage;
+    this.magicpen = magicpenetration;
+  }
+
+  move() {
+    if (this.direction === "forward") {
+      this.x += width * 0.01;
+    }
+    else if (this.direction === "backward") {
+      this.x -= width * 0.01;
+    }
+  }
+
+  display() {
+    image(this.image, this.x, this.y, this.width, this.height);
   }
 
 }
@@ -749,6 +805,13 @@ function loadData() {
   summonerDicon = images.flash;
   summonerF = 3;
   summonerFicon = images.heal;
+  bolts = [];
+  abilitycosts = {
+    q : 25,
+    w : 75,
+    e : 25,
+    r : 125,
+  };
   castability = {
     q : false,
     w : false,
@@ -770,7 +833,7 @@ function loadData() {
   castTime = {
     q : 650,
     w : 200,
-    e : 200,
+    e : 500,
     r : 50,
   };
   tstatus = false;
@@ -1081,7 +1144,7 @@ function characterPosition() {
         }
       }
       
-      else if (stats.lvl >= 6 && stats.lvl < 12) {
+      else if (stats.lvl < 12) {
         if (castability.q && ! rmode) {
           playerdisplay = player.charaa2b;
         }
@@ -1154,7 +1217,7 @@ function characterPosition() {
         }
       }
 
-      else if (stats.lvl >= 6 && stats.lvl < 12) {
+      else if (stats.lvl < 12) {
         if (castability.q && ! rmode) {
           playerdisplay = player.charaa2;
         }
@@ -1353,45 +1416,69 @@ function createBullet() {
 }
 
 //responsible for the individual movement of each bullet
-function moveBullet() {
+function moveProjectiles() {
 
   if (state === "game") {
     stroke(0, 0, 255);
-
-    //moves each bullet in the array bullets, defined at the beginning, according to the class code above
-    for (let i = bullets.length - 1; i >= 0; i--) {
-      if (!shopSubstate) {
-        bullets[i].move();
-      }
-
-      //display the bullets that are on screen
-      if (bullets[i].x > 0) {
-        bullets[i].display();
-      }
-
-      //gameover if the bullet is colliding with the character
-      if ((bullets[i].x - 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x - 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
-      bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
-      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + charpos.height ||
-      bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + charpos.height) &&
-       ! invins) {
-        stats.health -= 50;
-        bullets.splice(i, 1);
-        if (volumeControl){
-          sound.clickItem.setVolume(0.1);
-          sound.clickItem.play();
-        }
-      }
-
-    }
-
-    for (let i = bullets.length - 1; i >= 0; i--) {
-      if (bullets[i].x < 0) {
-        bullets.splice(i, 0);
-      }
-    }
-    
+    moveBullets();
+    moveBolts();
   }
+
+}
+
+function moveBullets() {
+  //moves each bullet in the array bullets, defined at the beginning, according to the class code above
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    if (!shopSubstate) {
+      bullets[i].move();
+    }
+  
+    //display the bullets that are on screen
+    if (bullets[i].x > 0) {
+      bullets[i].display();
+    }
+  
+    //gameover if the bullet is colliding with the character
+    if ((bullets[i].x - 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x - 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
+        bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
+        bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + charpos.height ||
+        bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + charpos.height) &&
+         ! invins) {
+      stats.health -= 50;
+      bullets.splice(i, 1);
+      if (volumeControl){
+        sound.clickItem.setVolume(0.1);
+        sound.clickItem.play();
+      }
+    }
+  
+  }
+  
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    if (bullets[i].x < 0) {
+      bullets.splice(i, 0);
+    }
+  }
+}
+
+function moveBolts() {
+
+  for (let k = bolts.length - 1; k >= 0; k--) {
+
+    bolts[k].display();
+
+    if (!shopSubstate) {
+      bolts[k].move();
+    }
+
+    for (let k = bolts.length - 1; k >= 0; k--) {
+      if (bolts[k].x < bolts[k].width * 0.1 || bolts[k].x > width) {
+        bolts.splice(k, 0);
+      }
+    }
+  
+  }
+
 }
 
 function castingAbilities() {
@@ -1425,7 +1512,6 @@ function castingAbilities() {
     if (castability.e) {
       if (millis() - currentTime <= castTime.e) {
         void 0;
-        //insert e ability here
       }
       if (millis() - currentTime > castTime.e) {
         castability.e = false;
@@ -1436,7 +1522,6 @@ function castingAbilities() {
 
     if (castability.r) {
       if (millis() - currentTime <= castTime.e) {
-        // insert r effects in another function
         rmode = true;
       }
       if (millis() - currentTime > castTime.e) {
@@ -1446,9 +1531,12 @@ function castingAbilities() {
       }
     }
 
-    if (millis() - rtimer >= 20000) {
+    if (millis() - rtimer >= 20000 && rtimer !== -500) {
       rmode = false;
       rtimer = -500;
+      cdcharge.q = cds.q;
+      cdcharge.w = cds.w;
+      cdcharge.e = cds.e;
     }
 
   }
@@ -1671,36 +1759,60 @@ function cooldowns() {
 
   rechargeAbilities();
 
+  cooldownBars();
+
 }
 
 function rechargeAbilities() {
-  if (cdcharge.q > cds.q) {
-    cdcharge.q === cds.q;
+
+  if (! shopSubstate) {
+    if (cdcharge.q > cds.q) {
+      cdcharge.q === cds.q;
+    }
+    else {
+      cdcharge.q += 1 / 60;
+    }
+
+    if (cdcharge.w > cds.w) {
+      cdcharge.w === cds.w;
+    }
+    else {
+      cdcharge.w += 1 / 60;
+    }
+
+    if (cdcharge.e > cds.e) {
+      cdcharge.e === cds.e;
+    }
+    else {
+      cdcharge.e += 1/60;
+    }
+
+    if (cdcharge.r > cds.r) {
+      cdcharge.r === cds.r;
+    }
+    else {
+      cdcharge.r += 1/60;
+    }
   }
-  else {
-    cdcharge.q += 1 / 60;
+}
+
+function cooldownBars() {
+
+  noStroke();
+  fill(0, 0, 0, 165);
+  if (cdcharge.q < cds.q) {
+    rect(width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+  if (cdcharge.w < cds.w) {
+    rect(width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+  if (cdcharge.e < cds.e) {
+    rect(width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+  if (cdcharge.r < cds.r || stats.lvl < 6) {
+    rect(width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
   }
 
-  if (cdcharge.w > cds.w) {
-    cdcharge.w === cds.w;
-  }
-  else {
-    cdcharge.w += 1/60;
-  }
-
-  if (cdcharge.e > cds.e) {
-    cdcharge.e === cds.e;
-  }
-  else {
-    cdcharge.e += 1/60;
-  }
-
-  if (cdcharge.r > cds.r) {
-    cdcharge.r === cds.r;
-  }
-  else {
-    cdcharge.r += 1/60;
-  }
 }
 
 function levelDisplay() {
@@ -1812,8 +1924,23 @@ function abilityDesc() {
 
   if(mouseX >= width * 0.35 && mouseX <= width * 0.3745 && mouseY >= height * 0.8825 && mouseY <= height * 0.9225) {
 
+    let passivelevel;
+
+    if (stats.lvl < 6) {
+      passivelevel = 0;
+    }
+    else if (stats.lvl < 12) {
+      passivelevel = 1;
+    }
+    else if (stats.lvl < 16) {
+      passivelevel = 2;
+    }
+    else {
+      passivelevel = 3;
+    }
+
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
-    texts.effect1 = "Path of the Exiled";
+    texts.effect1 = "Path of the Exiled (" + str(passivelevel) + ")";
     texts.effect2 = "As you level up, gain additional effects:";
     texts.effect3 = "Level 6: Increase your speed by 20 and Mystic Shot fires an additional projectile";
     texts.effect4 = "Level 12: Reduce all damage taken by 10% and Mystic Shot fires an additional projectile";
@@ -1827,7 +1954,7 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Redemption";
+      texts.effect1 = "Redemption (25)";
       texts.effect2 = "Strikes in front of your character, dealing damage equal to Attack Damage * 1.1 + 5";
       texts.effect3 = "Slaying an enemy has a chance to absorb their soul, increasing your Attack Damage by 1";
       texts.effect6 = "Active Ability";  
@@ -1849,7 +1976,7 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Mystic Shot";
+      texts.effect1 = "Mystic Shot (75)";
       let temp;
       if (stats.lvl <= 5) {
         temp = "an projectile of pure energy,";
@@ -1882,7 +2009,7 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Angelic Shift";
+      texts.effect1 = "Angelic Shift (25)";
       texts.effect2 = "Shift across space with immense speed, cutting through all enemies in your path";
       texts.effect3 = "The speed of the dash scales with your number of wings. Enemies in your path";
       texts.effect4 = "takes 10 + 0.1 * Ability Power + 0.15 * Attack Damage damage";
@@ -1905,7 +2032,7 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     texts.effect1 = "Tempest";
-    texts.effect2 = "Transcend into your ultimate form, empower your abilities for 20 seconds:";
+    texts.effect2 = "For 20 seconds, your abilities are empowered and costs no mana:";
     texts.effect3 = "Q - Judgment: Cooldown reduced, deals bonus damage as TRUE damage";
     texts.effect4 = "W - Orbs of Agony: Cooldown reduced, ememies hit takes increased damage";
     texts.effect5 = "E - Wanderer's Strike: Cooldown reduced, deals increased damage";
@@ -1977,10 +2104,21 @@ function statsMenu() {
 
 function abilityicons() {
 
+  let passiveability;
   let qability;
   let wability;
   let eability;
   let rability;
+
+  if (stats.lvl < 6) {
+    passiveability = player.passiveicon;
+  }
+  else if (stats.lvl < 12) { 
+    passiveability = player.passive1icon;
+  }
+  else {
+    passiveability = player.passive2icon;
+  }
 
   if (!rmode) {
     qability = player.qicon;
@@ -1996,12 +2134,19 @@ function abilityicons() {
 
   rability= player.ricon;
 
-  image(player.passiveicon, width * 0.35, height * 0.8825, width * 0.0245, height * 0.04);
+  image(passiveability, width * 0.35, height * 0.8825, width * 0.0245, height * 0.04);
   image(qability, width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
   image(wability, width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
   image(eability, width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
   image(rability, width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
-  
+
+  textSize(width/120);
+  stroke(18, 18, 181);
+  fill(204, 0, 255);  
+  text(abilitycosts.q, width * 0.405, height * 0.895);
+  text(abilitycosts.w, width * 0.443, height * 0.895);
+  text(abilitycosts.e, width * 0.4805, height * 0.895);
+  text(abilitycosts.r, width * 0.5165, height * 0.895);
 
 }
 
@@ -2461,7 +2606,7 @@ function addStats() {
     stats.ad += 40;
     stats.ap += 80;
     stats.maxmana += 150;
-    stats.mana + 150;
+    stats.mana += 150;
     //special ability heal 5%
   }
   if (currentItem === 19) {
@@ -2581,10 +2726,17 @@ function resetGame() {
   statsToggle = false;
   rmode = false;
   rtimer = -500;
+  bolts = [];
+  abilitycosts = {
+    q : 25,
+    w : 75,
+    e : 25,
+    r : 125,
+  };
   castTime = {
     q : 650,
     w : 200,
-    e : 200,
+    e : 500,
     r : 50,
   };
   cds = {
@@ -2717,13 +2869,14 @@ function keyTyped() {
     }
 
     if (key === "q") {
-      if (cdcharge.q < cds.q || castability.w || castability.e || castability.r) {
+      if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
         }
       }
       else {
+        stats.mana -= abilitycosts.q;
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.q = true;
@@ -2741,76 +2894,74 @@ function keyTyped() {
     }
 
     if (key === "w") {
-      if (cdcharge.w < cds.w || castability.q || castability.e || castability.r) {
+      if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
         }
       }
       else {
+        stats.mana -= abilitycosts.w;
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.w = true;
         cdcharge.w = 0;
-        // if (rmode && volumeControl) {
-        //   player.rqsound.setVolume(0.6);
-        //   player.rqsound.play();
-        // }
-        // else if (! rmode && volumeControl) {
-        //   player.qsound.setVolume(1.0);
-        //   player.qsound.play();
-        // }
-        //addsound
+
         cast();
+
+        bolt1();
+        if (stats.lvl >= 6) {
+          setTimeout(bolt2, 100);    
+        }
+        if (stats.lvl >= 12) {
+          setTimeout(bolt3, 200);       
+        }
+
+ 
       }
     }
 
     if (key === "e") {
-      if (cdcharge.e < cds.e || castability.q || castability.w || castability.r) {
+      if (cdcharge.e < cds.e || castability.q || castability.w || castability.r || stats.mana < abilitycosts.e) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
         }
       }
       else {
+        stats.mana -= abilitycosts.e;
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.e = true;
         cdcharge.e = 0;
-        // if (rmode && volumeControl) {
-        //   player.rqsound.setVolume(0.6);
-        //   player.rqsound.play();
-        // }
-        // else if (! rmode && volumeControl) {
-        //   player.qsound.setVolume(1.0);
-        //   player.qsound.play();
-        // }
-        //addsound
+        if (volumeControl) {
+          player.esound.setVolume(0.6);
+          player.esound.play();
+        }
         cast();
       }
     }
 
     if (key === "r") {
-      if (cdcharge.r < cds.r || castability.q || castability.w || castability.e) {
+      if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r || stats.lvl < 6) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
         }
       }
       else {
+        stats.mana -= abilitycosts.r;
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
+        cdcharge.q = cds.q;
+        cdcharge.w = cds.w;
+        cdcharge.e = cds.e;
         castability.r = true;
         cdcharge.r = 0;
-        // if (rmode && volumeControl) {
-        //   player.rqsound.setVolume(0.6);
-        //   player.rqsound.play();
-        // }
-        // else if (! rmode && volumeControl) {
-        //   player.qsound.setVolume(1.0);
-        //   player.qsound.play();
-        // }
-        //addsound
+        if (volumeControl) {
+          player.rsound.setVolume(0.6);
+          player.rsound.play();
+        }
         cast();
         rtimer = millis();
       }
@@ -2818,6 +2969,45 @@ function keyTyped() {
 
   }
 
+}
+
+function bolt1() {
+  if (destinationpos.x >= charpos.x) {
+    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.03, height * 0.08, 1, 1, 50, 0));
+  }
+  else if (destinationpos.x < charpos.x) {
+    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08)/ 2, width * 0.03, height * 0.08, 1, 0, 50, 0));
+  }
+  if (volumeControl) {
+    player.wsound1.setVolume(0.5);
+    player.wsound1.play();
+  }
+}
+
+function bolt2() {
+  if (destinationpos.x >= charpos.x) {
+    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 1, 50, 0));
+  }
+  else if (destinationpos.x < charpos.x) {
+    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 0, 50, 0));
+  }
+  if (volumeControl) {
+    player.wsound2.setVolume(0.5);
+    player.wsound2.play();
+  }
+}
+
+function bolt3() {
+  if (destinationpos.x >= charpos.x) {
+    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 1, 50, 0));
+  }
+  else if (destinationpos.x < charpos.x) {
+    bolts.push(new Bolt(charpos.x - height * 0.05, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 0, 50, 0));
+  }
+  if (volumeControl) {
+    player.wsound3.setVolume(0.5);
+    player.wsound3.play();
+  }
 }
 
 function cast() {

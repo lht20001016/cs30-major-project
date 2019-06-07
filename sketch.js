@@ -814,6 +814,8 @@ function loadData() {
     w : 75,
     e : 25,
     r : 125,
+    d : 0,
+    f : 0,
   };
   castability = {
     q : false,
@@ -826,17 +828,21 @@ function loadData() {
     w : 20,
     e : 10,
     r : 60,
+    d : 0,
+    f : 0,
   };
   cdcharge = {
     q : 5,
     w : 20,
     e : 10,
     r : 60,
+    d : 0,
+    f : 0,
   };
   castTime = {
     q : 650,
     w : 200,
-    e : 500,
+    e : 420,
     r : 50,
   };
   tstatus = false;
@@ -1047,14 +1053,14 @@ function summonerInfo() {
     texts.effect4 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 2) {
-    texts.effect1 = "clarity";
+    texts.effect1 = "Clarity";
     texts.effect2 = "Quickly restore some mana";
-    texts.effect4 = "Cooldown: 30 seconds";
+    texts.effect4 = "Cooldown: 10 seconds";
   }
   if (currentSummoner === 3) {
     texts.effect1 = "Heal";
     texts.effect2 = "Quickly heals your character";
-    texts.effect4 = "Cooldown: 30 seconds";
+    texts.effect4 = "Cooldown: 25 seconds";
   }
   if (currentSummoner === 4) {
     texts.effect1 = "Barrier";
@@ -1302,12 +1308,6 @@ function determineVelocity() {
   if (y < 0) {
     velocity.y = velocity.y * -1;
   }
-  if (abs(velocity.x) < 1) {
-    velocity.x = 0;
-  }
-  if (abs(velocity.y) < 1) {
-    velocity.y = 0;
-  }
 
 }
 
@@ -1315,11 +1315,21 @@ function determineVelocity() {
 function characterMovement() {
 
   if (!shopSubstate && charpos.x + charpos.width + velocity.x <= width && state === "game" && ! castability.q && ! castability.w && ! castability.e && ! castability.r) {
-    charpos.x += velocity.x;
+    if (velocity.x < 0 && charpos.x + velocity.x > destinationpos.x) {
+      charpos.x += velocity.x;
+    }
+    if (velocity.x > 0 && charpos.x + velocity.x < destinationpos.x) {
+      charpos.x += velocity.x;
+    }
   }
 
   if (!shopSubstate && charpos.y + velocity.y <= height - charpos.height && state === "game" && ! castability.q && ! castability.w && ! castability.e && ! castability.r) {
-    charpos.y += velocity.y;
+    if (velocity.y < 0 && charpos.y + velocity.y > destinationpos.y) {
+      charpos.y += velocity.y;
+    }
+    if (velocity.y > 0 && charpos.y + velocity.y < destinationpos.y) {
+      charpos.y += velocity.y;
+    }
   }
 
 }
@@ -1597,10 +1607,10 @@ function characterStatus() {
     
     summonericons();
 
-    image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
-
     cooldowns();
 
+    image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
+    
     levelDisplay();
 
     iteminfodisplay();
@@ -1800,24 +1810,76 @@ function rechargeAbilities() {
     else {
       cdcharge.r += 1/60;
     }
+
+    if (cdcharge.d > cds.d) {
+      cdcharge.d === cds.d;
+    }
+    else {
+      cdcharge.d += 1/60;
+    }
+
+    if (cdcharge.f > cds.f) {
+      cdcharge.f === cds.f;
+    }
+    else {
+      cdcharge.f += 1/60;
+    }
   }
 }
 
 function cooldownBars() {
 
   noStroke();
-  fill(0, 0, 0, 165);
-  if (cdcharge.q < cds.q) {
+
+  if (stats.mana < abilitycosts.q && !rmode) {
+    fill(80, 220, 220, 128);
     rect(width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
   }
-  if (cdcharge.w < cds.w) {
+  else if (cdcharge.q < cds.q) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+
+  if (stats.mana < abilitycosts.w && !rmode) {
+    fill(80, 220, 220, 128);
     rect(width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
   }
-  if (cdcharge.e < cds.e) {
+
+  else if (cdcharge.w < cds.w) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+
+  if (stats.mana < abilitycosts.e && !rmode) {
+    fill(80, 220, 220, 128);
     rect(width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
   }
-  if (cdcharge.r < cds.r || stats.lvl < 6) {
+  else if (cdcharge.e < cds.e) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.4545, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+
+  if (stats.lvl < 6) {
+    fill(0, 0, 0, 165);
     rect(width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+  else if (stats.mana < abilitycosts.r && !rmode) {
+    fill(80, 220, 220, 128);
+    rect(width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+  else if (cdcharge.r < cds.r) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.492, height * 0.8825, width * 0.0325, height * 0.0525);
+  }
+
+  if (cdcharge.d < cds.d) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.532, height * 0.8825, width * 0.024, height * 0.0393);
+  }
+
+  if (cdcharge.f < cds.f) {
+    fill(0, 0, 0, 165);
+    rect(width * 0.5605, height * 0.8825, width * 0.024, height * 0.0393);
   }
 
 }
@@ -1931,23 +1993,8 @@ function abilityDesc() {
 
   if(mouseX >= width * 0.35 && mouseX <= width * 0.3745 && mouseY >= height * 0.8825 && mouseY <= height * 0.9225) {
 
-    let passivelevel;
-
-    if (stats.lvl < 6) {
-      passivelevel = 0;
-    }
-    else if (stats.lvl < 12) {
-      passivelevel = 1;
-    }
-    else if (stats.lvl < 16) {
-      passivelevel = 2;
-    }
-    else {
-      passivelevel = 3;
-    }
-
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
-    texts.effect1 = "Path of the Exiled (" + str(passivelevel) + ")";
+    texts.effect1 = "Path of the Exiled";
     texts.effect2 = "As you level up, gain additional effects:";
     texts.effect3 = "Level 6: Increase your speed by 20 and Mystic Shot fires an additional projectile";
     texts.effect4 = "Level 12: Reduce all damage taken by 10% and Mystic Shot fires an additional projectile";
@@ -2022,7 +2069,7 @@ function abilityDesc() {
       texts.effect4 = "takes 10 + 0.1 * Ability Power + 0.15 * Attack Damage damage";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: 10 seconds";
-      texts.additionaltexts2 = "Take it as I was never here, just be grateful for what was left";
+      texts.additionaltexts2 = "Take it as I was never here, just be grateful for what is left";
     }
     else {
       texts.effect1 = "Wanderer's Strike";
@@ -2047,6 +2094,97 @@ function abilityDesc() {
     texts.additionaltexts = "Cooldown: 60 seconds"; 
     texts.additionaltexts2 = "Do not fear me, fear the nothing after I am gone"; 
 
+  }
+
+  if(mouseX >= width * 0.532 && mouseX <= width * 0.556 && mouseY >= height * 0.8825 && mouseY <= height * 0.9218) {
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    if (summonerD === 1) {
+      texts.effect1 = "Ignite";
+      texts.effect2 = "Strike with a fierce fiery energy, dealing 10% additional damage";
+      texts.effect3 = "with all abilities";
+      texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
+      texts.additionaltexts2 = "Why understand something when one can set fire to it?"; 
+    }
+    if (summonerD === 2) {
+      texts.effect1 = "Clarity";
+      texts.effect2 = "Have peace with the soul and the mind, restoring 20% of your maximum mana";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 10 seconds"; 
+      texts.additionaltexts2 = "The only true widsom is in knowing you know knothing"; 
+    }
+    if (summonerD === 3) {
+      texts.effect1 = "Heal";
+      texts.effect2 = "Call upon the energy of life, restoring 10% of your maximum health or";
+      texts.effect3 = "25% missing health, whichever is greater";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 25 seconds"; 
+      texts.additionaltexts2 = "It has been said, time heals all wounds"; 
+    }
+    if (summonerD === 4) {
+      texts.effect1 = "Barrier";
+      texts.effect2 = "Become ";
+      texts.effect3 = "with all abilities";
+      texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
+      texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
+    }
+    if (summonerD === 5) {
+      texts.effect1 = "Flash";
+      texts.effect2 = "Warp time and space, teleporting your character a distance towards";
+      texts.effect3 = "your cursoe";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
+      texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
+    }
+  }
+
+
+  if(mouseX >= width * 0.5605 && mouseX <= width * 0.5845 && mouseY >= height * 0.8825 && mouseY <= height * 0.9218) {
+    rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
+    if (summonerF === 1) {
+      texts.effect1 = "Ignite";
+      texts.effect2 = "Strike with a fierce fiery energy, dealing 10% additional damage";
+      texts.effect3 = "with all abilities";
+      texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
+      texts.additionaltexts2 = "Why understand something when one can set fire to it?"; 
+    }
+    if (summonerF === 2) {
+      texts.effect1 = "Clarity";
+      texts.effect2 = "Have peace with the soul and the mind, restoring 20% of your maximum mana";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 10 seconds"; 
+      texts.additionaltexts2 = "The only true widsom is in knowing you know knothing"; 
+    }
+    if (summonerF === 3) {
+      texts.effect1 = "Heal";
+      texts.effect2 = "Call upon the energy of life, restoring 10% of your maximum health or";
+      texts.effect3 = "25% missing health, whichever is greater";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 25 seconds"; 
+      texts.additionaltexts2 = "It has been said, time heals all wounds"; 
+    }
+    if (summonerF === 4) {
+      texts.effect1 = "Barrier";
+      texts.effect2 = "Become ";
+      texts.effect3 = "with all abilities";
+      texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 20 seconds"; 
+      texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
+    }
+    if (summonerF === 5) {
+      texts.effect1 = "Flash";
+      texts.effect2 = "Warp time and space, teleporting your character a distance towards";
+      texts.effect3 = "your cursoe";
+      texts.effect6 = "Summoner Ability";
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
+      texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
+    }
   }
 
 }
@@ -2739,11 +2877,13 @@ function resetGame() {
     w : 75,
     e : 25,
     r : 125,
+    d : 0,
+    f : 0,
   };
   castTime = {
     q : 650,
     w : 200,
-    e : 500,
+    e : 425,
     r : 50,
   };
   cds = {
@@ -2751,6 +2891,16 @@ function resetGame() {
     w : 20,
     e : 10,
     r : 60,
+    d : 0,
+    f : 0,
+  };
+  cdcharge = {
+    q : 5,
+    w : 20,
+    e : 10,
+    r : 60,
+    d : 0,
+    f : 0,
   };
   stats = {
     health : 500,
@@ -2812,6 +2962,46 @@ function mousePressed() {
     mouseY >= height * 0.75 && mouseY <= height / 4 * 3 + height / 6 && loadCount === files) {
     state = "game";
     menumusic.stop();
+    if (summonerD === 1) {
+      cds.d = 30;
+      cdcharge.d = 30;
+    }
+    else if (summonerD === 2){
+      cds.d = 10;
+      cdcharge.d = 10;
+    }
+    else if (summonerD === 3){
+      cds.d = 25;
+      cdcharge.d = 25;
+    }
+    else if (summonerD === 4){
+      cds.d = 30;
+      cdcharge.d = 30;
+    }
+    else if (summonerD === 5){
+      cds.d = 30;
+      cdcharge.d = 30;
+    }
+    if (summonerF === 1) {
+      cds.f = 30;
+      cdcharge.f = 30;
+    }
+    else if (summonerF === 2){
+      cds.f = 10;
+      cdcharge.f = 10;
+    }
+    else if (summonerF === 3){
+      cds.f = 25;
+      cdcharge.f = 25;
+    }
+    else if (summonerF === 4){
+      cds.f = 30;
+      cdcharge.f = 30;
+    }
+    else if (summonerF === 5){
+      cds.f = 30;
+      cdcharge.f = 30;
+    }
     if (volumeControl) {
       sound.startgame.setVolume(0.1);
       sound.startgame.play();
@@ -2999,9 +3189,129 @@ function keyTyped() {
       }
     }
 
+    if (key === "d") {
+      if (cdcharge.d < cds.d) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else {
+        cdcharge.d = 0;
+        if (summonerD === 1) {
+          castignite();
+        }
+        else if (summonerD === 2) {
+          castclarity();
+        }
+        else if (summonerD === 3) {
+          castheal();
+        }
+        else if (summonerD === 4) {
+          castbarrier();
+        }
+        else if (summonerD === 5) {
+          castflash();
+        }
+      }
+    }
+
+    
+    if (key === "f") {
+      if (cdcharge.f < cds.f) {
+        if (volumeControl) {
+          sound.gameover.setVolume(0.1);
+          sound.gameover.play();
+        }
+      }
+      else{
+        cdcharge.f = 0;
+        if (summonerF === 1) {
+          castignite();
+        }
+        else if (summonerF === 2) {
+          castclarity();
+        }
+        else if (summonerF === 3) {
+          castheal();
+        }
+        else if (summonerF === 4) {
+          castbarrier();
+        }
+        else if (summonerF === 5) {
+          castflash();
+        }
+      }
+    }
+
   }
 
 }
+
+function castignite() {
+  void 0;
+}
+
+function castclarity() {
+  if (volumeControl) {
+    sound.clarity.setVolume(0.1);
+    sound.clarity.play();
+  }
+  stats.mana += stats.maxmana / 5;
+  if (stats.mana > stats.manmana) {
+    stats.mana = stats.maxmana;
+  }
+}
+
+function castheal() {
+  if (volumeControl) {
+    sound.heal.setVolume(0.1);
+    sound.heal.play();
+  }
+  if (stats.maxhp * 0.1 > (stats.maxhp - stats.health) * 0.25) {
+    stats.health += stats.maxhp * 0.1;
+  }
+  else {
+    stats.health += (stats.maxhp - stats.health) * 0.25;
+  }
+  if (stats.health > stats.maxhp) {
+    stats.health = stats.maxhp;
+  }
+}
+
+function castbarrier() {
+  void 0;
+}
+
+function castflash() {
+  void 0;
+}
+
+// texts.effect1 = "Ignite";
+// texts.effect2 = "Strike with a fierce fiery energy, dealing 10% additional damage";
+// texts.effect3 = "with all abilities";
+// texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+// texts.effect6 = "Summoner Ability";
+// texts.additionaltexts = "Cooldown: 30 seconds"; 
+// texts.additionaltexts2 = "Why understand something when one can set fire to it?"; 
+// }
+
+// if (summonerF === 4) {
+// texts.effect1 = "Barrier";
+// texts.effect2 = "Become ";
+// texts.effect3 = "with all abilities";
+// texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+// texts.effect6 = "Summoner Ability";
+// texts.additionaltexts = "Cooldown: 20 seconds"; 
+// texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
+// }
+// if (summonerF === 5) {
+// texts.effect1 = "Flash";
+// texts.effect2 = "Warp time and space, teleporting your character a distance towards";
+// texts.effect3 = "your cursoe";
+// texts.effect6 = "Summoner Ability";
+// texts.additionaltexts = "Cooldown: 30 seconds"; 
+// texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
 
 function bolt1() {
   if (destinationpos.x >= charpos.x) {

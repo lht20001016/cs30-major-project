@@ -24,6 +24,7 @@ let summonerFicon;
 let allSummoners;
 let currentTime;
 let castTime;
+let buffs;
 let cds;
 let cdcharge;
 let castability;
@@ -43,7 +44,7 @@ let charpos;
 let velocity;
 let destinationpos;
 let timer;
-let rtimer;
+let abilitytiming;
 let invins;
 let soundOn;
 let soundOff;
@@ -117,6 +118,7 @@ function draw() {
   itemDetails();
   characterStatus();
   gameOverYet();
+  console.log(destinationpos);
 
 }
 
@@ -205,12 +207,14 @@ function loadFiles() {
     chardash2b : loadImage("assets/pictures/character/chardash2b.PNG", itemLoaded),
     charq2 : loadImage("assets/pictures/character/charq2.PNG", itemLoaded),
     charq2b : loadImage("assets/pictures/character/charq2b.PNG", itemLoaded),
+    // not currently used
     charrun1 : loadImage("assets/pictures/character/charrun1.PNG", itemLoaded),
     charrun1b : loadImage("assets/pictures/character/charrun1b.PNG", itemLoaded),
     charrun2 : loadImage("assets/pictures/character/charrun2.PNG", itemLoaded),
     charrun2b : loadImage("assets/pictures/character/charrun2b.PNG", itemLoaded),
     charrun3 : loadImage("assets/pictures/character/charrun3.PNG", itemLoaded),
     charrun3b : loadImage("assets/pictures/character/charrun3b.PNG", itemLoaded),
+    //
     projectile1 : loadImage("assets/pictures/character/projectile1.PNG", itemLoaded),
     projectile1b : loadImage("assets/pictures/character/projectile1b.PNG", itemLoaded),
     projectile2 : loadImage("assets/pictures/character/projectile2.PNG", itemLoaded),
@@ -803,12 +807,20 @@ function loadData() {
   currentItem = 0;
   currentSummoner = 0;
   translatecount = 0;
-  rtimer = -500;
+  abilitytiming = {
+    r : -500,
+    ignite : -500,
+    barrier : -500,
+  };
   summonerD = 5;
   summonerDicon = images.flash;
   summonerF = 3;
   summonerFicon = images.heal;
   bolts = [];
+  buffs = {
+    barrier : false,
+    ignite : false,    
+  };
   abilitycosts = {
     q : 25,
     w : 75,
@@ -1347,9 +1359,6 @@ function updateTimer() {
     if (!shopSubstate && frameCount % 60 === 0) {
       timer++;
       minionsSpawn();
-      if (rmode) {
-        rtimer++;
-      }
     }
   }
 }
@@ -1548,12 +1557,23 @@ function castingAbilities() {
       }
     }
 
-    if (millis() - rtimer >= 20000 && rtimer !== -500) {
+    if (millis() - abilitytiming.r >= 20000 && abilitytiming.r !== -500) {
       rmode = false;
-      rtimer = -500;
+      abilitytiming.r = -500;
       cdcharge.q = cds.q;
       cdcharge.w = cds.w;
       cdcharge.e = cds.e;
+    }
+
+    if (millis() - abilitytiming.ignite >= 10000 && abilitytiming.ignite !== -500) {
+      buffs.ignite = false;
+      abilitytiming.ignite = -500;
+    }
+
+    
+    if (millis() - abilitytiming.barrier >= 10000 && abilitytiming.barrier !== -500) {
+      buffs.barrier = false;
+      abilitytiming.barrier = -500;
     }
 
   }
@@ -2319,6 +2339,17 @@ function inGameShopDisplay() {
     fill(111, 242, 24);
     stroke(15, 66, 32);
     text("Shop", width * 0.7, height * 0.08);
+    
+    //freeze buff timing
+    if (abilitytiming.r !== 500) {
+      abilitytiming.r += 16 + 2 / 3;
+    }
+    if (abilitytiming.ignite !== 500) {
+      abilitytiming.r += 16 + 2 / 3;
+    }
+    if (abilitytiming.barrier !== 500) {
+      abilitytiming.r += 16 + 2 / 3;
+    }
 
   } 
 }
@@ -2870,7 +2901,15 @@ function resetGame() {
   tstatus = false;
   statsToggle = false;
   rmode = false;
-  rtimer = -500;
+  buffs = {
+    barrier : false,
+    ignite : false,    
+  };
+  abilitytiming = {
+    r : -500,
+    ignite : -500,
+    barrier : -500,
+  };
   bolts = [];
   abilitycosts = {
     q : 25,
@@ -3185,7 +3224,7 @@ function keyTyped() {
           player.rsound.play();
         }
         cast();
-        rtimer = millis();
+        abilitytiming.r = millis();
       }
     }
 
@@ -3200,6 +3239,7 @@ function keyTyped() {
         cdcharge.d = 0;
         if (summonerD === 1) {
           castignite();
+          abilitytiming.ignite = millis();
         }
         else if (summonerD === 2) {
           castclarity();
@@ -3209,6 +3249,7 @@ function keyTyped() {
         }
         else if (summonerD === 4) {
           castbarrier();
+          abilitytiming.barrier = millis();
         }
         else if (summonerD === 5) {
           castflash();
@@ -3228,6 +3269,7 @@ function keyTyped() {
         cdcharge.f = 0;
         if (summonerF === 1) {
           castignite();
+          abilitytiming.ignite = millis();
         }
         else if (summonerF === 2) {
           castclarity();
@@ -3237,6 +3279,7 @@ function keyTyped() {
         }
         else if (summonerF === 4) {
           castbarrier();
+          abilitytiming.barrier = millis();
         }
         else if (summonerF === 5) {
           castflash();
@@ -3249,7 +3292,11 @@ function keyTyped() {
 }
 
 function castignite() {
-  void 0;
+  if (volumeControl) {
+    sound.ignite.setVolume(0.1);
+    sound.ignite.play();
+  }
+  buffs.ignite = true;
 }
 
 function castclarity() {
@@ -3280,38 +3327,60 @@ function castheal() {
 }
 
 function castbarrier() {
-  void 0;
+  if (volumeControl) {
+    sound.barrier.setVolume(0.1);
+    sound.barrier.play();
+  }
+  buffs.barrier = true;
 }
 
 function castflash() {
-  void 0;
+
+
+  let x;
+  let y;
+  let theta;
+  let dashx;
+  let dashy;
+  destinationpos.x = mouseX;
+  destinationpos.y = mouseY;
+  // negative x means backward movement
+  x = destinationpos.x - charpos.x;
+  // negative y means upward movement
+  y = destinationpos.y - charpos.y;
+  theta = atan(abs(x) / abs(y));
+  if (volumeControl) {
+    sound.flash.setVolume(0.1);
+    sound.flash.play();
+  }
+  if (sqrt(sq(x) + sq(y)) < width * 0.35) {
+    charpos.x = destinationpos.x;
+    charpos.y = destinationpos.y;
+  }
+  else {
+    dashx = abs(sin(theta) * width * 0.2);
+    dashy = abs(cos(theta) * width * 0.2);
+    if (x < 0) {
+      dashx = dashx * -1;
+    }
+    if (y < 0) {
+      dashy = dashy * -1;
+    }
+    destinationpos.x = charpos.x + dashx;
+    destinationpos.y = charpos.y + dashy;
+    charpos.x = destinationpos.x;
+    charpos.y = destinationpos.y;
+    if (x < 0) {
+      destinationpos.x = charpos.x - 1;
+    }
+    else {
+      destinationpos.x = charpos.x + 1;
+    }
+  }
+
 }
 
-// texts.effect1 = "Ignite";
-// texts.effect2 = "Strike with a fierce fiery energy, dealing 10% additional damage";
-// texts.effect3 = "with all abilities";
-// texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
-// texts.effect6 = "Summoner Ability";
-// texts.additionaltexts = "Cooldown: 30 seconds"; 
-// texts.additionaltexts2 = "Why understand something when one can set fire to it?"; 
-// }
 
-// if (summonerF === 4) {
-// texts.effect1 = "Barrier";
-// texts.effect2 = "Become ";
-// texts.effect3 = "with all abilities";
-// texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
-// texts.effect6 = "Summoner Ability";
-// texts.additionaltexts = "Cooldown: 20 seconds"; 
-// texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
-// }
-// if (summonerF === 5) {
-// texts.effect1 = "Flash";
-// texts.effect2 = "Warp time and space, teleporting your character a distance towards";
-// texts.effect3 = "your cursoe";
-// texts.effect6 = "Summoner Ability";
-// texts.additionaltexts = "Cooldown: 30 seconds"; 
-// texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
 
 function bolt1() {
   if (destinationpos.x >= charpos.x) {

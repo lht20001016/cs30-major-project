@@ -118,7 +118,6 @@ function draw() {
   itemDetails();
   characterStatus();
   gameOverYet();
-  console.log(destinationpos);
 
 }
 
@@ -128,7 +127,7 @@ function setAssets() {
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png");
   volumeControl = true;
-  files = 95;
+  files = 101;
 
 }
 
@@ -176,6 +175,12 @@ function loadFiles() {
     enemyCannon : loadImage("assets/pictures/enemyCannon.png", itemLoaded),
     friendlyMinion : loadImage("assets/pictures/friendlyMinion.png", itemLoaded),
     enemyMinion : loadImage("assets/pictures/enemyMinion.png", itemLoaded),
+    border : loadImage("assets/pictures/border.png", itemLoaded),
+    border2 : loadImage("assets/pictures/border2.png", itemLoaded),
+    border3 : loadImage("assets/pictures/border3.png", itemLoaded),
+    buttonwings : loadImage("assets/pictures/buttondecor.png", itemLoaded),
+    buttonborder : loadImage("assets/pictures/buttonborder.png", itemLoaded),
+    buttonborder2 : loadImage("assets/pictures/buttonborder2.png", itemLoaded),
   };
 
   player = {
@@ -421,12 +426,12 @@ class Button extends GameObject {
     if(this.mouse) {
       fill(this.hoverColor);
       cursor(this.hoverCursor);
+      image(images.buttonborder2, this.x - this.width * 0.049, this.y - this.height * 0.08, this.width * 1.103, this.height * 1.12);
+    }
+    else {
+      image(images.buttonborder, this.x - this.width * 0.049, this.y - this.height * 0.08, this.width * 1.103, this.height * 1.12);
     }
     noStroke();
-    rect(this.x, this.y, this.width, this.height);
-    noFill();
-    stroke(this.hoverColor);
-    strokeWeight(3);
     rect(this.x, this.y, this.width, this.height);
 
     fill(this.textColor);
@@ -462,20 +467,18 @@ class Item extends GameObject {
     strokeWeight(7.5);
 
     if(this.itemID === currentItem) {
-      stroke(0, 255, 255);
+      image(images.border3, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height * 1.12);
     }
     else if (this.mouse) {
-      stroke(this.hoverBorderColor);
+      image(images.border2, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height * 1.12);
     }
     else {
-      stroke(this.borderColor);
+      image(images.border, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height * 1.12);
     }
 
     if (mouseX >= this.x && mouseY >= this.y && mouseX <= this.x + this.width && mouseY <= this.y + this.height) {
       cursor("assets/cursors/gotomenu.cur");
     }
-
-    rect(this.x, this.y, this.width, this.height);
 
     image(this.icon, this.x, this.y, this.width, this.height);
 
@@ -644,20 +647,18 @@ class Summoners extends GameObject {
     strokeWeight(7.5);
 
     if(this.summonerID === currentSummoner) {
-      stroke(186, 20, 161);
+      image(images.border3, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height + this.height * 0.12);
     }
     else if (this.mouse) {
-      stroke(this.hoverBorderColor);
+      image(images.border2, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height + this.height * 0.12);
     }
     else {
-      stroke(this.borderColor);
+      image(images.border, this.x - this.width * 0.028, this.y - this.height * 0.08, this.width * 1.066, this.height + this.height * 0.12);
     }
 
     if (mouseX >= this.x && mouseY >= this.y && mouseX <= this.x + this.width && mouseY <= this.y + this.height) {
       cursor("assets/cursors/gotomenu.cur");
     }
-
-    rect(this.x, this.y, this.width, this.height);
 
     image(this.icon, this.x, this.y, this.width, this.height);
 
@@ -676,11 +677,11 @@ class Summoners extends GameObject {
 //function called when all the loading is done, initializing buttons
 function createButtons() {
 
-  openShopButton = new Button(width / 8, height * (13/24), width * 0.75, height / 8, "Loadout", 36, 0, 
+  openShopButton = new Button(width * 0.35, height * (13/24), width * 0.3, height / 8, "Loadout", 36, 0, 
     openShop, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
-  shopToMenuButton = new Button(width * 0.15, height * 0.85, width * 0.7, height * 0.1, "Done", 36, 0, 
+  shopToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Done", 36, 0, 
     shopToMenu, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
-  gameoverToMenuButton = new Button(width * 0.15, height * 0.85, width * 0.7, height * 0.1, "Return To Menu", 36, 0, 
+  gameoverToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Return To Menu", 36, 0, 
     gmToMenu, [0, 255, 255], [0, 77, 255], "assets/cursors/gotomenu.cur");
   openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], 
     openInGameShopMenu, [36, 78, 125], [26, 86, 206], "assets/cursors/shop.cur");
@@ -939,20 +940,23 @@ function showMenus() {
     image(titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
     
     stroke(0, 0, 255);
-    noFill();
-    rect(width / 10, height / 4 * 3, width * 0.8, height / 6);
     if (loadCount < files) {
       fill(255, 0 ,0);
+      image(images.buttonborder, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
     }
-    else if (mouseX >= width / 10 && mouseX <= width * 0.9 &&
+    else if (mouseX >= width * 0.25 && mouseX <= width * 0.75 &&
       mouseY >= height * 0.75 && mouseY <= height / 4 * 3 + height / 6 && loadCount === files) {
       fill(0, 77, 255);
       cursor("assets/cursors/startgame.cur");
+      image(images.buttonborder2, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
     }
     else {
       fill(0, 255, 255);
+      image(images.buttonborder, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
     }
-    rect(width / 10, height * 0.75, width * 0.8 / files * loadCount, height / 6);
+    rect(width * 0.25, height * 0.75, width * 0.5 / files * loadCount, height / 6);
+
+    
 
     fill(0);
     textSize(32);
@@ -2200,7 +2204,7 @@ function abilityDesc() {
     if (summonerF === 5) {
       texts.effect1 = "Flash";
       texts.effect2 = "Warp time and space, teleporting your character a distance towards";
-      texts.effect3 = "your cursoe";
+      texts.effect3 = "your cursor";
       texts.effect6 = "Summoner Ability";
       texts.additionaltexts = "Cooldown: 30 seconds"; 
       texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
@@ -3379,8 +3383,6 @@ function castflash() {
   }
 
 }
-
-
 
 function bolt1() {
   if (destinationpos.x >= charpos.x) {

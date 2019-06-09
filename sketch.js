@@ -127,7 +127,7 @@ function setAssets() {
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png");
   volumeControl = true;
-  files = 101;
+  files = 102;
 
 }
 
@@ -178,9 +178,10 @@ function loadFiles() {
     border : loadImage("assets/pictures/border.png", itemLoaded),
     border2 : loadImage("assets/pictures/border2.png", itemLoaded),
     border3 : loadImage("assets/pictures/border3.png", itemLoaded),
-    buttonwings : loadImage("assets/pictures/buttondecor.png", itemLoaded),
     buttonborder : loadImage("assets/pictures/buttonborder.png", itemLoaded),
     buttonborder2 : loadImage("assets/pictures/buttonborder2.png", itemLoaded),
+    startgameborder :loadImage("assets/pictures/startgameborder.png", itemLoaded),
+    startgameborder2 :loadImage("assets/pictures/startgameborder2.png", itemLoaded),
   };
 
   player = {
@@ -407,14 +408,12 @@ class Bolt extends GameObject {
 
 //Extension class responsible for clickable buttons
 class Button extends GameObject {
-  constructor(x, y, width, height, buttonText, textSize, textColor, clickedOn, color, hoverColor, hoverCursor) {
+  constructor(x, y, width, height, buttonText, textSize, textColor, clickedOn, hoverCursor) {
     super(x, y, width, height);
     this.buttonText = buttonText;
     this.textColor = textColor;
     this.textSize = textSize;
     this.clickedOn = clickedOn;
-    this.color = color;
-    this.hoverColor = hoverColor;
     this.hoverCursor = hoverCursor;
   }
 
@@ -422,17 +421,16 @@ class Button extends GameObject {
   run() {
     this.checkMouse();
 
-    fill(this.color);
-    if(this.mouse) {
-      fill(this.hoverColor);
-      cursor(this.hoverCursor);
-      image(images.buttonborder2, this.x - this.width * 0.049, this.y - this.height * 0.08, this.width * 1.103, this.height * 1.12);
-    }
-    else {
-      image(images.buttonborder, this.x - this.width * 0.049, this.y - this.height * 0.08, this.width * 1.103, this.height * 1.12);
-    }
+    fill(65, 155, 255);
     noStroke();
     rect(this.x, this.y, this.width, this.height);
+    if(this.mouse) {
+      cursor(this.hoverCursor);
+      image(images.buttonborder2, this.x - this.width * 0.026, this.y - this.height * 0.2, this.width * 1.052, this.height * 1.43);
+    }
+    else {
+      image(images.buttonborder, this.x - this.width * 0.026, this.y - this.height * 0.2, this.width * 1.052, this.height * 1.43);
+    }
 
     fill(this.textColor);
     strokeWeight(1);
@@ -677,18 +675,12 @@ class Summoners extends GameObject {
 //function called when all the loading is done, initializing buttons
 function createButtons() {
 
-  openShopButton = new Button(width * 0.35, height * (13/24), width * 0.3, height / 8, "Loadout", 36, 0, 
-    openShop, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
-  shopToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Done", 36, 0, 
-    shopToMenu, [209, 19, 221], [103, 19, 109], "assets/cursors/shop.cur");
-  gameoverToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Return To Menu", 36, 0, 
-    gmToMenu, [0, 255, 255], [0, 77, 255], "assets/cursors/gotomenu.cur");
-  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], 
-    openInGameShopMenu, [36, 78, 125], [26, 86, 206], "assets/cursors/shop.cur");
-  selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, 
-    selecttoD, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
-  selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, 
-    selecttoF, [191, 57, 239], [93, 12, 122], "assets/cursors/gotomenu.cur");
+  openShopButton = new Button(width * 0.35, height * (13/24), width * 0.3, height / 8, "Loadout", 36, 0, openShop, "assets/cursors/shop.cur");
+  shopToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Done", 36, 0, shopToMenu, "assets/cursors/shop.cur");
+  gameoverToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Return To Menu", 36, 0, gmToMenu, "assets/cursors/gotomenu.cur");
+  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], openInGameShopMenu, "assets/cursors/shop.cur");
+  selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, selecttoD, "assets/cursors/gotomenu.cur");
+  selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, selecttoF, "assets/cursors/gotomenu.cur");
 
 }
 
@@ -939,23 +931,30 @@ function showMenus() {
     rectMode(CORNER);
     image(titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
     
-    stroke(0, 0, 255);
+    noStroke();
     if (loadCount < files) {
-      fill(255, 0 ,0);
-      image(images.buttonborder, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
+      fill(65, 155, 255, 155);
     }
     else if (mouseX >= width * 0.25 && mouseX <= width * 0.75 &&
       mouseY >= height * 0.75 && mouseY <= height / 4 * 3 + height / 6 && loadCount === files) {
-      fill(0, 77, 255);
+      fill(65, 155, 255);
       cursor("assets/cursors/startgame.cur");
-      image(images.buttonborder2, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
     }
     else {
-      fill(0, 255, 255);
-      image(images.buttonborder, width * 0.225, height * 0.735, width * 0.5525, height * 0.195);
+      fill(65, 155, 255);
     }
     rect(width * 0.25, height * 0.75, width * 0.5 / files * loadCount, height / 6);
 
+    if (loadCount < files) {
+      image(images.startgameborder, width * 0.235, height * 0.705, width * 0.53, height * 0.235);
+    }
+    else if (mouseX >= width * 0.25 && mouseX <= width * 0.75 &&
+      mouseY >= height * 0.75 && mouseY <= height / 4 * 3 + height / 6 && loadCount === files) {
+      image(images.startgameborder2, width * 0.235, height * 0.705, width * 0.53, height * 0.235);
+    }
+    else {
+      image(images.startgameborder, width * 0.235, height * 0.705, width * 0.53, height * 0.235);
+    }
     
 
     fill(0);
@@ -2330,7 +2329,7 @@ function summonericons() {
 function inGameShopDisplay() {
   if (shopSubstate && state === "game") {
 
-    fill(154, 191, 167);
+    fill(198, 211, 255, 165);
     rect(width * 0.13, height * 0.02, width * 0.7, height * 0.8);
 
     for (let y = 0; y < 6; y++) {
@@ -2379,6 +2378,7 @@ function itemDetails() {
       purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
         purchaseItem, [11, 232, 176], [45, 142, 118], "assets/cursors/shop.cur");
       image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
+      image(images.buttonborder, width * 0.668, height * 0.2575, width * 0.063, width * 0.086);
       purchaseButton.run();
       noStroke();
       fill(0);
@@ -3109,7 +3109,7 @@ function keyTyped() {
     }
 
     if (key === "q") {
-      if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q) {
+      if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
@@ -3124,11 +3124,11 @@ function keyTyped() {
         castability.q = true;
         cdcharge.q = 0;
         if (rmode && volumeControl) {
-          player.rqsound.setVolume(0.6);
+          player.rqsound.setVolume(0.5);
           player.rqsound.play();
         }
         else if (! rmode && volumeControl) {
-          player.qsound.setVolume(1.0);
+          player.qsound.setVolume(0.5);
           player.qsound.play();
         }
         cast();
@@ -3136,7 +3136,7 @@ function keyTyped() {
     }
 
     if (key === "w") {
-      if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w) {
+      if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
@@ -3166,7 +3166,7 @@ function keyTyped() {
     }
 
     if (key === "e") {
-      if (cdcharge.e < cds.e || castability.q || castability.w || castability.r || stats.mana < abilitycosts.e) {
+      if (cdcharge.e < cds.e|| castability.q || castability.w || castability.r || stats.mana < abilitycosts.e && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();
@@ -3200,7 +3200,7 @@ function keyTyped() {
         }
 
         if (volumeControl) {
-          player.esound.setVolume(0.6);
+          player.esound.setVolume(0.5);
           player.esound.play();
         }
         cast();
@@ -3208,7 +3208,7 @@ function keyTyped() {
     }
 
     if (key === "r") {
-      if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r || stats.lvl < 6) {
+      if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r && !rmode || stats.lvl < 6) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
           sound.gameover.play();

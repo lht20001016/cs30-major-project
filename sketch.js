@@ -65,14 +65,14 @@ let texts;
 let images;
 let sound;
 let items;
+let direction;
+let playerdisplay;
 let inventory = [];
 let bullets = [];
 let minions = [];
 let enemyMinions = [];
 let bolts = [];
-
-let direction;
-let playerdisplay;
+let cannonbolts = [];
 
 //preload assets
 function preload() {
@@ -360,7 +360,7 @@ class Bullet {
 }
 
 class Bolt extends GameObject {
-  constructor(x, y, width, height, type, orientation, damage, magicpenetration) {
+  constructor(x, y, width, height, type, orientation, damage, magicpenetration, vx, vy, theta) {
     super(x, y, width, height);
     if (orientation === 1) {
       this.direction = "forward";
@@ -389,19 +389,24 @@ class Bolt extends GameObject {
     }
     this.damage = damage;
     this.magicpen = magicpenetration;
+    this.vx = vx;
+    this.vy = vy;
+    this.theta = theta;
   }
 
   move() {
-    if (this.direction === "forward") {
-      this.x += width * 0.01;
-    }
-    else if (this.direction === "backward") {
-      this.x -= width * 0.01;
-    }
+    this.x += this.vx;
+    this.y += this.vy;  
   }
 
   display() {
-    image(this.image, this.x, this.y, this.width, this.height);
+    push();
+    translate(this.x, this.y);
+    rotate(this.theta);
+    imageMode(CENTER);
+    image(this.image, 0, 0, this.width, this.height);
+    imageMode(CORNER);
+    pop();
   }
 
 }
@@ -626,6 +631,71 @@ class Creep extends GameObject {
 
 }
 
+class Cannons extends GameObject {
+
+  constructor(x, y, width, height, direction, damage) {
+    super(x, y, width, height);
+    this.health = 50 + timer;
+    this.maxhp = 50 + timer;
+    this.magicresist = 10 + floor(timer / 5);
+    this.armor = 15 + floor(timer / 4);
+    this.speed = width * 0.01;
+    this.direction = direction;
+    this.damage = damage;
+  }
+
+  display() {
+    image(images.enemyCannon, this.x, this.y, this.width, this.height);
+  }
+
+  move() {
+    // if (direction === "forward") {
+    //   this.x += this.speed;
+    // }
+    // else {
+    this.x -= this.speed;
+    // }
+  }
+
+  attack() {
+
+    let x;
+    let y;
+    let theta;
+    x = (charpos.x + charpos.width / 2) - (this.x + this.width / 2);
+    y = (charpos.y + charpos.height / 2) - (this.y + this.height / 2);
+    theta = atan(x / y);
+    let vx = abs(width * 0.006 * sin(theta));
+    let vy = abs(width * 0.006 * cos(theta));
+    if (x < 0) {
+      vx = vx * -1;
+    }
+    if (y < 0) {
+      vy = vy * -1;
+    }
+    cannonbolts.push(new Cannonbolt(this.x + this.width / 2, this.y + this.height / 2, this.width, this.height, vx, vy, this.damage));
+    
+  }
+
+}
+
+class Cannonbolt extends GameObject {
+  constructor(x, y, width, height, vx, vy, damage) {
+    super(x, y, width, height);
+    this.vx = vx;
+    this.vy = vy;
+    this.damage = damage;
+  }
+
+  run () {
+    this.x += this.vx;
+    this.y += this.vy;
+    fill(0);
+    ellipse(this.x, this.y, 50, 50);
+  }
+
+}
+
 class Summoners extends GameObject {
   constructor(x, y, width, height, sound, picture, hoverCursor, borderColor, hoverBorderColor, summonerID) {
     super(x, y, width, height);
@@ -800,6 +870,7 @@ function loadData() {
   currentItem = 0;
   currentSummoner = 0;
   translatecount = 0;
+  cannonbolts = [];
   abilitytiming = {
     r : -500,
     ignite : -500,
@@ -1368,72 +1439,75 @@ function updateTimer() {
 
 function minionsSpawn() {
 
-  if (timer % 30 === 5) {
-    spawnMelee();
-  }
-  if (timer % 30 === 7) {
+  if (timer % 20 === 5) {
     spawnCannon();
   }
 
 }
 
-function spawnMelee() {
+// function spawnMelee() {
 
-  minions.push(new Creep(0, height * 0.2, width * 0.06, height * 0.1, "melee", "friendly"));
-  minions.push(new Creep(0, height * 0.4, width * 0.06, height * 0.1, "melee", "friendly"));
-  minions.push(new Creep(0, height * 0.6, width * 0.06, height * 0.1, "melee", "friendly"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "melee", "enemy"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "melee", "enemy"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "melee", "enemy"));
+//   // minions.push(new Creep(0, height * 0.2, width * 0.06, height * 0.1, "melee", "friendly"));
+//   // minions.push(new Creep(0, height * 0.4, width * 0.06, height * 0.1, "melee", "friendly"));
+//   // minions.push(new Creep(0, height * 0.6, width * 0.06, height * 0.1, "melee", "friendly"));
+//   enemyMinions.push(new Creep(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "melee", "enemy"));
+//   enemyMinions.push(new Creep(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "melee", "enemy"));
+//   enemyMinions.push(new Creep(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "melee", "enemy"));
 
-}
+// }
 
 function spawnCannon() {
-  minions.push(new Creep(0, height * 0.2, width * 0.06, height * 0.1, "cannon", "friendly"));
-  minions.push(new Creep(0, height * 0.4, width * 0.06, height * 0.1, "cannon", "friendly"));
-  minions.push(new Creep(0, height * 0.6, width * 0.06, height * 0.1, "cannon", "friendly"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "cannon", "enemy"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "cannon", "enemy"));
-  enemyMinions.push(new Creep(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "cannon", "enemy"));
+  enemyMinions.push(new Cannons(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "backward", 50));
+  // enemyMinions.push(new Cannons(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "backward", 50));
+  // enemyMinions.push(new Cannons(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "backward", 50));
 }
 
 function minionFunctions() {
 
-  if (state === "game") {
+  if (state === "game" && ! shopSubstate) {
 
-    //move minions
+    // for (let i = minions.length - 1; i >= 0; i--) {
+    //   if (! shopSubstate && minions[i] !== undefined) {
+    //     minions[i].moveAttack();
+    //   }
+    //   minions[i].show();
+    // }
 
-    for (let i = minions.length - 1; i >= 0; i--) {
-      if (! shopSubstate && minions[i] !== undefined) {
-        minions[i].moveAttack();
-      }
-      minions[i].show();
-    }
+    // for (let k = enemyMinions.length - 1; k >= 0; k--) {
+    //   if (! shopSubstate && enemyMinions[k] !== undefined) {
+    //     enemyMinions[k].moveAttack();
+    //   }
+    //   enemyMinions[k].show();
+    // }
+
+    // for (let m = enemyMinions.length - 1; m >= 0; m--) {
+    //   if (enemyMinions[m].hp <= 0) {
+    //     enemyMinions.splice(m , 1);
+    //   }
+    // }
+
+    // for (let l = minions.length - 1; l >= 0; l--) {
+    //   if (minions[l].hp <= 0) {
+    //     minions.splice(l, 1);
+    //   }
+    // }
 
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
-      if (! shopSubstate && enemyMinions[k] !== undefined) {
-        enemyMinions[k].moveAttack();
-      }
-      enemyMinions[k].show();
-    }
-
-    for (let m = enemyMinions.length - 1; m >= 0; m--) {
-      if (enemyMinions[m].hp <= 0) {
-        enemyMinions.splice(m , 1);
+      enemyMinions[k].move();
+      enemyMinions[k].display();
+      if (frameCount % 60 === 0 ){
+        enemyMinions[k].attack();
       }
     }
 
-    for (let l = minions.length - 1; l >= 0; l--) {
-      if (minions[l].hp <= 0) {
-        minions.splice(l, 1);
-      }
+    for(let i = cannonbolts.length - 1; i >= 0; i--) {
+      cannonbolts[i].run();
     }
-
-
 
   }
 
 }
+
 
 //responsible for the creation of the bullets
 function createBullet() {
@@ -1443,7 +1517,7 @@ function createBullet() {
     //loop that cycles through every frame and, depending on the difficulty and timer, there is a possibility of generating a bullet according to the class code above, which is then pushed into an array defined at the beginning
     let randomvalue = random(0, difficulty - 20 * timer);
     if (randomvalue <= 40) { 
-      bullets.push(new Bullet());
+      //bullets.push(new Bullet());
     }
   }
 
@@ -2905,6 +2979,7 @@ function resetGame() {
   tstatus = false;
   statsToggle = false;
   rmode = false;
+  cannonbolts = [];
   buffs = {
     barrier : false,
     ignite : false,    
@@ -3385,11 +3460,27 @@ function castflash() {
 }
 
 function bolt1() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - (charpos.x + charpos.width / 2);
+  y = mouseY - (charpos.y + charpos.height / 2);
+  theta = atan(x / y);
+  let vx = abs(width * 0.006 * sin(theta));
+  let vy = abs(width * 0.006 * cos(theta));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.03, height * 0.08, 1, 1, 50, 0));
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, 50, 0, vx, vy, theta));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08)/ 2, width * 0.03, height * 0.08, 1, 0, 50, 0));
+    bolts.push(new Bolt(charpos.x  + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, 50, 0, vx, vy, theta));
   }
   if (volumeControl) {
     player.wsound1.setVolume(0.5);
@@ -3398,11 +3489,26 @@ function bolt1() {
 }
 
 function bolt2() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - charpos.x - charpos.width / 2;
+  y = mouseY - charpos.y - charpos.height / 2;
+  theta = atan(x / y);
+  let vx = abs(width * 0.006 * sin(theta));
+  let vy = abs(width * 0.006 * cos(theta));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 1, 50, 0));
+    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 1, 50, 0, vx, vy, theta));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 0, 50, 0));
+    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 0, 50, 0, vx, vy, theta));
   }
   if (volumeControl) {
     player.wsound2.setVolume(0.5);
@@ -3411,11 +3517,26 @@ function bolt2() {
 }
 
 function bolt3() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - charpos.x - charpos.width / 2;
+  y = mouseY - charpos.y - charpos.height / 2;
+  theta = atan(x / y);
+  let vx = abs(width * 0.006 * sin(theta));
+  let vy = abs(width * 0.006 * cos(theta));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 1, 50, 0));
+    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 1, 50, 0, vx, vy, theta));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x - height * 0.05, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 0, 50, 0));
+    bolts.push(new Bolt(charpos.x - height * 0.05, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 0, 50, 0, vx, vy, theta));
   }
   if (volumeControl) {
     player.wsound3.setVolume(0.5);

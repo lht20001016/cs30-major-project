@@ -22,7 +22,7 @@ The goal for this Major Project is to create a 2-D fighting game featuring a div
 
 #### Gameplay
 
-- Abilities Chosen Before Bame in a Menu (State Variables, Text, Variables, maybe Arrays)
+- Abilities Chosen Before Game in a Menu (State Variables, Text, Variables, maybe Arrays)
 - Currency to be Gained in-game (Variables)
 - Powerups to Collect in-game using a Shop (2-D Arrays and Classes)
 - Character styles, abilities, and theme/flavor (Assets and Variables)

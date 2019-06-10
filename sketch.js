@@ -127,7 +127,7 @@ function setAssets() {
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png");
   volumeControl = true;
-  files = 102;
+  files = 100;
 
 }
 
@@ -225,8 +225,6 @@ function loadFiles() {
     projectile1b : loadImage("assets/pictures/character/projectile1b.PNG", itemLoaded),
     projectile2 : loadImage("assets/pictures/character/projectile2.PNG", itemLoaded),
     projectile2b : loadImage("assets/pictures/character/projectile2b.PNG", itemLoaded),
-    projectile3 : loadImage("assets/pictures/character/projectile3b.PNG", itemLoaded),
-    projectile3b : loadImage("assets/pictures/character/projectile3.PNG", itemLoaded),
     qicon : loadImage("assets/pictures/character/qicon.png", itemLoaded),
     rqicon : loadImage("assets/pictures/character/rqicon.png", itemLoaded),
     wicon : loadImage("assets/pictures/character/wicon.png", itemLoaded),
@@ -363,28 +361,20 @@ class Bolt extends GameObject {
   constructor(x, y, width, height, type, orientation, damage, magicpenetration, vx, vy, theta) {
     super(x, y, width, height);
     if (orientation === 1) {
-      this.direction = "forward";
       if (type === 1) {
         this.image = player.projectile1;
       }
       if (type === 2) {
         this.image = player.projectile2;
       }
-      if (type === 3) {
-        this.image = player.projectile3;
-      }
     }
 
     if (orientation === 0) {
-      this.direction = "backward";
       if (type === 1) {
         this.image = player.projectile1b;
       }
       if (type === 2) {
         this.image = player.projectile2b;
-      }
-      if (type === 3) {
-        this.image = player.projectile3b;
       }
     }
     this.damage = damage;
@@ -401,7 +391,7 @@ class Bolt extends GameObject {
 
   display() {
     push();
-    translate(this.x, this.y);
+    translate(this.x + this.width / 2, this.y + this.width / 2);
     rotate(this.theta);
     imageMode(CENTER);
     image(this.image, 0, 0, this.width, this.height);
@@ -662,8 +652,8 @@ class Cannons extends GameObject {
     let x;
     let y;
     let theta;
-    x = (charpos.x + charpos.width / 2) - (this.x + this.width / 2);
-    y = (charpos.y + charpos.height / 2) - (this.y + this.height / 2);
+    x = charpos.x + charpos.width / 2 - (this.x + this.width / 2);
+    y = charpos.y + charpos.height / 2 - (this.y + this.height / 2);
     theta = atan(x / y);
     let vx = abs(width * 0.006 * sin(theta));
     let vy = abs(width * 0.006 * cos(theta));
@@ -1564,7 +1554,7 @@ function moveBullets() {
   
   for (let i = bullets.length - 1; i >= 0; i--) {
     if (bullets[i].x < 0) {
-      bullets.splice(i, 0);
+      bullets.splice(i, 1);
     }
   }
 }
@@ -1579,9 +1569,9 @@ function moveBolts() {
       bolts[k].move();
     }
 
-    for (let k = bolts.length - 1; k >= 0; k--) {
-      if (bolts[k].x < bolts[k].width * 0.1 || bolts[k].x > width) {
-        bolts.splice(k, 0);
+    for (let l = bolts.length - 1; l >= 0; l--) {
+      if (bolts[l].x < bolts[l].width * -1 || bolts[l].x > width) {
+        bolts.splice(l, 1);
       }
     }
   
@@ -1626,7 +1616,7 @@ function castingAbilities() {
     }
 
     if (castability.r) {
-      if (millis() - currentTime > castTime.e) {
+      if (millis() - currentTime > castTime.r) {
         castability.r = false;
         rmode = true;
         destinationpos.x = charpos.x;
@@ -2418,13 +2408,13 @@ function inGameShopDisplay() {
     text("Shop", width * 0.7, height * 0.08);
     
     //freeze buff timing
-    if (abilitytiming.r !== 500) {
+    if (abilitytiming.r !== -500) {
       abilitytiming.r += 16 + 2 / 3;
     }
-    if (abilitytiming.ignite !== 500) {
+    if (abilitytiming.ignite !== -500) {
       abilitytiming.r += 16 + 2 / 3;
     }
-    if (abilitytiming.barrier !== 500) {
+    if (abilitytiming.barrier !== -500) {
       abilitytiming.r += 16 + 2 / 3;
     }
 
@@ -3230,10 +3220,10 @@ function keyTyped() {
 
         bolt1();
         if (stats.lvl >= 6) {
-          setTimeout(bolt2, 100);    
+          setTimeout(bolt1, 100);    
         }
         if (stats.lvl >= 12) {
-          setTimeout(bolt3, 200);       
+          setTimeout(bolt2, 200);       
         }
 
  
@@ -3259,9 +3249,9 @@ function keyTyped() {
         let y;
         let theta;
         // negative x means backward dash
-        x = destinationpos.x - charpos.x;
+        x = destinationpos.x - charpos.x + charpos.width / 2;
         // negative y means upward dash
-        y = destinationpos.y - charpos.y;
+        y = destinationpos.y - charpos.y + charpos.height / 2;
         theta = atan(x / y);
         dashvelocity = {
           x : abs(width * 0.005 * sin(theta)),
@@ -3476,11 +3466,18 @@ function bolt1() {
     vy = vy * -1;
   }
 
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
   if (destinationpos.x >= charpos.x) {
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, 50, 0, vx, vy, theta));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x  + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, 50, 0, vx, vy, theta));
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, 50, 0, vx, vy, theta));
   }
   if (volumeControl) {
     player.wsound1.setVolume(0.5);
@@ -3504,43 +3501,23 @@ function bolt2() {
   if (y < 0) {
     vy = vy * -1;
   }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 1, 50, 0, vx, vy, theta));
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, 75, 0, vx, vy, theta));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x - height * 0.08, charpos.y + (charpos.height - height * 0.08) / 2, width * 0.035, height * 0.08, 2, 0, 50, 0, vx, vy, theta));
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, 75, 0, vx, vy, theta));
   }
   if (volumeControl) {
     player.wsound2.setVolume(0.5);
     player.wsound2.play();
-  }
-}
-
-function bolt3() {
-
-  let x;
-  let y;
-  let theta;
-  x = mouseX - charpos.x - charpos.width / 2;
-  y = mouseY - charpos.y - charpos.height / 2;
-  theta = atan(x / y);
-  let vx = abs(width * 0.006 * sin(theta));
-  let vy = abs(width * 0.006 * cos(theta));
-  if (x < 0) {
-    vx = vx * -1;
-  }
-  if (y < 0) {
-    vy = vy * -1;
-  }
-  if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 1, 50, 0, vx, vy, theta));
-  }
-  else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x - height * 0.05, charpos.y + (charpos.height - height * 0.05) / 2, width * 0.05, height * 0.05, 3, 0, 50, 0, vx, vy, theta));
-  }
-  if (volumeControl) {
-    player.wsound3.setVolume(0.5);
-    player.wsound3.play();
   }
 }
 

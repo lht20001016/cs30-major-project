@@ -77,9 +77,6 @@ let cannonbolts = [];
 //preload assets
 function preload() {
 
-  menumusic = loadSound("assets/sounds/menumusic.wav");
-  soundOn = loadImage("assets/pictures/soundon.png");
-  soundOff = loadImage("assets/pictures/soundoff.png");
   setAssets();
 
 }
@@ -126,8 +123,11 @@ function setAssets() {
 
   bg = loadImage("assets/pictures/gamebackground.jpg");
   titlepic = loadImage("assets/pictures/gamename.png");
+  menumusic = loadSound("assets/sounds/menumusic.wav");
+  soundOn = loadImage("assets/pictures/soundon.png");
+  soundOff = loadImage("assets/pictures/soundoff.png");
   volumeControl = true;
-  files = 100;
+  files = 101;
 
 }
 
@@ -180,8 +180,9 @@ function loadFiles() {
     border3 : loadImage("assets/pictures/border3.png", itemLoaded),
     buttonborder : loadImage("assets/pictures/buttonborder.png", itemLoaded),
     buttonborder2 : loadImage("assets/pictures/buttonborder2.png", itemLoaded),
-    startgameborder :loadImage("assets/pictures/startgameborder.png", itemLoaded),
-    startgameborder2 :loadImage("assets/pictures/startgameborder2.png", itemLoaded),
+    startgameborder : loadImage("assets/pictures/startgameborder.png", itemLoaded),
+    startgameborder2 : loadImage("assets/pictures/startgameborder2.png", itemLoaded),
+    cannonbolt : loadImage("assets/pictures/cannonbolt.png", itemLoaded),
   };
 
   player = {
@@ -655,33 +656,48 @@ class Cannons extends GameObject {
     x = charpos.x + charpos.width / 2 - (this.x + this.width / 2);
     y = charpos.y + charpos.height / 2 - (this.y + this.height / 2);
     theta = atan(x / y);
-    let vx = abs(width * 0.006 * sin(theta));
-    let vy = abs(width * 0.006 * cos(theta));
+    let vx = abs(width * 0.0085 * sin(theta));
+    let vy = abs(width * 0.0085 * cos(theta));
     if (x < 0) {
       vx = vx * -1;
     }
     if (y < 0) {
       vy = vy * -1;
     }
-    cannonbolts.push(new Cannonbolt(this.x + this.width / 2, this.y + this.height / 2, this.width, this.height, vx, vy, this.damage));
+    cannonbolts.push(new Cannonbolt(this.x + this.width / 2, this.y + this.height / 2, vx, vy, this.damage, theta));
     
   }
 
 }
 
 class Cannonbolt extends GameObject {
-  constructor(x, y, width, height, vx, vy, damage) {
-    super(x, y, width, height);
+  constructor(x, y, vx, vy, damage, theta) {
+    super(x, y);
+    this.width = width * 0.065;
+    this.height = height * 0.03;
     this.vx = vx;
     this.vy = vy;
     this.damage = damage;
+    if (theta > 0) {
+      this.theta = PI / 2 - theta;
+    }
+    else if (theta < 0) {
+      this.theta = 3 * PI / 2 - theta;
+    }
+    this.image = images.cannonbolt;
   }
 
   run () {
     this.x += this.vx;
     this.y += this.vy;
     fill(0);
-    ellipse(this.x, this.y, 50, 50);
+    push();
+    translate(this.x, this.y);
+    rotate(this.theta);
+    imageMode(CENTER);
+    image(this.image, 0, 0, this.width, this.height);
+    imageMode(CORNER);
+    pop();
   }
 
 }

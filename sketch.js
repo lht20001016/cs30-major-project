@@ -690,6 +690,9 @@ class Cannonbolt extends GameObject {
   run () {
     this.x += this.vx;
     this.y += this.vy;
+  }
+
+  display() {
     fill(0);
     push();
     translate(this.x, this.y);
@@ -1470,7 +1473,7 @@ function spawnCannon() {
 
 function minionFunctions() {
 
-  if (state === "game" && ! shopSubstate) {
+  if (state === "game") {
 
     // for (let i = minions.length - 1; i >= 0; i--) {
     //   if (! shopSubstate && minions[i] !== undefined) {
@@ -1499,15 +1502,20 @@ function minionFunctions() {
     // }
 
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
-      enemyMinions[k].move();
       enemyMinions[k].display();
-      if (frameCount % 60 === 0 ){
-        enemyMinions[k].attack();
+      if (! shopSubstate) {
+        enemyMinions[k].move();
+        if (frameCount % 60 === 0 ){
+          enemyMinions[k].attack();
+        }
       }
     }
 
     for(let i = cannonbolts.length - 1; i >= 0; i--) {
-      cannonbolts[i].run();
+      cannonbolts[i].display();
+      if (! shopSubstate) {
+        cannonbolts[i].run();
+      }
     }
 
   }

@@ -2439,8 +2439,7 @@ function itemDetails() {
 
     //Display the item information when selected
     if (currentItem !== 0 && shopSubstate) {
-      purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, 
-        purchaseItem, [11, 232, 176], [45, 142, 118], "assets/cursors/shop.cur");
+      purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, purchaseItem, "assets/cursors/shop.cur");
       image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
       image(images.buttonborder, width * 0.668, height * 0.2575, width * 0.063, width * 0.086);
       purchaseButton.run();

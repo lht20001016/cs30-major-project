@@ -1934,7 +1934,9 @@ function cooldowns() {
   rect(width * 0.38275, height * 0.9383, width * 0.02385 * (cdcharge.q / cds.q), height * 0.008);
   rect(width * 0.420185, height * 0.9383, width * 0.02385 * (cdcharge.w / cds.w), height * 0.008);
   rect(width * 0.4582, height * 0.9383, width * 0.02385 * (cdcharge.e / cds.e), height * 0.008);
-  rect(width * 0.495775, height * 0.9383, width * 0.02385 * (cdcharge.r / cds.r), height * 0.008);
+  if (stats.lvl >= 6) {
+    rect(width * 0.495775, height * 0.9383, width * 0.02385 * (cdcharge.r / cds.r), height * 0.008);
+  }
 
   rechargeAbilities();
 

@@ -1,10 +1,6 @@
 //STILL TO DO
 // - COMBAT AND LEVELING SYSTEM
-// - UPDATE CURSORS
-// - ABILITY DESCRPITION
 // - GAME DISCRIPTION
-// - BACKGROUND AND AESTHETICS
-// - CHARACTER ABILITY
 // - BALANCE ITEMS
 // - WIN CON?
 
@@ -17,6 +13,7 @@ let gameoverToMenuButton;
 let purchaseButton;
 let selectSummoner;
 let selectSummoner2;
+let hit = false;
 let summonerD;
 let summonerDicon;
 let summonerF;
@@ -67,6 +64,14 @@ let sound;
 let items;
 let direction;
 let playerdisplay;
+let qup = false;
+let eup = false;
+let cannonbolthitbox = [];
+let bolthitbox = [];
+let playerhitbox = [];
+let enemyminionhitbox = [];
+let qhitbox = [];
+let ehitbox = [];
 let inventory = [];
 let bullets = [];
 let minions = [];
@@ -359,7 +364,7 @@ class Bullet {
 }
 
 class Bolt extends GameObject {
-  constructor(x, y, width, height, type, orientation, damage, magicpenetration, vx, vy, theta) {
+  constructor(x, y, width, height, type, orientation, damage, magicpenetration, vx, vy, theta, id) {
     super(x, y, width, height);
     if (orientation === 1) {
       if (type === 1) {
@@ -383,11 +388,23 @@ class Bolt extends GameObject {
     this.vx = vx;
     this.vy = vy;
     this.theta = theta;
+    this.id = id;
   }
 
   move() {
     this.x += this.vx;
     this.y += this.vy;  
+  }
+
+  hitbox() {
+    let hitx = this.x;
+    let hity = this.y;
+    let hitwidth = this.width;
+    let hitheight = this.height;
+    bolthitbox[this.id][0] = createVector(hitx, hity);
+    bolthitbox[this.id][1] = createVector(hitx + hitwidth, hity);
+    bolthitbox[this.id][2] = createVector(hitx + hitwidth, hity + hitheight);
+    bolthitbox[this.id][3] = createVector(hitx, hity + hitheight);
   }
 
   display() {
@@ -488,143 +505,9 @@ class Item extends GameObject {
   }
 }
 
-class Creep extends GameObject {
-
-  constructor(x, y, width, height, type, side) {
-    super(x, y, width, height);
-    this.type = type;
-    this.side = side;
-    if (type === "cannon") {
-      this.hp = 300 + timer * 25;
-      this.damage = 30 + 3 * timer;
-    }
-    if (type === "melee") {
-      this.hp = 500 + timer * 50;
-      this.damage = 20 + 2 * timer;
-    }
-    if (side === "friendly") {
-      this.speed = width * 0.015;
-    }
-    if (side === "enemy") {
-      this.speed = width * -0.015;
-    }
-    this.maxhp = this.hp;
-
-  }
-
-  moveAttack() {
-
-    if (this.type === "melee" && this.side === "enemy") {
-
-      if (minions.length > 0) { 
-        if (this.x - minions[0].x >= this.width * 1.05) {
-          this.x += this.speed;
-        }
-        else {
-          for (let i = 0; i < 3; i++) {
-            if (minions[i].y === this.y && frameCount % 60 === 0){
-              minions[i].hp -= 15 +  timer;
-            }
-          }
-        }
-      }
-      else {
-        this.x += this.speed;
-      }
-
-    }
-
-    if (this.type === "melee" && this.side === "friendly") {
-
-      if (enemyMinions.length > 0) {
-        if (enemyMinions[0].x - this.x >= this.width * 1.05) {
-          this.x += this.speed;
-        }
-        else {
-          for (let i = 0; i < 3; i++) {
-            if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
-              enemyMinions[i].hp -= 15 + timer;
-            }
-          }
-        }
-      }
-      else {
-        this.speed += this.speed;
-      }
-
-    }
-
-    if (this.type === "cannon" && this.side === "enemy") {
-
-      if (minions.length > 0) {
-        if (this.x - minions[0].x >= this.width * 2.5) {
-          this.x += this.speed;
-        }
-        else {
-          for (let i = 0; i < 3; i++) {
-            if (minions[i].y === this.y && frameCount % 60 === 0){
-              minions[i].hp -= 20 + 2 * timer;
-            }
-          }
-        }
-      }
-      else {
-        this.x += this.speed;
-      }
-
-    }
-
-    if (this.type === "cannon" && this.side === "friendly") {
-
-      if (enemyMinions.length > 0) {
-        if (enemyMinions[0].x - this.x >= this.width * 2.5) {
-          this.x += this.speed;
-        }
-        else {
-          for (let i = 0; i < 3; i++) {
-            if (enemyMinions[i].y === this.y && frameCount % 60 === 0){
-              enemyMinions[i].hp -= 20 + 2 * timer;
-            }
-          }
-        }
-      }
-      else {
-        this.x += this.speed;
-      }
-      
-    }
-
-  }
-
-  show() {
-
-    if (this.type === "melee" && this.side === "friendly") {
-      image(images.friendlyMinion, this.x, this.y, this.width, this.height);
-    }
-    else if (this.type === "melee" && this.side === "enemy") {
-      image(images.enemyMinion, this.x, this.y, this.width, this.height);
-    }
-    else if (this.type === "cannon" && this.side === "friendly") {
-      image(images.friendlyCannon, this.x, this.y, this.width, this.height);
-    }
-    else if (this.type === "cannon" && this.side === "enemy") {
-      image(images.enemyCannon, this.x, this.y, this.width, this.height);
-    }
-
-    //hp
-    fill(81, 85, 91);
-    stroke(0);
-    rect(this.x, this.y - height * 0.02, width * 0.05, height * 0.01);
-    fill(214, 22, 19);
-    rect(this.x, this.y - height * 0.02, width * 0.05 * (this.hp / this.maxhp), height * 0.01);
-
-  }
-
-}
-
 class Cannons extends GameObject {
 
-  constructor(x, y, width, height, direction, damage) {
+  constructor(x, y, width, height, direction, damage, id) {
     super(x, y, width, height);
     this.health = 50 + timer;
     this.maxhp = 50 + timer;
@@ -632,20 +515,37 @@ class Cannons extends GameObject {
     this.armor = 15 + floor(timer / 4);
     this.speed = width * 0.01;
     this.direction = direction;
+    this.id = id;
     this.damage = damage;
   }
 
   display() {
     image(images.enemyCannon, this.x, this.y, this.width, this.height);
+    stroke(0);
+    noFill();
+    rect(this.x, this.y - height * 0.03, this.width, height * 0.018);
+    fill(249, 22, 26);
+    rect(this.x, this.y - height * 0.03, this.width * (this.health / this.maxhp), height * 0.018);
   }
 
   move() {
-    // if (direction === "forward") {
-    //   this.x += this.speed;
-    // }
-    // else {
-    this.x -= this.speed;
-    // }
+    if (this.direction === 1) {
+      this.x += this.speed;
+    }
+    else if (this.direction === 0){
+      this.x -= this.speed;
+    }
+  }
+
+  hitbox() {
+    let hitx = this.x;
+    let hity = this.y;
+    let hitwidth = this.width;
+    let hitheight = this.height;
+    enemyminionhitbox[this.id][0] = createVector(hitx, hity);
+    enemyminionhitbox[this.id][1] = createVector(hitx + hitwidth, hity);
+    enemyminionhitbox[this.id][2] = createVector(hitx + hitwidth, hity + hitheight);
+    enemyminionhitbox[this.id][3] = createVector(hitx, hity + hitheight);
   }
 
   attack() {
@@ -664,27 +564,32 @@ class Cannons extends GameObject {
     if (y < 0) {
       vy = vy * -1;
     }
-    cannonbolts.push(new Cannonbolt(this.x + this.width / 2, this.y + this.height / 2, vx, vy, this.damage, theta));
+
+    if (theta > 0) {
+      theta = PI / 2 - theta;
+    }
+    else if (theta < 0) {
+      theta = 3 * PI / 2 - theta;
+    }
+
+    cannonbolthitbox.push([]);
+    cannonbolts.push(new Cannonbolt(this.x + this.width / 2, this.y + this.height / 2, vx, vy, theta, cannonbolthitbox.length - 1, this.damage));
     
   }
 
 }
 
 class Cannonbolt extends GameObject {
-  constructor(x, y, vx, vy, damage, theta) {
+  constructor(x, y, vx, vy, theta, projectilenumber, damage) {
     super(x, y);
     this.width = width * 0.065;
     this.height = height * 0.03;
     this.vx = vx;
     this.vy = vy;
-    this.damage = damage;
-    if (theta > 0) {
-      this.theta = PI / 2 - theta;
-    }
-    else if (theta < 0) {
-      this.theta = 3 * PI / 2 - theta;
-    }
+    this.id = projectilenumber;
     this.image = images.cannonbolt;
+    this.theta = theta;
+    this.damage = damage;
   }
 
   run () {
@@ -692,14 +597,24 @@ class Cannonbolt extends GameObject {
     this.y += this.vy;
   }
 
+  hitbox() {
+    let hitx = this.x - this.width / 2;
+    let hity = this.y;
+    let hitwidth = this.width;
+    let hitheight = this.height;
+    cannonbolthitbox[this.id][0] = createVector(hitx, hity);
+    cannonbolthitbox[this.id][1] = createVector(hitx + hitwidth * cos(this.theta), hity + hitwidth * sin(this.theta));
+    cannonbolthitbox[this.id][2] = createVector(hitx + hitwidth * cos(this.theta) - hitheight * sin(this.theta), hity + hitwidth * sin(this.theta) + hitheight * cos(this.theta));
+    cannonbolthitbox[this.id][3] = createVector(hitx - hitheight * sin(this.theta), hity + hitheight * cos(this.theta));
+  }
+
   display() {
     fill(0);
     push();
-    translate(this.x, this.y);
+    translate(this.x - this.width / 2, this.y);
     rotate(this.theta);
-    imageMode(CENTER);
-    image(this.image, 0, 0, this.width, this.height);
     imageMode(CORNER);
+    image(this.image, 0, 0, this.width, this.height);
     pop();
   }
 
@@ -880,6 +795,12 @@ function loadData() {
   currentSummoner = 0;
   translatecount = 0;
   cannonbolts = [];
+  cannonbolthitbox = [];
+  bolthitbox = [];
+  playerhitbox = [];
+  enemyminionhitbox = [];
+  qhitbox = [];
+  ehitbox = [];
   abilitytiming = {
     r : -500,
     ignite : -500,
@@ -1378,7 +1299,79 @@ function characterPosition() {
     charpos.height = height * 0.11;
     image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
+    playerhitboxes();
+
   }
+
+}
+
+function playerhitboxes() {
+
+  playerhitbox[0] = createVector(charpos.x, charpos.y);
+  playerhitbox[1] = createVector(charpos.x + charpos.width, charpos.y);    
+  playerhitbox[2] = createVector(charpos.x + charpos.width, charpos.y + charpos.height);    
+  playerhitbox[3] = createVector(charpos.x, charpos.y + charpos.height);
+
+  if (! castability.q || ! qup) {
+    qup = false;
+    qhitbox[0] = createVector(-1000, -1000);
+    qhitbox[1] = createVector(-999, -999);
+    qhitbox[2] = createVector(-998, -998);
+    qhitbox[3] = createVector(-997, -997);
+  }
+
+  if (! castability.e || ! eup) {
+    eup = false;
+    ehitbox[0] = createVector(-1000, -1000);
+    ehitbox[1] = createVector(-999, -999);
+    ehitbox[2] = createVector(-998, -998);
+    ehitbox[3] = createVector(-997, -997);
+  }
+
+  if (qup) {
+    if (direction === "forward") {
+      qhitbox[0] = createVector(charpos.x + charpos.width / 2, charpos.y);
+      qhitbox[1] = createVector(charpos.x + charpos.width * 1.5, charpos.y);
+      qhitbox[2] = createVector(charpos.x + charpos.width * 1.5, charpos.y + charpos.height);
+      qhitbox[3] = createVector(charpos.x + charpos.width / 2, charpos.y + charpos.height);
+    }
+    if (direction === "backward") {
+      qhitbox[0] = createVector(charpos.x + charpos.width / 2, charpos.y);
+      qhitbox[1] = createVector(charpos.x - charpos.width * - 0.5, charpos.y);
+      qhitbox[2] = createVector(charpos.x - charpos.width * - 0.5, charpos.y + charpos.height);
+      qhitbox[3] = createVector(charpos.x + charpos.width / 2, charpos.y + charpos.height);
+    }
+
+    for(let k = enemyminionhitbox.length - 1; k >= 0; k--) {
+      hit = collidePolyPoly(qhitbox, enemyminionhitbox[k], true);
+      if (hit) {
+        qup = false;
+        //q damage
+        enemyMinions[k].health -= 100;
+      }
+    }
+
+
+  }
+
+  if (eup) {
+    ehitbox[0] = createVector(charpos.x, charpos.y);
+    ehitbox[1] = createVector(charpos.x + charpos.width, charpos.y);
+    ehitbox[2] = createVector(charpos.x + charpos.width, charpos.y + charpos.height); 
+    ehitbox[3] = createVector(charpos.x, charpos.y + charpos.height);
+
+    for(let k = enemyminionhitbox.length - 1; k >= 0; k--) {
+      hit = collidePolyPoly(ehitbox, enemyminionhitbox[k], true);
+      if (hit) {
+        eup = false;
+        //e damage
+        enemyMinions[k].health -= 50;
+      }
+    }
+  }
+
+
+
 
 }
 
@@ -1454,67 +1447,101 @@ function minionsSpawn() {
 
 }
 
-// function spawnMelee() {
-
-//   // minions.push(new Creep(0, height * 0.2, width * 0.06, height * 0.1, "melee", "friendly"));
-//   // minions.push(new Creep(0, height * 0.4, width * 0.06, height * 0.1, "melee", "friendly"));
-//   // minions.push(new Creep(0, height * 0.6, width * 0.06, height * 0.1, "melee", "friendly"));
-//   enemyMinions.push(new Creep(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "melee", "enemy"));
-//   enemyMinions.push(new Creep(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "melee", "enemy"));
-//   enemyMinions.push(new Creep(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "melee", "enemy"));
-
-// }
-
 function spawnCannon() {
-  enemyMinions.push(new Cannons(width * 0.95, height * 0.2, width * 0.06, height * 0.1, "backward", 50));
-  // enemyMinions.push(new Cannons(width * 0.95, height * 0.4, width * 0.06, height * 0.1, "backward", 50));
-  // enemyMinions.push(new Cannons(width * 0.95, height * 0.6, width * 0.06, height * 0.1, "backward", 50));
+
+  enemyminionhitbox.push([]);
+  enemyMinions.push(new Cannons(width * 0.95, height * 0.2, width * 0.06, height * 0.1, 0, 50, enemyminionhitbox.length-1));
+
 }
 
 function minionFunctions() {
 
   if (state === "game") {
 
-    // for (let i = minions.length - 1; i >= 0; i--) {
-    //   if (! shopSubstate && minions[i] !== undefined) {
-    //     minions[i].moveAttack();
-    //   }
-    //   minions[i].show();
-    // }
+    for(let i = cannonbolts.length - 1; i >= 0; i--) {
 
-    // for (let k = enemyMinions.length - 1; k >= 0; k--) {
-    //   if (! shopSubstate && enemyMinions[k] !== undefined) {
-    //     enemyMinions[k].moveAttack();
-    //   }
-    //   enemyMinions[k].show();
-    // }
+      cannonbolts[i].display();
+      cannonbolts[i].hitbox();
 
-    // for (let m = enemyMinions.length - 1; m >= 0; m--) {
-    //   if (enemyMinions[m].hp <= 0) {
-    //     enemyMinions.splice(m , 1);
-    //   }
-    // }
+      if (! shopSubstate) {
 
-    // for (let l = minions.length - 1; l >= 0; l--) {
-    //   if (minions[l].hp <= 0) {
-    //     minions.splice(l, 1);
-    //   }
-    // }
+        cannonbolts[i].run();
+        
+      }
+
+      if (cannonbolthitbox[cannonbolts[i].id][0].x > width * 1.2 ||
+        cannonbolthitbox[cannonbolts[i].id][0].x < width * - 0.2 ||
+        cannonbolthitbox[cannonbolts[i].id][0].y > height * 1.2 ||
+        cannonbolthitbox[cannonbolts[i].id][0].y < height * - 0.2) {
+
+        cannonbolts.splice(i, 1);
+        cannonbolthitbox.splice(i, 1);
+        for (let p = cannonbolts.length - 1; p >= 0; p --) {
+          if (cannonbolts[p].id !== 0) {
+            cannonbolts[p].id -= 1;
+          }
+        }
+
+      }
+
+      for(let m = cannonbolthitbox.length - 1; m >= 0; m--) {
+        hit = collidePolyPoly(cannonbolthitbox[m], playerhitbox, true);
+        if (hit) {
+          cannonbolthitbox.splice(m, 1);
+          stats.health -= cannonbolts[m].damage;
+          cannonbolts.splice(m, 1);
+          for (let p = cannonbolts.length - 1; p >= 0; p --) {
+            if (cannonbolts[p].id !== 0) {
+              cannonbolts[p].id -= 1;
+            }
+          }
+        }
+      }
+
+    }
+
+    for (let l = enemyMinions.length - 1; l >= 0; l--) {
+      if (enemyMinions[l].x > width || enemyMinions[l].x + enemyMinions[l].width < 0) {
+        enemyMinions.splice(l, 1);
+        enemyminionhitbox.splice(l, 1);
+        for (let b = enemyMinions.length - 1; b >= 0; b--) {
+          if (enemyMinions[b].id !== 0) {
+            enemyMinions[b].id -= 1;
+          }
+        }
+        stats.health -= 50;
+      }
+      else if (enemyMinions[l].health <= 0) {
+        enemyMinions.splice(l, 1);
+        enemyminionhitbox.splice(l, 1);
+        for (let b = enemyMinions.length - 1; b >= 0; b--) {
+          if (enemyMinions[b].id !== 0) {
+            enemyMinions[b].id -= 1;
+          }
+        }
+        stats.xp += 15;
+        stats.gold += 50;
+      }
+    }
 
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
       enemyMinions[k].display();
       if (! shopSubstate) {
         enemyMinions[k].move();
-        if (frameCount % 60 === 0 ){
+        enemyMinions[k].hitbox();
+
+        let diff;
+        if (timer < 300) {
+          diff = floor(timer / 30);
+        }
+        else {
+          diff = 10;
+        }
+
+        let randomvalue = random(0, 2000 - diff * 50);
+        if (randomvalue <= 13) { 
           enemyMinions[k].attack();
         }
-      }
-    }
-
-    for(let i = cannonbolts.length - 1; i >= 0; i--) {
-      cannonbolts[i].display();
-      if (! shopSubstate) {
-        cannonbolts[i].run();
       }
     }
 
@@ -1590,14 +1617,41 @@ function moveBolts() {
 
     if (!shopSubstate) {
       bolts[k].move();
+      bolts[k].hitbox();
     }
 
     for (let l = bolts.length - 1; l >= 0; l--) {
+
       if (bolts[l].x < bolts[l].width * -1 || bolts[l].x > width) {
         bolts.splice(l, 1);
+        bolthitbox.splice(l, 1);
+        for (let l = bolts.length - 1; l >= 0; l--) {
+          if (bolts[l].id !== 0) {
+            bolts[l].id -= 1;
+          }
+        }
       }
+
+      
+      for(let m = bolthitbox.length - 1; m >= 0; m--) {
+        for (let n = enemyminionhitbox.length - 1; n >= 0; n--) {
+          hit = collidePolyPoly(bolthitbox[m], enemyminionhitbox[n], true);
+          if (hit) {
+            bolthitbox.splice(m, 1);
+            enemyMinions[n].health -= bolts[m].damage;
+            bolts.splice(m, 1);
+            for (let p = bolts.length - 1; p >= 0; p --) {
+              if (bolts[p].id !== 0) {
+                bolts[p].id -= 1;
+              }
+            }
+          }
+        }
+
+      }
+
     }
-  
+
   }
 
 }
@@ -1694,8 +1748,6 @@ function characterStatus() {
     if (stats.health >= stats.maxhp) {
       stats.health = stats.maxhp;
     }
-    
-    // image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
 
     blankbars();
 
@@ -2992,6 +3044,12 @@ function resetGame() {
   statsToggle = false;
   rmode = false;
   cannonbolts = [];
+  cannonbolthitbox = [];
+  bolthitbox = [];
+  playerhitbox = [];
+  enemyminionhitbox = [];
+  qhitbox = [];
+  ehitbox = [];
   buffs = {
     barrier : false,
     ignite : false,    
@@ -3209,6 +3267,7 @@ function keyTyped() {
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.q = true;
+        qup = true;
         cdcharge.q = 0;
         if (rmode && volumeControl) {
           player.rqsound.setVolume(0.5);
@@ -3266,6 +3325,7 @@ function keyTyped() {
         destinationpos.x = mouseX;
         destinationpos.y = mouseY;
         castability.e = true;
+        eup = true;
         cdcharge.e = 0;
         let x;
         let y;
@@ -3384,7 +3444,7 @@ function keyTyped() {
 
 function castignite() {
   if (volumeControl) {
-    sound.ignite.setVolume(0.1);
+    sound.ignite.setVolume(0.3);
     sound.ignite.play();
   }
   buffs.ignite = true;
@@ -3392,7 +3452,7 @@ function castignite() {
 
 function castclarity() {
   if (volumeControl) {
-    sound.clarity.setVolume(0.1);
+    sound.clarity.setVolume(0.3);
     sound.clarity.play();
   }
   stats.mana += stats.maxmana / 5;
@@ -3403,7 +3463,7 @@ function castclarity() {
 
 function castheal() {
   if (volumeControl) {
-    sound.heal.setVolume(0.1);
+    sound.heal.setVolume(0.3);
     sound.heal.play();
   }
   if (stats.maxhp * 0.1 > (stats.maxhp - stats.health) * 0.25) {
@@ -3419,7 +3479,7 @@ function castheal() {
 
 function castbarrier() {
   if (volumeControl) {
-    sound.barrier.setVolume(0.1);
+    sound.barrier.setVolume(0.3);
     sound.barrier.play();
   }
   buffs.barrier = true;
@@ -3441,10 +3501,24 @@ function castflash() {
   y = destinationpos.y - charpos.y;
   theta = atan(abs(x) / abs(y));
   if (volumeControl) {
-    sound.flash.setVolume(0.1);
+    sound.flash.setVolume(0.3);
     sound.flash.play();
   }
   if (sqrt(sq(x) + sq(y)) < width * 0.35) {
+    
+    if (destinationpos.x > width - charpos.width) {
+      destinationpos.x = floor(width - charpos.width);
+    }
+    if (destinationpos.x < 0) {
+      destinationpos.x = 0;
+    }
+    if (destinationpos.y > height - charpos.height) {
+      destinationpos.y = floor(height - charpos.height);
+    }
+    if (destinationpos.y < 0) {
+      destinationpos.y = 0;
+    }
+
     charpos.x = destinationpos.x;
     charpos.y = destinationpos.y;
   }
@@ -3459,8 +3533,23 @@ function castflash() {
     }
     destinationpos.x = charpos.x + dashx;
     destinationpos.y = charpos.y + dashy;
+
+    if (destinationpos.x > width - charpos.width) {
+      destinationpos.x = floor(width - charpos.width);
+    }
+    if (destinationpos.x < 0) {
+      destinationpos.x = 0;
+    }
+    if (destinationpos.y > height - charpos.height) {
+      destinationpos.y = floor(height - charpos.height);
+    }
+    if (destinationpos.y < 0) {
+      destinationpos.y = 0;
+    }
+
     charpos.x = destinationpos.x;
     charpos.y = destinationpos.y;
+
     if (x < 0) {
       destinationpos.x = charpos.x - 1;
     }
@@ -3496,10 +3585,12 @@ function bolt1() {
   }
 
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, 50, 0, vx, vy, theta));
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, 50, 0, vx, vy, theta, bolthitbox.length - 1));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, 50, 0, vx, vy, theta));
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, 50, 0, vx, vy, theta, bolthitbox.length - 1));
   }
   if (volumeControl) {
     player.wsound1.setVolume(0.5);
@@ -3532,10 +3623,12 @@ function bolt2() {
   }
 
   if (destinationpos.x >= charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, 75, 0, vx, vy, theta));
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, 75, 0, vx, vy, theta, bolthitbox.length - 1));
   }
   else if (destinationpos.x < charpos.x) {
-    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, 75, 0, vx, vy, theta));
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, 75, 0, vx, vy, theta, bolthitbox.length - 1));
   }
   if (volumeControl) {
     player.wsound2.setVolume(0.5);

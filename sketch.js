@@ -1522,7 +1522,6 @@ function minionFunctions() {
 
 }
 
-
 //responsible for the creation of the bullets
 function createBullet() {
 

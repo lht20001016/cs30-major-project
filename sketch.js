@@ -1498,8 +1498,8 @@ function updateTimer() {
 function minionsSpawn() {
 
   if (timer % 10 === 2) {
-    //spawnCannon();
-    //spawnCannon();
+    spawnCannon();
+    spawnCannon();
   }
 
 }
@@ -1869,6 +1869,15 @@ function levelUp() {
   
   if (stats.xp >= stats.lvlupxp && stats.lvl <= 17) {
     stats.xp -= stats.lvlupxp;
+    if (stats.lvl === 6) {
+      stats.speed += 20;
+    }
+    else if (stats.lvl === 12) {
+      buffs.angelicshield = true;
+    }
+    else if (stats.lvl === 16) {
+      buffs.holyfire = true;
+    }    
     if (stats.lvl === 18) {
       stats.xp = 0;
     }
@@ -1888,16 +1897,6 @@ function levelUp() {
       sound.levelUp.play();
     }
   }
-
-  if (stats.lvl === 6) {
-    stats.speed += 20;
-  }
-  else if (stats.lvl === 12) {
-    buffs.angelicshield = true;
-  }
-  else if (stats.lvl === 16) {
-    buffs.holyfire = true;
-  }    
 
 }
 

@@ -306,6 +306,7 @@ function loadItems() {
 
 }  
 
+//load summoner spells and push them into a list
 function loadSummoners() {
 
   summoners = {
@@ -363,6 +364,7 @@ class Bullet {
 
 }
 
+//class for Mystic Shot projectiles, responsible for displaying, creating hitbox, and running each projectile, also carries a damage value
 class Bolt extends GameObject {
   constructor(x, y, width, height, type, orientation, damage, magicpenetration, vx, vy, theta, id) {
     super(x, y, width, height);
@@ -512,6 +514,7 @@ class Item extends GameObject {
   }
 }
 
+//class for range attack cannon monsters, including basic functionality scripts
 class Cannons extends GameObject {
 
   constructor(x, y, width, height, direction, damage, id) {
@@ -555,6 +558,7 @@ class Cannons extends GameObject {
     enemyminionhitbox[this.id][3] = createVector(hitx, hity + hitheight);
   }
 
+  //creates a projectile with a damage value
   attack() {
 
     let x;
@@ -586,6 +590,7 @@ class Cannons extends GameObject {
 
 }
 
+//class for the projectile created by Cannons, including basic functionality scripts
 class Cannonbolt extends GameObject {
   constructor(x, y, vx, vy, theta, projectilenumber, damage) {
     super(x, y);
@@ -627,6 +632,7 @@ class Cannonbolt extends GameObject {
 
 }
 
+//class for summoner ability selection in pre-game shop
 class Summoners extends GameObject {
   constructor(x, y, width, height, sound, picture, hoverCursor, borderColor, hoverBorderColor, summonerID) {
     super(x, y, width, height);
@@ -721,6 +727,7 @@ function gmToMenu() {
   }
 }
 
+//function that opens the in-game item shop
 function openInGameShopMenu() {
 
   shopSubstate = !shopSubstate;
@@ -742,6 +749,7 @@ function openInGameShopMenu() {
 
 }
 
+//equip selected summoner to D key
 function selecttoD() {
 
   if (currentSummoner === summonerF) {
@@ -768,6 +776,7 @@ function selecttoD() {
 
 }
 
+//equip selected summoner to F key
 function selecttoF() {
 
   if (currentSummoner === summonerD) {
@@ -793,7 +802,7 @@ function selecttoF() {
 
 }
 
-//assign initial values and default stats to variables
+//assign initial values and default stats to variables and arrays
 function loadData() {
 
   state = "menu";
@@ -972,8 +981,6 @@ function showMenus() {
     if (loadCount < files) {
       text("Loading...(" + floor(loadCount / files * 100) + "%)", width / 2, height * (27/32));
     }
-
-    //first button
     if (loadCount === files) {
       
       openShopButton.run();
@@ -985,7 +992,7 @@ function showMenus() {
 
 }
 
-//shop menu, still to come
+//shop menu
 function showShop() {
   if (state === "shop") {
 
@@ -1011,7 +1018,6 @@ function showShop() {
     
       summonerInfo();
 
-      //menu
       fill(232, 199, 227);
       strokeWeight(5);
       stroke(86, 5, 74);
@@ -1070,6 +1076,7 @@ function showShop() {
   strokeWeight(1);
 }
 
+//txt info contained with each summoner ability to display
 function summonerInfo() {
   if (currentSummoner === 1) {
     texts.effect1 = "Ignite";
@@ -1158,6 +1165,7 @@ function characterPosition() {
       direction = "backward";
     }
 
+    //these statements determine the correct "animation", or stance of the character
     if (direction === "forward") {
 
       if (stats.lvl < 6) {
@@ -1306,8 +1314,10 @@ function characterPosition() {
 
     charpos.width = width * 0.065;
     charpos.height = height * 0.11;
+    //display
     image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
+    //hitboxes
     playerhitboxes();
 
   }
@@ -1322,6 +1332,7 @@ function playerhitboxes() {
   playerhitbox[2] = createVector(charpos.x + charpos.width, charpos.y + charpos.height);    
   playerhitbox[3] = createVector(charpos.x, charpos.y + charpos.height);
 
+  //temporary hitboxes of q and e abilities
   if (! castability.q || ! qup) {
     qup = false;
     qhitbox[0] = createVector(-1000, -1000);
@@ -1495,6 +1506,7 @@ function updateTimer() {
   }
 }
 
+//spawn minions according to restrictions above in the timing function
 function minionsSpawn() {
 
   if (timer % 10 === 2) {
@@ -1504,6 +1516,7 @@ function minionsSpawn() {
 
 }
 
+//creates a cannon minion
 function spawnCannon() {
   
   enemyminionhitbox.push([]);
@@ -1512,6 +1525,7 @@ function spawnCannon() {
 
 }
 
+//responsible for the major functionalities of minions including attacking, damage calculation, and hitboxes
 function minionFunctions() {
 
   if (state === "game") {
@@ -1527,6 +1541,7 @@ function minionFunctions() {
         
       }
 
+      //delete fi out of screen
       if (cannonbolthitbox[cannonbolts[i].id][0].x > width * 1.2 ||
         cannonbolthitbox[cannonbolts[i].id][0].x < width * - 0.2 ||
         cannonbolthitbox[cannonbolts[i].id][0].y > height * 1.2 ||
@@ -1543,6 +1558,7 @@ function minionFunctions() {
 
       }
 
+      //deleted and do damage if hit
       for(let m = cannonbolthitbox.length - 1; m >= 0; m--) {
         hit = collidePolyPoly(cannonbolthitbox[m], playerhitbox, true);
         if (hit) {
@@ -1568,6 +1584,7 @@ function minionFunctions() {
 
     }
 
+    //delete if out of screen
     for (let l = enemyMinions.length - 1; l >= 0; l--) {
       if (enemyMinions[l].x > width || enemyMinions[l].x + enemyMinions[l].width < 0) {
         enemyMinions.splice(l, 1);
@@ -1579,6 +1596,7 @@ function minionFunctions() {
         }
         stats.health -= 50;
       }
+      //or if dead
       else if (enemyMinions[l].health <= 0) {
         enemyMinions.splice(l, 1);
         enemyminionhitbox.splice(l, 1);
@@ -1588,12 +1606,13 @@ function minionFunctions() {
           }
         }
         if (stats.lvl !== 18) {
-          stats.xp += 20;
+          stats.xp += 35;
         }
         stats.gold += 65;
       }
     }
 
+    //minions motion and attack
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
       enemyMinions[k].display();
       enemyMinions[k].hitbox();
@@ -1672,6 +1691,7 @@ function moveBullets() {
   
   }
   
+  //delete if out of screen
   for (let i = bullets.length - 1; i >= 0; i--) {
     if (bullets[i].x < 0) {
       bullets.splice(i, 1);
@@ -1679,6 +1699,7 @@ function moveBullets() {
   }
 }
 
+//function to track bolt movement, hitbox, and damage calculation
 function moveBolts() {
 
   for (let k = bolts.length - 1; k >= 0; k--) {
@@ -1690,6 +1711,7 @@ function moveBolts() {
       bolts[k].move();
     }
 
+    //delete if out of screen
     if (bolts[k].x < bolts[k].width * -1 || bolts[k].x > width) {
       bolts.splice(k, 1);
       bolthitbox.splice(k, 1);
@@ -1702,6 +1724,7 @@ function moveBolts() {
 
   }
 
+  //damage if hit
   for (let m = enemyminionhitbox.length - 1; m >= 0; m--) {
     for (let a = bolthitbox.length - 1; a >= 0; a--) {
 
@@ -1737,15 +1760,13 @@ function moveBolts() {
 
 }
 
+//responsible for casting time of abilities and certain functions
 function castingAbilities() {
 
   if (state === "game") {
 
+    //q animation
     if (castability.q) {
-      if (millis() - currentTime <= castTime.q) {
-        void 0;
-        //insert q ability here
-      }
       if (millis() - currentTime > castTime.q) {
         castability.q = false;
         destinationpos.x = charpos.x;
@@ -1753,6 +1774,7 @@ function castingAbilities() {
       }
     }
 
+    //casting w animation
     if (castability.w) {
       if (millis() - currentTime > castTime.w) {
         castability.w = false;
@@ -1761,6 +1783,7 @@ function castingAbilities() {
       }
     }
 
+    //dashing with e
     if (castability.e) {
       if (millis() - currentTime <= castTime.e) {
         charpos.x += dashvelocity.x;
@@ -1773,6 +1796,7 @@ function castingAbilities() {
       }
     }
 
+    //casting r ability
     if (castability.r) {
       if (millis() - currentTime > castTime.r) {
         castability.r = false;
@@ -1782,6 +1806,7 @@ function castingAbilities() {
       }
     }
 
+    //times ultimate
     if (millis() - abilitytiming.r >= 20000 && abilitytiming.r !== -500) {
       rmode = false;
       stats.crit -= 10;
@@ -1791,12 +1816,13 @@ function castingAbilities() {
       cdcharge.e = cds.e;
     }
 
+    //times ignite buff
     if (millis() - abilitytiming.ignite >= 10000 && abilitytiming.ignite !== -500) {
       buffs.ignite = false;
       abilitytiming.ignite = -500;
     }
 
-    
+    //times barrier buff
     if (millis() - abilitytiming.barrier >= 7000 && abilitytiming.barrier !== -500) {
       buffs.barrier = false;
       abilitytiming.barrier = -500;
@@ -1831,6 +1857,7 @@ function characterStatus() {
       stats.health = stats.maxhp;
     }
 
+    //components of the UI
     blankbars();
 
     healthbar();
@@ -1865,6 +1892,7 @@ function characterStatus() {
 
 }
 
+//function repsonsible for adding stats when leveling up
 function levelUp() {
   
   if (stats.xp >= stats.lvlupxp && stats.lvl <= 17) {
@@ -1900,6 +1928,7 @@ function levelUp() {
 
 }
 
+//background graphics
 function blankbars() {
 
   stroke(0, 97, 255);
@@ -1986,6 +2015,7 @@ function expbar() {
 
 }
 
+//player image in UI
 function charpic() {
   
 
@@ -2015,6 +2045,7 @@ function gold() {
 
 }
 
+//shades ability icons depending on cooldown and mana (and the lack thereof)
 function cooldowns() {
 
   stroke(0, 97, 255);
@@ -2032,12 +2063,14 @@ function cooldowns() {
     rect(width * 0.495775, height * 0.9383, width * 0.02385 * (cdcharge.r / cds.r), height * 0.008);
   }
 
+  //recharging abilities
   rechargeAbilities();
 
   cooldownBars();
 
 }
 
+//recharging abilities
 function rechargeAbilities() {
 
   // if (! shopSubstate) {
@@ -2130,6 +2163,7 @@ function rechargeAbilities() {
 
 }
 
+//bars as an extension to main cooldown effects
 function cooldownBars() {
 
   noStroke();
@@ -2187,6 +2221,7 @@ function cooldownBars() {
 
 }
 
+//display the level in the UI
 function levelDisplay() {
 
   noStroke();
@@ -2212,8 +2247,10 @@ function itemDisplay() {
 
 }
 
+//display the information of items when propmted in the inventory
 function iteminfodisplay() {
 
+  //first row
   for (let itemcount = 0; itemcount < inventory.length && itemcount < 3; itemcount++) {
     if (mouseX >= width * 0.60248 + itemcount * width * 0.026 && mouseX <= width * 0.60248 + itemcount * width * 0.026 + height * 0.0415 && mouseY >= height * 0.88 && mouseY <= height * 0.92145) {
       fill(0, 0, 0, 75);
@@ -2233,6 +2270,7 @@ function iteminfodisplay() {
     }
   }
 
+  //second row
   for (let itemcount = 3; itemcount < inventory.length && itemcount < 6; itemcount++) {
     if (mouseX >= width * 0.60248 + (itemcount - 3) * width * 0.026 && mouseX <= width * 0.60228 + (itemcount - 3) * width * 0.026 + height * 0.0415 && mouseY >= height * 0.922 && mouseY <= height * 0.96345) {
       fill(0, 0, 0, 75);
@@ -2254,6 +2292,7 @@ function iteminfodisplay() {
 
 }
 
+//display ability information when prompted in uI
 function abilityInfoDisplay() {
 
   fill(0, 0, 0, 64);
@@ -2292,6 +2331,7 @@ function abilityInfoDisplay() {
 
 }
 
+//txt information to be displayed with abilities
 function abilityDesc() {
 
   if(mouseX >= width * 0.35 && mouseX <= width * 0.3745 && mouseY >= height * 0.8825 && mouseY <= height * 0.9225) {
@@ -2552,6 +2592,7 @@ function statsMenu() {
   pop();
 }
 
+//display ability icons in UI
 function abilityicons() {
 
   let passiveability;
@@ -3398,6 +3439,7 @@ function keyTyped() {
       statsToggle = ! statsToggle;
     }
 
+    //q ability
     if (key === "q") {
       if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q && !rmode) {
         if (volumeControl) {
@@ -3426,6 +3468,7 @@ function keyTyped() {
       }
     }
 
+    //w ability
     if (key === "w") {
       if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w && !rmode) {
         if (volumeControl) {
@@ -3456,6 +3499,7 @@ function keyTyped() {
       }
     }
 
+    //e ability
     if (key === "e") {
       if (cdcharge.e < cds.e|| castability.q || castability.w || castability.r || stats.mana < abilitycosts.e && !rmode) {
         if (volumeControl) {
@@ -3500,6 +3544,7 @@ function keyTyped() {
       }
     }
 
+    //r ability
     if (key === "r") {
       if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r && !rmode || stats.lvl < 6) {
         if (volumeControl) {
@@ -3527,6 +3572,7 @@ function keyTyped() {
       }
     }
 
+    //d summoner ability
     if (key === "d") {
       if (cdcharge.d < cds.d) {
         if (volumeControl) {
@@ -3556,7 +3602,7 @@ function keyTyped() {
       }
     }
 
-    
+    //f summoner ability
     if (key === "f") {
       if (cdcharge.f < cds.f) {
         if (volumeControl) {
@@ -3590,6 +3636,7 @@ function keyTyped() {
 
 }
 
+//ignite buff
 function castignite() {
   if (volumeControl) {
     sound.ignite.setVolume(0.3);
@@ -3598,6 +3645,7 @@ function castignite() {
   buffs.ignite = true;
 }
 
+//clarity ability
 function castclarity() {
   if (volumeControl) {
     sound.clarity.setVolume(0.3);
@@ -3609,6 +3657,7 @@ function castclarity() {
   }
 }
 
+//heal ability
 function castheal() {
   if (volumeControl) {
     sound.heal.setVolume(0.3);
@@ -3625,6 +3674,7 @@ function castheal() {
   }
 }
 
+//carrier buff
 function castbarrier() {
   if (volumeControl) {
     sound.barrier.setVolume(0.3);
@@ -3633,6 +3683,7 @@ function castbarrier() {
   buffs.barrier = true;
 }
 
+//flash ability
 function castflash() {
 
 
@@ -3708,6 +3759,7 @@ function castflash() {
 
 }
 
+//fires the first or second projectile
 function bolt1() {
 
   let x;
@@ -3760,6 +3812,7 @@ function bolt1() {
   }
 }
 
+//fires the third projectile
 function bolt2() {
 
   let x;
@@ -3806,6 +3859,7 @@ function bolt2() {
   }
 }
 
+//cast timer
 function cast() {
 
   currentTime = millis();

@@ -26,17 +26,30 @@
 - Sound Improvements (New Assets and Control Option)
 
 #### Two Dimensional Arrays
-##### //25 March 2019//
+##### 23 April 2019
 
 - Shop Screen using 2D Arrays
 - Item Files
-- Game Object Class and Button Class for most Interactive Buttons
+- Game Object Class and Button Class for Interactive Buttons
 
-#### Minions and Major Bugfix
-##### //14 May 2019//
+#### Minion Behavior and Combat
+##### 06 May 2019
 
-- Bugfix
-- Restart Game Functions
-- List Operations with Minions and Projectiles
-- Self Automating Minion Combat (Non-Interactable Currently)
+- Minion Generation
+- Minion Combat
+- Basic Skeleton for Enemies
 
+#### User Interface
+##### 24 May 2019
+
+- Completed an aesthetically pleasing UI
+- With icons and descriptions
+- (Cooldowns are later added)
+- Inventory
+
+#### Animation and Hitbobx
+##### 13 June 2019
+
+- Completed combat animation and hitboxes
+- Math and Damage Calculation
+- Interaction with powerups and enemies

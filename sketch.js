@@ -1,7 +1,8 @@
 //STILL TO DO
-// - COMBAT AND LEVELING SYSTEM
+
 // - GAME DISCRIPTION
 // - BALANCE ITEMS
+// - commenting
 // - WIN CON?
 
 
@@ -111,14 +112,13 @@ function draw() {
   characterPosition();
   determineVelocity();
   characterMovement();
-  createBullet();
   castingAbilities();
-  inGameShopDisplay();
-  itemDetails();
-  characterStatus();
   updateTimer();
   minionFunctions();
   moveProjectiles();
+  inGameShopDisplay();
+  itemDetails();
+  characterStatus();
   gameOverYet();
 
 }
@@ -132,7 +132,7 @@ function setAssets() {
   soundOn = loadImage("assets/pictures/soundon.png");
   soundOff = loadImage("assets/pictures/soundoff.png");
   volumeControl = true;
-  files = 101;
+  files = 104;
 
 }
 
@@ -155,6 +155,8 @@ function loadFiles() {
     clickItem : loadSound("assets/sounds/clickItem.wav", itemLoaded),
     buyItem : loadSound("assets/sounds/buyItem.wav", itemLoaded),
     levelUp : loadSound("assets/sounds/levelUp.mp3", itemLoaded),
+    cannonfire : loadSound("assets/sounds/cannonfire.wav", itemLoaded),
+    cannonhit : loadSound("assets/sounds/cannonhit.wav", itemLoaded),
   };
 
   images = {
@@ -250,6 +252,7 @@ function loadFiles() {
     wsound3 : loadSound("assets/sounds/projectile3.wav", itemLoaded),
     esound : loadSound("assets/sounds/esound.wav", itemLoaded),
     rsound : loadSound("assets/sounds/rsound.wav", itemLoaded),
+    whit : loadSound("assets/sounds/whit.wav", itemLoaded),
   };
 
 }
@@ -338,30 +341,6 @@ class GameObject {
   checkMouse() {
     this.mouse = mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
   }
-}
-
-//class is used to track and display bullets
-class Bullet {
-
-  //sets up the variables of each individual bullet including position, size, and velocity
-  constructor() {
-    this.x = width;
-    this.y = random(0, height);
-    this.diameter = random(width / 25, height / 35);
-    this.speed = random(3, 10 + floor(timer / 4));
-  }
-
-  //function responsible for the movement of each bullet
-  move() {
-    this.x += random(-this.speed);
-  }
-
-  //function to displays the bullets
-  display() {
-    fill(0, 255 ,255);
-    ellipse(this.x, this.y, this.diameter, this.diameter);
-  }
-
 }
 
 //class for Mystic Shot projectiles, responsible for displaying, creating hitbox, and running each projectile, also carries a damage value
@@ -526,16 +505,31 @@ class Cannons extends GameObject {
     this.speed = width * 0.01;
     this.direction = direction;
     this.id = id;
+
+    this.spawntime = timer;
+
+    //damage display portion
     this.damage = damage;
+    this.showdamage = false;
+    this.damagedisplay = false;
+    this.critdmg = false;
+    this.damagetaken = 0;
+    this.starttime = -500;
   }
 
   display() {
+
     image(images.enemyCannon, this.x, this.y, this.width, this.height);
     stroke(0);
     noFill();
     rect(this.x, this.y - height * 0.03, this.width, height * 0.018);
     fill(249, 22, 26);
     rect(this.x, this.y - height * 0.03, this.width * (this.health / this.maxhp), height * 0.018);
+    noStroke();
+    fill(255);
+    textSize(width / 120);
+    text(ceil(this.health) + "/" + this.maxhp, this.x + this.width / 2, this.y - height * 0.0195);
+
   }
 
   move() {
@@ -557,6 +551,39 @@ class Cannons extends GameObject {
     enemyminionhitbox[this.id][2] = createVector(hitx + hitwidth, hity + hitheight);
     enemyminionhitbox[this.id][3] = createVector(hitx, hity + hitheight);
   }
+
+  showdmg(crit, damagevalue) {
+
+    if (this.showdamage) {
+      this.starttime = millis();
+      this.damagedisplay = true;
+      this.showdamage = false;
+    }
+
+    if (this.damagedisplay) {
+      if (crit) {
+        fill(249, 22, 26);
+        strokeWeight(3);
+        textSize(width / 50);
+      }
+      else {
+        fill(255);
+        strokeWeight(3);
+        textSize(width / 80);
+      }
+      noStroke();
+      text("- " + floor(damagevalue), this.x + this.width / 2, this.y - height * 0.05 * (millis() - this.starttime) / 750);
+      strokeWeight(1);
+
+    }
+
+    if (millis() - this.starttime >= 750 && this.starttime !== -500) {
+      this.damagedisplay = false;
+      this.starttime = -500;
+    }
+
+  }
+
 
   //creates a projectile with a damage value
   attack() {
@@ -834,10 +861,18 @@ function loadData() {
     holyfire : false,    
   };
   abilitycosts = {
-    q : 25,
-    w : 75,
-    e : 25,
-    r : 125,
+    q : 15,
+    w : 35,
+    e : 10,
+    r : 100,
+    d : 0,
+    f : 0,
+  };
+  cds = {
+    q : 3,
+    w : 8,
+    e : 5,
+    r : 80,
     d : 0,
     f : 0,
   };
@@ -847,19 +882,11 @@ function loadData() {
     e : false,
     r : false,
   },
-  cds = {
-    q : 5,
-    w : 20,
-    e : 10,
-    r : 60,
-    d : 0,
-    f : 0,
-  };
   cdcharge = {
-    q : 5,
-    w : 20,
-    e : 10,
-    r : 60,
+    q : cds.q,
+    w : cds.w,
+    e : cds.e,
+    r : cds.r,
     d : 0,
     f : 0,
   };
@@ -1013,8 +1040,7 @@ function showShop() {
       texts.effect4 = "";
       texts.effect5 = "";
       texts.effect6 = "";
-      texts.additionaltexts = "";
-      texts.additionaltexts2 = "";
+
     
       summonerInfo();
 
@@ -1023,18 +1049,14 @@ function showShop() {
       stroke(86, 5, 74);
       rect(width * 0.6, height * 0.02, width * 0.3, height * 0.8);
   
-      textSize(55);
+      textSize(width / 30);
       fill(209, 20, 180);
       text("Summoner Spell", width * 0.75, height * 0.08);
 
       noStroke();
       fill(0);
-      textSize(36);
+      textSize(width / 40);
       textStyle(BOLD);
-    
-      textSize(20);
-      textStyle(NORMAL);
-      textSize(48);
       stroke(86, 5, 74);
       if (currentSummoner === 1) {
         fill(226, 20, 20);
@@ -1052,12 +1074,15 @@ function showShop() {
         fill(223, 252, 5);
       }
       text(texts.effect1, width * 0.749, height * 0.17);
-      textSize(24);
+      textSize(width / 65);
+      textStyle(NORMAL);
       noStroke();
       fill(0);
       text(texts.effect2, width * 0.749, height * 0.25);
       text(texts.effect3, width * 0.749, height * 0.3);
       text(texts.effect4, width * 0.749, height * 0.35);
+      text(texts.effect5, width * 0.749, height * 0.4);
+      text(texts.effect6, width * 0.749, height * 0.45);
 
       if (summonerD !== currentSummoner) {
         selectSummoner.run();
@@ -1080,31 +1105,36 @@ function showShop() {
 function summonerInfo() {
   if (currentSummoner === 1) {
     texts.effect1 = "Ignite";
-    texts.effect2 = "Igintes an enemy, dealing a burst of";
-    texts.effect3 = "initial damage and burns over time";
-    texts.effect4 = "Cooldown: 30 seconds";
+    texts.effect2 = "Strike with a fierce fiery energy,";
+    texts.effect3 = "dealing 10% additional damage with";
+    texts.effect4 = "ALL abilities";
+    texts.effect4 = "(Increase Critical Strike Damage by 25%)";
+    texts.effect6 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 2) {
     texts.effect1 = "Clarity";
-    texts.effect2 = "Quickly restore some mana";
-    texts.effect4 = "Cooldown: 10 seconds";
+    texts.effect2 = "Have peace with the soul and the mind,";
+    texts.effect3 = "restoring 20% of your maximum mana";
+    texts.effect6 = "Cooldown: 10 seconds";
   }
   if (currentSummoner === 3) {
     texts.effect1 = "Heal";
-    texts.effect2 = "Quickly heals your character";
-    texts.effect4 = "Cooldown: 25 seconds";
+    texts.effect2 = "Call upon the energy of life, restoring";
+    texts.effect3 = "10% of your maximum health or 25%";
+    texts.effect4 = "missing health (whichever is greater)";
+    texts.effect6 = "Cooldown: 25 seconds";
   }
   if (currentSummoner === 4) {
     texts.effect1 = "Barrier";
-    texts.effect2 = "Reduces all incomming damage for a";
-    texts.effect3 = "brief duration";
-    texts.effect4 = "Cooldown: 30 seconds";
+    texts.effect2 = "Gain strength, take 15% reduced damage";
+    texts.effect3 = "from ALL sources for 7 seconds";
+    texts.effect6 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 5) {
     texts.effect1 = "Flash";
-    texts.effect2 = "Blinks your character a distance";
-    texts.effect3 = "towards the cursor";
-    texts.effect4 = "Cooldown: 30 seconds";
+    texts.effect2 = "Warp time and space, teleporting your";
+    texts.effect3 = "character a distance towards your cursor";
+    texts.effect6 = "Cooldown: 30 seconds"; 
   }
 }
 
@@ -1352,14 +1382,15 @@ function playerhitboxes() {
   if (qup) {
     if (direction === "forward") {
       qhitbox[0] = createVector(charpos.x + charpos.width / 2, charpos.y);
-      qhitbox[1] = createVector(charpos.x + charpos.width * 1.5, charpos.y);
-      qhitbox[2] = createVector(charpos.x + charpos.width * 1.5, charpos.y + charpos.height);
+      qhitbox[1] = createVector(charpos.x + charpos.width * 1.15, charpos.y);
+      qhitbox[2] = createVector(charpos.x + charpos.width * 1.15, charpos.y + charpos.height);
       qhitbox[3] = createVector(charpos.x + charpos.width / 2, charpos.y + charpos.height);
     }
+
     if (direction === "backward") {
       qhitbox[0] = createVector(charpos.x + charpos.width / 2, charpos.y);
-      qhitbox[1] = createVector(charpos.x - charpos.width * - 0.5, charpos.y);
-      qhitbox[2] = createVector(charpos.x - charpos.width * - 0.5, charpos.y + charpos.height);
+      qhitbox[1] = createVector(charpos.x - charpos.width * 0.15, charpos.y);
+      qhitbox[2] = createVector(charpos.x - charpos.width * 0.15, charpos.y + charpos.height);
       qhitbox[3] = createVector(charpos.x + charpos.width / 2, charpos.y + charpos.height);
     }
 
@@ -1370,6 +1401,7 @@ function playerhitboxes() {
         //q damage
         let damage = stats.ad;
         let temp = random(0, 100);
+        let crit = false;
         if (rmode) {
           damage = stats.ad * 1.2;
         }
@@ -1380,6 +1412,7 @@ function playerhitboxes() {
           damage = damage * 1.1;
         }
         if (stats.crit >= temp) {
+          crit = true;
           if (buffs.ignite) {
             damage = damage * 2.25;
           }
@@ -1396,7 +1429,12 @@ function playerhitboxes() {
             stats.ad += 1;
           }
         }
+
         enemyMinions[k].health -= damage;
+        enemyMinions[k].damagetaken = damage;
+        enemyMinions[k].critdmg = crit;
+        enemyMinions[k].showdamage = true;
+
       }
     }
 
@@ -1432,7 +1470,12 @@ function playerhitboxes() {
         if (buffs.ignite) {
           damage = damage * 1.1;
         }
+
+        
         enemyMinions[k].health -= damage;
+        enemyMinions[k].damagetaken = damage;
+        enemyMinions[k].critdmg = false;
+        enemyMinions[k].showdamage = true;
       }
     }
   }
@@ -1509,8 +1552,13 @@ function updateTimer() {
 //spawn minions according to restrictions above in the timing function
 function minionsSpawn() {
 
-  if (timer % 10 === 2) {
-    spawnCannon();
+  let temp = random(0, 100);
+  if (enemyMinions.length !== 0) {
+    if (temp <= 10) {
+      spawnCannon();
+    }
+  }
+  else {
     spawnCannon();
   }
 
@@ -1520,8 +1568,8 @@ function minionsSpawn() {
 function spawnCannon() {
   
   enemyminionhitbox.push([]);
-  let temp = random(0, 0.7);
-  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, 45 + stats.lvl * 5, enemyminionhitbox.length-1));
+  let temp = random(0.1, 0.7);
+  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, 10 + stats.lvl * 5, enemyminionhitbox.length-1));
 
 }
 
@@ -1574,6 +1622,12 @@ function minionFunctions() {
 
           stats.health -= temp;
           cannonbolts.splice(m, 1);
+
+          if (volumeControl) {
+            sound.cannonhit.setVolume(0.1);
+            sound.cannonhit.play();
+          }
+
           for (let p = m; p <= cannonbolts.length - 1; p++) {
             if (cannonbolts[p].id !== 0) {
               cannonbolts[p].id -= 1;
@@ -1614,89 +1668,35 @@ function minionFunctions() {
 
     //minions motion and attack
     for (let k = enemyMinions.length - 1; k >= 0; k--) {
+
       enemyMinions[k].display();
       enemyMinions[k].hitbox();
+      enemyMinions[k].showdmg(enemyMinions[k].critdmg, enemyMinions[k].damagetaken);
       if (! shopSubstate) {
         enemyMinions[k].move();
-
-        let diff;
-        if (timer < 300) {
-          diff = floor(timer / 30);
-        }
-        else {
-          diff = 10;
-        }
-
-        let randomvalue = random(0, 2000 - diff * 50);
-        if (randomvalue <= 13) { 
+        if ((timer - enemyMinions[k].spawntime) % 2 === 0 && frameCount % 60 === 0) {
           enemyMinions[k].attack();
+          if (volumeControl) {
+            sound.cannonfire.setVolume(0.1);
+            sound.cannonfire.play();
+          }
         }
       }
+
     }
 
   }
 
 }
 
-//responsible for the creation of the bullets
-function createBullet() {
-
-  if (!shopSubstate && state === "game") {
-
-    //loop that cycles through every frame and, depending on the difficulty and timer, there is a possibility of generating a bullet according to the class code above, which is then pushed into an array defined at the beginning
-    let randomvalue = random(0, difficulty - 20 * timer);
-    if (randomvalue <= 40) { 
-      //bullets.push(new Bullet());
-    }
-  }
-
-}
-
-//responsible for the individual movement of each bullet
+//responsible for the individual movement of all projecties in game
 function moveProjectiles() {
 
   if (state === "game") {
     stroke(0, 0, 255);
-    moveBullets();
     moveBolts();
   }
 
-}
-
-function moveBullets() {
-  //moves each bullet in the array bullets, defined at the beginning, according to the class code above
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    if (!shopSubstate) {
-      bullets[i].move();
-    }
-  
-    //display the bullets that are on screen
-    if (bullets[i].x > 0) {
-      bullets[i].display();
-    }
-  
-    //gameover if the bullet is colliding with the character
-    if ((bullets[i].x - 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x - 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
-        bullets[i].x + 0.5 * bullets[i].diameter >= charpos.x && bullets[i].x + 0.5 * bullets[i].diameter <= charpos.x + charpos.width && bullets[i].y >= charpos.y && bullets[i].y <= charpos.y + charpos.height ||
-        bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y + 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y + 0.5 * bullets[i].diameter <= charpos.y + charpos.height ||
-        bullets[i].x >= charpos.x && bullets[i].x <= charpos.x + charpos.width && bullets[i].y - 0.5 * bullets[i].diameter >= charpos.y && bullets[i].y - 0.5 * bullets[i].diameter <= charpos.y + charpos.height) &&
-         ! invins) {
-      stats.health -= 50;
-      bullets.splice(i, 1);
-      if (volumeControl){
-        sound.clickItem.setVolume(0.1);
-        sound.clickItem.play();
-      }
-    }
-  
-  }
-  
-  //delete if out of screen
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    if (bullets[i].x < 0) {
-      bullets.splice(i, 1);
-    }
-  }
 }
 
 //function to track bolt movement, hitbox, and damage calculation
@@ -1734,8 +1734,10 @@ function moveBolts() {
       
         let temp = random(0, 100);
         let damage = bolts[a].damage;
+        let crit = false;
   
         if (stats.crit >= temp) {
+          crit = true;
           if (! buffs.ignite) {
             damage = damage * 2;
           }
@@ -1745,8 +1747,18 @@ function moveBolts() {
         }
   
         enemyMinions[m].health -= damage;
+        enemyMinions[m].damagetaken = damage;
+        enemyMinions[m].critdmg = crit;
+        enemyMinions[m].showdamage = true;
+
         bolts.splice(a, 1);
         bolthitbox.splice(a, 1);
+
+        if (volumeControl) {
+          player.whit.setVolume(0.3);
+          player.whit.play();
+        }
+
 
         for (let n = a; n <= bolts.length - 1; n++) {
           if (bolts[n].id !== 0) {
@@ -2073,91 +2085,47 @@ function cooldowns() {
 //recharging abilities
 function rechargeAbilities() {
 
-  // if (! shopSubstate) {
-  //   if (cdcharge.q > cds.q) {
-  //     cdcharge.q === cds.q;
-  //   }
-  //   else {
-  //     cdcharge.q += 1 / 60;
-  //   }
-
-  //   if (cdcharge.w > cds.w) {
-  //     cdcharge.w === cds.w;
-  //   }
-  //   else {
-  //     cdcharge.w += 1 / 60;
-  //   }
-
-  //   if (cdcharge.e > cds.e) {
-  //     cdcharge.e === cds.e;
-  //   }
-  //   else {
-  //     cdcharge.e += 1 / 60;
-  //   }
-
-  //   if (cdcharge.r > cds.r) {
-  //     cdcharge.r === cds.r;
-  //   }
-  //   else {
-  //     cdcharge.r += 1 / 60;
-  //   }
-
-  //   if (cdcharge.d > cds.d) {
-  //     cdcharge.d === cds.d;
-  //   }
-  //   else {
-  //     cdcharge.d += 1 / 60;
-  //   }
-
-  //   if (cdcharge.f > cds.f) {
-  //     cdcharge.f === cds.f;
-  //   }
-  //   else {
-  //     cdcharge.f += 1 / 60;
-  //   }
-  // }
-
   if (! shopSubstate) {
     if (cdcharge.q > cds.q) {
       cdcharge.q === cds.q;
     }
     else {
-      cdcharge.q += 1 / 2;
+      cdcharge.q += 1 / 60;
     }
 
     if (cdcharge.w > cds.w) {
       cdcharge.w === cds.w;
     }
     else {
-      cdcharge.w += 1 / 2;
+      cdcharge.w += 1 / 60;
     }
 
     if (cdcharge.e > cds.e) {
       cdcharge.e === cds.e;
     }
     else {
-      cdcharge.e += 1 / 2;
+      cdcharge.e += 1 / 60;
     }
 
     if (cdcharge.r > cds.r) {
       cdcharge.r === cds.r;
     }
     else {
-      cdcharge.r += 1 / 2;
+      cdcharge.r += 1 / 60;
     }
 
     if (cdcharge.d > cds.d) {
       cdcharge.d === cds.d;
     }
     else {
-      cdcharge.d += 1 / 2;
+      cdcharge.d += 1 / 60;
     }
 
     if (cdcharge.f > cds.f) {
       cdcharge.f === cds.f;
     }
     else {
-      cdcharge.f += 1 / 2;
+      cdcharge.f += 1 / 60;
     }
   }
 
@@ -2351,12 +2319,12 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Redemption (25)";
+      texts.effect1 = "Redemption (" + abilitycosts.q + ")";
       texts.effect2 = "Strikes in front of your character, dealing damage equal to your Damage";
       texts.effect3 = "Slaying an enemy has a 15% chance to absorb their soul, increasing your Damage by 1";
       texts.effect4 = "(Can Critical Strike)";
       texts.effect6 = "Active Ability";  
-      texts.additionaltexts = "Cooldown: 5 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.q) + " seconds";
       texts.additionaltexts2 = "Redemption is earned through culling, not prayers";
     }
     else {
@@ -2365,7 +2333,7 @@ function abilityDesc() {
       texts.effect3 = "Slaying an enemy absorbs their soul, increasing your Damage by 1";
       texts.effect4 = "(Can Critical Strike)";
       texts.effect6 = "Active Ability";  
-      texts.additionaltexts = "Cooldown: 3 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.q) + " seconds";
       texts.additionaltexts2 = "When judgment arrives, it is too late";
     }
 
@@ -2375,7 +2343,7 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Mystic Shot (75)";
+      texts.effect1 = "Mystic Shot (" + abilitycosts.w + ")";
       let temp;
       if (stats.lvl <= 5) {
         temp = "an projectile of pure energy,";
@@ -2390,7 +2358,7 @@ function abilityDesc() {
       texts.effect3 = "15 + 80% of your ability power. If a third projectile is fired,";
       texts.effect4 = "it deals 25% increased damage (Can Critically Strike)";
       texts.effect6 = "Active Ability";
-      texts.additionaltexts = "Cooldown: 20 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.w) + " seconds";
       texts.additionaltexts2 = "Purer than the holy fire and stronger than the sacred blade";
     }
     else {
@@ -2400,7 +2368,7 @@ function abilityDesc() {
       texts.effect4 = "(Can Critically Strike)";
       texts.effect5 = "Passive: Gain + 10% Critical Strike Chance";
       texts.effect6 = "Active Ability";
-      texts.additionaltexts = "Cooldown: 20 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.w) + " seconds";
       texts.additionaltexts2 = "Sometimes, it's better to suffer";
     }
 
@@ -2410,11 +2378,11 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     if (!rmode) {
-      texts.effect1 = "Angelic Shift (25)";
+      texts.effect1 = "Angelic Shift (" + abilitycosts.e + ")";
       texts.effect2 = "Shift across space with immense speed, cutting through up to one enemy in your";
       texts.effect3 = "path, it takes damage equal to 25 + 35% of your Ability Power";
       texts.effect6 = "Active Ability";
-      texts.additionaltexts = "Cooldown: 10 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
       texts.additionaltexts2 = "You see nothing";
     }
     else {
@@ -2423,7 +2391,7 @@ function abilityDesc() {
       texts.effect3 = "path, it takes damage equal to 50% of your Ability Power or 40% of your Damage";
       texts.effect4 = "(whichever is greater)";
       texts.effect6 = "Active Ability";
-      texts.additionaltexts = "Cooldown: 5 seconds";
+      texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
       texts.additionaltexts2 = "Take it as I was never here, just be grateful for what is left";
     }
 
@@ -2432,13 +2400,13 @@ function abilityDesc() {
   if(mouseX >= width * 0.492 && mouseX <= width * 0.5245 && mouseY >= height * 0.8825 && mouseY <= height * 0.935) {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
-    texts.effect1 = "Tempest";
+    texts.effect1 = "Tempest (" + abilitycosts.r + ")";
     texts.effect2 = "For 20 seconds, your abilities are empowered and costs no mana:";
     texts.effect3 = "Q - Judgment: Cooldown reduced, deals bonus damage as TRUE damage";
     texts.effect4 = "W - Orbs of Agony: Cooldown reduced, ememies hit takes increased damage";
     texts.effect5 = "E - Wanderer's Strike: Cooldown reduced, deals increased damage";
     texts.effect6 = "Ultimate Ability";
-    texts.additionaltexts = "Cooldown: 60 seconds"; 
+    texts.additionaltexts = "Cooldown: " + str(cds.r) + " seconds"; 
     texts.additionaltexts2 = "Do not fear me, fear the nothing after I am gone"; 
 
   }
@@ -2471,9 +2439,7 @@ function abilityDesc() {
     }
     if (summonerD === 4) {
       texts.effect1 = "Barrier";
-      texts.effect2 = "Become ";
-      texts.effect3 = "with all abilities";
-      texts.effect4 = "(Critical strike damage while ignite is active is increased by 25%)";
+      texts.effect2 = "Gain strength, take 15% reduced damage from ALL sources for 7 seconds";
       texts.effect6 = "Summoner Ability";
       texts.additionaltexts = "Cooldown: 30 seconds"; 
       texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
@@ -2481,7 +2447,7 @@ function abilityDesc() {
     if (summonerD === 5) {
       texts.effect1 = "Flash";
       texts.effect2 = "Warp time and space, teleporting your character a distance towards";
-      texts.effect3 = "your cursoe";
+      texts.effect3 = "your cursor";
       texts.effect6 = "Summoner Ability";
       texts.additionaltexts = "Cooldown: 30 seconds"; 
       texts.additionaltexts2 = "To warp time and space is to traverse the infinity of the universe"; 
@@ -2519,7 +2485,7 @@ function abilityDesc() {
       texts.effect1 = "Barrier";
       texts.effect2 = "Gain strength, take 15% reduced damage from ALL sources for 7 seconds";
       texts.effect6 = "Summoner Ability";
-      texts.additionaltexts = "Cooldown: 20 seconds"; 
+      texts.additionaltexts = "Cooldown: 30 seconds"; 
       texts.additionaltexts2 = "Only those with strongs hearts can truely be indestructible"; 
     }
     if (summonerF === 5) {
@@ -2634,10 +2600,12 @@ function abilityicons() {
   textSize(width/120);
   stroke(18, 18, 181);
   fill(204, 0, 255);  
-  text(abilitycosts.q, width * 0.405, height * 0.895);
-  text(abilitycosts.w, width * 0.443, height * 0.895);
-  text(abilitycosts.e, width * 0.4805, height * 0.895);
-  text(abilitycosts.r, width * 0.5165, height * 0.895);
+  if (! rmode) {
+    text(abilitycosts.q, width * 0.405, height * 0.895);
+    text(abilitycosts.w, width * 0.443, height * 0.895);
+    text(abilitycosts.e, width * 0.4805, height * 0.895);
+    text(abilitycosts.r, width * 0.5165, height * 0.895);
+  }
 
 }
 
@@ -3246,33 +3214,33 @@ function resetGame() {
     barrier : -500,
   };
   bolts = [];
-  abilitycosts = {
-    q : 25,
-    w : 75,
-    e : 25,
-    r : 125,
-    d : 0,
-    f : 0,
-  };
   castTime = {
     q : 650,
     w : 200,
     e : 425,
     r : 50,
   };
-  cds = {
-    q : 5,
-    w : 20,
+  abilitycosts = {
+    q : 15,
+    w : 35,
     e : 10,
-    r : 60,
+    r : 100,
+    d : 0,
+    f : 0,
+  };
+  cds = {
+    q : 3,
+    w : 8,
+    e : 5,
+    r : 80,
     d : 0,
     f : 0,
   };
   cdcharge = {
-    q : 5,
-    w : 20,
-    e : 10,
-    r : 60,
+    q : cds.q,
+    w : cds.w,
+    e : cds.e,
+    r : cds.r,
     d : 0,
     f : 0,
   };
@@ -3336,6 +3304,7 @@ function mousePressed() {
     mouseY >= height * 0.75 && mouseY <= height / 4 * 3 + height / 6 && loadCount === files) {
     state = "game";
     menumusic.stop();
+    //set summoner cooldowns
     if (summonerD === 1) {
       cds.d = 30;
       cdcharge.d = 30;
@@ -3420,7 +3389,7 @@ function keyTyped() {
   if (state === "game") {
 
     //Opens and closes the in-game shop
-    if ((key === "`" || key === "p") && state === "game") {
+    if ((key === "`" || key === "p" || key === "P") && state === "game") {
       shopSubstate = !shopSubstate;
       if (!shopSubstate) {
         currentItem = 0;
@@ -3435,12 +3404,12 @@ function keyTyped() {
       }
     }
 
-    if (key === "c" && state === "game") {
+    if ((key === "c"  || key === "C") && state === "game") {
       statsToggle = ! statsToggle;
     }
 
     //q ability
-    if (key === "q") {
+    if (key === "q" || key === "Q") {
       if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3469,7 +3438,7 @@ function keyTyped() {
     }
 
     //w ability
-    if (key === "w") {
+    if (key === "w" || key === "W") {
       if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3486,12 +3455,12 @@ function keyTyped() {
         cdcharge.w = 0;
 
         cast();
-
         bolt1();
+
         if (stats.lvl >= 6) {
           setTimeout(bolt1, 100);    
         }
-        if (stats.lvl >= 12) {
+        if (stats.lvl >= 12 || rmode) {
           setTimeout(bolt2, 200);       
         }
 
@@ -3500,7 +3469,7 @@ function keyTyped() {
     }
 
     //e ability
-    if (key === "e") {
+    if (key === "e" || key == "E") {
       if (cdcharge.e < cds.e|| castability.q || castability.w || castability.r || stats.mana < abilitycosts.e && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3545,7 +3514,7 @@ function keyTyped() {
     }
 
     //r ability
-    if (key === "r") {
+    if (key === "r" || key === "R") {
       if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r && !rmode || stats.lvl < 6) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3573,7 +3542,7 @@ function keyTyped() {
     }
 
     //d summoner ability
-    if (key === "d") {
+    if (key === "d" || key === "D") {
       if (cdcharge.d < cds.d) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3603,7 +3572,7 @@ function keyTyped() {
     }
 
     //f summoner ability
-    if (key === "f") {
+    if (key === "f" || key === "F") {
       if (cdcharge.f < cds.f) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3777,17 +3746,12 @@ function bolt1() {
     vy = vy * -1;
   }
 
-  console.log(theta);
-
   if (theta > 0) {
     theta = PI / 2 - theta;
   }
   else if (theta < 0) {
     theta = 3 * PI / 2 - theta;
   }
-
-  console.log(theta);
-
 
 
   let damage;
@@ -3798,11 +3762,11 @@ function bolt1() {
     damage = 15 + stats.ap * 0.8;
   }
 
-  if (destinationpos.x >= charpos.x + charpos.width / 2) {
+  if (mouseX >= charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
   }
-  else if (destinationpos.x < charpos.x + charpos.width / 2) {
+  else if (mouseX < charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
   }
@@ -3839,17 +3803,17 @@ function bolt2() {
 
   let damage;
   if (rmode) {
-    damage = 15 + stats.ap * 2.5;
+    damage = 30 + stats.ap * 2.5;
   }
   else {
     damage = 15 + stats.ap;
   }
 
-  if (destinationpos.x >= charpos.x + charpos.width / 2) {
+  if (mouseX >= charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
   }
-  else if (destinationpos.x < charpos.x + charpos.width / 2) {
+  else if (mouseX < charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
   }

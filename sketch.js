@@ -132,7 +132,7 @@ function setAssets() {
   soundOn = loadImage("assets/pictures/soundon.png");
   soundOff = loadImage("assets/pictures/soundoff.png");
   volumeControl = true;
-  files = 104;
+  files = 106;
 
 }
 
@@ -253,6 +253,8 @@ function loadFiles() {
     esound : loadSound("assets/sounds/esound.wav", itemLoaded),
     rsound : loadSound("assets/sounds/rsound.wav", itemLoaded),
     whit : loadSound("assets/sounds/whit.wav", itemLoaded),
+    holyfire : loadImage("assets/pictures/character/holyfire.png", itemLoaded),
+    angelicshield : loadImage("assets/pictures/character/angelicshield.png", itemLoaded),
   };
 
 }
@@ -498,10 +500,10 @@ class Cannons extends GameObject {
 
   constructor(x, y, width, height, direction, damage, id) {
     super(x, y, width, height);
-    this.health = 50 + timer;
-    this.maxhp = 50 + timer;
-    this.magicresist = 10 + floor(timer / 5);
-    this.armor = 15 + floor(timer / 4);
+    this.health = 20 + sq(stats.lvl) * 2;
+    this.maxhp = 20 + sq(stats.lvl) * 2;
+    this.magicresist = 10 + stats.lvl;
+    this.armor = 15 + stats.lvl;
     this.speed = width * 0.01;
     this.direction = direction;
     this.id = id;
@@ -906,15 +908,15 @@ function loadData() {
     maxhp : 500,
     mana : 200,
     maxmana : 200,
-    ad : 50,
+    ad : 20,
     ap : 0,
     crit : 0,
     cdr : 0,
-    armor : 25,
-    mr : 15,
+    armor : 0,
+    mr : 0,
     armorpen : 0,
     magicpen : 0,
-    hpregen : 2,
+    hpregen : 4,
     manaregen : 5,
     speed : 0,
     xp : 0,
@@ -1107,8 +1109,8 @@ function summonerInfo() {
     texts.effect1 = "Ignite";
     texts.effect2 = "Strike with a fierce fiery energy,";
     texts.effect3 = "dealing 10% additional damage with";
-    texts.effect4 = "ALL abilities";
-    texts.effect4 = "(Increase Critical Strike Damage by 25%)";
+    texts.effect4 = "all abilities";
+    texts.effect5 = "(Increase Critical Strike Damage by 25%)";
     texts.effect6 = "Cooldown: 30 seconds";
   }
   if (currentSummoner === 2) {
@@ -1430,6 +1432,9 @@ function playerhitboxes() {
           }
         }
 
+        
+        damage = damage * ((100 - enemyMinions[k].armor) / 100);
+
         enemyMinions[k].health -= damage;
         enemyMinions[k].damagetaken = damage;
         enemyMinions[k].critdmg = crit;
@@ -1454,15 +1459,15 @@ function playerhitboxes() {
         //e damage
         let damage;
         if (rmode) {
-          if (stats.ap / 2 > stats.ad * 0.4) {
-            damage = stats.ap / 2;
+          if (stats.ap * 0.2 > stats.ad * 0.1) {
+            damage = stats.ap * 0.2;
           }
           else {
-            damage = stats.ad * 0.4;
+            damage = stats.ad * 0.1;
           }
         }
         else {
-          damage = 25 + stats.ap * 0.35;
+          damage = 10 + stats.ap * 0.1;
         }
         if (buffs.holyfire) {
           damage = damage * 1.1;
@@ -1471,6 +1476,7 @@ function playerhitboxes() {
           damage = damage * 1.1;
         }
 
+        damage = damage * ((100 - enemyMinions[k].magicresist) / 100);
         
         enemyMinions[k].health -= damage;
         enemyMinions[k].damagetaken = damage;
@@ -1554,7 +1560,7 @@ function minionsSpawn() {
 
   let temp = random(0, 100);
   if (enemyMinions.length !== 0) {
-    if (temp <= 10) {
+    if (temp <= 5) {
       spawnCannon();
     }
   }
@@ -1619,6 +1625,8 @@ function minionFunctions() {
           if (buffs.angelicshield) {
             temp = temp * 0.9;
           }
+
+          temp = temp * ((100 - stats.mr) / 100);
 
           stats.health -= temp;
           cannonbolts.splice(m, 1);
@@ -1745,6 +1753,8 @@ function moveBolts() {
             damage = damage * 2.25;
           }
         }
+
+        damage = damage * ((100 - enemyMinions[m].magicresist) / 100);
   
         enemyMinions[m].health -= damage;
         enemyMinions[m].damagetaken = damage;
@@ -1869,6 +1879,25 @@ function characterStatus() {
       stats.health = stats.maxhp;
     }
 
+    if (stats.armor >= 50) {
+      stats.armor = 50;
+    }
+    if (stats.cdr >= 50) {
+      stats.cdr = 50;
+    }
+    if (stats.mr >= 50) {
+      stats.mr = 50;
+    }
+    if (stats.magicpen >= 80) {
+      stats.magicpen = 80;
+    }
+    if (stats.armorpen >= 80) {
+      stats.armorpen = 80;
+    }
+    if (stats.speed >= 100) {
+      stats.speed = 60;
+    }
+
     //components of the UI
     blankbars();
 
@@ -1892,6 +1921,8 @@ function characterStatus() {
 
     cooldowns();
 
+    displaybuffs();
+
     image(player.overlay, width * 0.2, height * 0.8, width * 0.6, height * 0.2);
     
     levelDisplay();
@@ -1909,6 +1940,8 @@ function levelUp() {
   
   if (stats.xp >= stats.lvlupxp && stats.lvl <= 17) {
     stats.xp -= stats.lvlupxp;
+    stats.lvlupxp += 50;
+    stats.lvl += 1;
     if (stats.lvl === 6) {
       stats.speed += 20;
     }
@@ -1921,16 +1954,13 @@ function levelUp() {
     if (stats.lvl === 18) {
       stats.xp = 0;
     }
-    stats.lvlupxp += 50;
-    stats.lvl += 1;
     stats.maxhp += 50;
     stats.health += 50;
     stats.mana += 20;
     stats.maxmana += 20;
-    stats.armor += 2;
-    stats.speed += 5;
     stats.ad += 5;
-    stats.hpregen += 1;
+    stats.ap += 10;
+    stats.hpregen += 0.5;
     stats.manaregen += 0.5;
     if (volumeControl){
       sound.levelUp.setVolume(0.3);
@@ -2082,6 +2112,43 @@ function cooldowns() {
 
 }
 
+function displaybuffs() {
+
+  if (buffs.ignite) {
+    stroke(0, 97, 255);
+    strokeWeight(3);
+    noFill();
+    rect(width * 0.34, height * 0.8, width * 0.0145, width * 0.0145);
+    image(images.ignite, width * 0.34, height * 0.8, width * 0.015, width * 0.015);
+  }
+
+  if (buffs.barrier) {
+    stroke(0, 97, 255);
+    strokeWeight(3);
+    noFill();
+    rect(width * 0.36, height * 0.8, width * 0.0145, width * 0.0145);
+    image(images.barrier, width * 0.36, height * 0.8, width * 0.015, width * 0.015);
+  }
+
+  if (buffs.angelicshield) {
+    stroke(0, 97, 255);
+    strokeWeight(3);
+    noFill();
+    rect(width * 0.63, height * 0.8, width * 0.0145, width * 0.0145);
+    image(player.angelicshield, width * 0.63, height * 0.8, width * 0.015, width * 0.015);
+  }
+
+  if (buffs.holyfire) {
+    stroke(0, 97, 255);
+    strokeWeight(3);
+    noFill();
+    rect(width * 0.65, height * 0.8, width * 0.0145, width * 0.0145);
+    image(player.holyfire, width * 0.65, height * 0.8, width * 0.015, width * 0.015);
+  }
+
+}
+
+
 //recharging abilities
 function rechargeAbilities() {
 
@@ -2222,19 +2289,21 @@ function iteminfodisplay() {
   for (let itemcount = 0; itemcount < inventory.length && itemcount < 3; itemcount++) {
     if (mouseX >= width * 0.60248 + itemcount * width * 0.026 && mouseX <= width * 0.60248 + itemcount * width * 0.026 + height * 0.0415 && mouseY >= height * 0.88 && mouseY <= height * 0.92145) {
       fill(0, 0, 0, 75);
-      noStroke();
-      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.17, 25);
+      stroke(0, 97, 255);
+      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.18, 25);
       fill(255);
+      noStroke();
+      textStyle(NORMAL);
       textSize(width / 100);
       currentItem = inventory[itemcount].itemID;
       text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
       textSize(width / 120);
-      text(texts.effect1, mouseX, mouseY - height * 0.12);
-      text(texts.effect2, mouseX, mouseY - height * 0.10);
-      text(texts.effect3, mouseX, mouseY - height * 0.08);
-      text(texts.effect4, mouseX, mouseY - height * 0.06);
-      text(texts.effect5, mouseX, mouseY - height * 0.04);
-      text(texts.effect6, mouseX, mouseY - height * 0.02);
+      text(texts.effect1, mouseX, mouseY - height * 0.11);
+      text(texts.effect2, mouseX, mouseY - height * 0.09);
+      text(texts.effect3, mouseX, mouseY - height * 0.07);
+      text(texts.effect4, mouseX, mouseY - height * 0.05);
+      text(texts.effect5, mouseX, mouseY - height * 0.03);
+      text(texts.effect6, mouseX, mouseY - height * 0.01);
     }
   }
 
@@ -2242,25 +2311,27 @@ function iteminfodisplay() {
   for (let itemcount = 3; itemcount < inventory.length && itemcount < 6; itemcount++) {
     if (mouseX >= width * 0.60248 + (itemcount - 3) * width * 0.026 && mouseX <= width * 0.60228 + (itemcount - 3) * width * 0.026 + height * 0.0415 && mouseY >= height * 0.922 && mouseY <= height * 0.96345) {
       fill(0, 0, 0, 75);
-      noStroke();
-      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.17, 25);
+      stroke(0, 97, 255);
+      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.18, 25);
       fill(255);
+      noStroke();
+      textStyle(NORMAL);
       textSize(width / 100);
       currentItem = inventory[itemcount].itemID;
       text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
       textSize(width / 120);
-      text(texts.effect1, mouseX, mouseY - height * 0.12);
-      text(texts.effect2, mouseX, mouseY - height * 0.10);
-      text(texts.effect3, mouseX, mouseY - height * 0.08);
-      text(texts.effect4, mouseX, mouseY - height * 0.06);
-      text(texts.effect5, mouseX, mouseY - height * 0.04);
-      text(texts.effect6, mouseX, mouseY - height * 0.02);
+      text(texts.effect1, mouseX, mouseY - height * 0.11);
+      text(texts.effect2, mouseX, mouseY - height * 0.09);
+      text(texts.effect3, mouseX, mouseY - height * 0.07);
+      text(texts.effect4, mouseX, mouseY - height * 0.05);
+      text(texts.effect5, mouseX, mouseY - height * 0.03);
+      text(texts.effect6, mouseX, mouseY - height * 0.01);
     }
   }
 
 }
 
-//display ability information when prompted in uI
+//display ability information when prompted in ui
 function abilityInfoDisplay() {
 
   fill(0, 0, 0, 64);
@@ -2355,8 +2426,8 @@ function abilityDesc() {
         temp = "two projectiles of pure energy,";
       }
       texts.effect2 = "Fires " + temp + " enemies hit takes damage equal to";
-      texts.effect3 = "15 + 80% of your ability power. If a third projectile is fired,";
-      texts.effect4 = "it deals 25% increased damage (Can Critically Strike)";
+      texts.effect3 = "15 + your ability power. If a third projectile is fired,";
+      texts.effect4 = "it deals 125% damage (Can Critically Strike)";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: " + str(cds.w) + " seconds";
       texts.additionaltexts2 = "Purer than the holy fire and stronger than the sacred blade";
@@ -2364,7 +2435,7 @@ function abilityDesc() {
     else {
       texts.effect1 = "Orbs of Agony";
       texts.effect2 = "Fires three orbs from your character, enemies hit takes damage equal to";
-      texts.effect3 = "15 + 1.25 * Ability Power, the third orb deals 200% damage";
+      texts.effect3 = "30 + 1.25 * Ability Power, the third orb deals 125% damage";
       texts.effect4 = "(Can Critically Strike)";
       texts.effect5 = "Passive: Gain + 10% Critical Strike Chance";
       texts.effect6 = "Active Ability";
@@ -2380,7 +2451,7 @@ function abilityDesc() {
     if (!rmode) {
       texts.effect1 = "Angelic Shift (" + abilitycosts.e + ")";
       texts.effect2 = "Shift across space with immense speed, cutting through up to one enemy in your";
-      texts.effect3 = "path, it takes damage equal to 25 + 35% of your Ability Power";
+      texts.effect3 = "path, it takes damage equal to 10 + 10% of your Ability Power";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
       texts.additionaltexts2 = "You see nothing";
@@ -2388,7 +2459,7 @@ function abilityDesc() {
     else {
       texts.effect1 = "Wanderer's Strike";
       texts.effect2 = "Shift across space with immense speed, cutting through up to one enemy in your";
-      texts.effect3 = "path, it takes damage equal to 50% of your Ability Power or 40% of your Damage";
+      texts.effect3 = "path, it takes damage equal to 10 + 20% of your Ability Power or 10% of your Damage";
       texts.effect4 = "(whichever is greater)";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
@@ -2636,13 +2707,13 @@ function inGameShopDisplay() {
     
     //freeze buff timing
     if (abilitytiming.r !== -500) {
-      abilitytiming.r += 16 + 2 / 3;
+      abilitytiming.r = abilitytiming.r + 16 + 2/3;
     }
     if (abilitytiming.ignite !== -500) {
-      abilitytiming.r += 16 + 2 / 3;
+      abilitytiming.ignite = abilitytiming.ignite + 16 + 2/3;
     }
     if (abilitytiming.barrier !== -500) {
-      abilitytiming.r += 16 + 2 / 3;
+      abilitytiming.barrier = abilitytiming.barrier + 16 + 2/3;
     }
 
   } 
@@ -3249,16 +3320,16 @@ function resetGame() {
     maxhp : 500,
     mana : 200,
     maxmana : 200,
-    ad : 50,
+    ad : 20,
     ap : 0,
     crit : 0,
     cdr : 0,
-    armor : 25,
-    mr : 15,
+    armor : 0,
+    mr : 0,
     armorpen : 0,
     magicpen : 0,
-    hpregen : 1,
-    manaregen : 2,
+    hpregen : 4,
+    manaregen : 5,
     speed : 0,
     xp : 0,
     lvlupxp : 100,
@@ -3756,10 +3827,17 @@ function bolt1() {
 
   let damage;
   if (rmode) {
-    damage = 15 + stats.ap * 1.25;
+    damage = 30 + stats.ap * 1.25;
   }
   else {
-    damage = 15 + stats.ap * 0.8;
+    damage = 15 + stats.ap;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
   }
 
   if (mouseX >= charpos.x + charpos.width / 2) {
@@ -3803,10 +3881,17 @@ function bolt2() {
 
   let damage;
   if (rmode) {
-    damage = 30 + stats.ap * 2.5;
+    damage = (30 + stats.ap * 1.25) * 1.25;
   }
   else {
-    damage = 15 + stats.ap;
+    damage = (15 + stats.ap) * 1.25;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
   }
 
   if (mouseX >= charpos.x + charpos.width / 2) {

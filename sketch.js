@@ -103,7 +103,7 @@ function setup() {
 function draw() {
 
   drawBackground();
-  passiveEffects();
+  itemEffects();
   showCursor();
   showMenus();
   showShop();
@@ -134,7 +134,7 @@ function setAssets() {
   soundOn = loadImage("assets/pictures/soundon.png");
   soundOff = loadImage("assets/pictures/soundoff.png");
   volumeControl = true;
-  files = 107;
+  files = 108;
 
 }
 
@@ -159,6 +159,7 @@ function loadFiles() {
     levelUp : loadSound("assets/sounds/levelUp.mp3", itemLoaded),
     cannonfire : loadSound("assets/sounds/cannonfire.wav", itemLoaded),
     cannonhit : loadSound("assets/sounds/cannonhit.wav", itemLoaded),
+    supernova : loadSound("assets/sounds/supernova.mp3", itemLoaded),
   };
 
   images = {
@@ -853,6 +854,7 @@ function loadData() {
     r : -500,
     ignite : -500,
     barrier : -500,
+    supernova : -500,
   };
   summonerD = 5;
   summonerDicon = images.flash;
@@ -908,6 +910,8 @@ function loadData() {
     quickdash : false,
     culling : false,
     maxhpdmg : false,
+    multishot : false,
+    supernova : false,
   };
   tstatus = false;
   invins = false;
@@ -943,6 +947,7 @@ function loadData() {
     effect4 : "",
     effect5 : "",
     effect6 : "",
+    effect7 : "",
     additionaltexts : "",
     additionaltexts2 : "",
   };
@@ -975,11 +980,17 @@ function drawBackground() {
   background(bg);
 }
 
-function passiveEffects() {
+function itemEffects() {
 
   //stormrazor static ability
   if (itemabilities.quickdash) {
     cds.e = 1;
+  }
+
+  //supernova recharge
+  if (abilitytiming.supernova !== -500 && timer - abilitytiming.supernova >= 60) {
+    abilitytiming.supernova = -500;
+    itemabilities.supernova = true;
   }
 
 }
@@ -2423,20 +2434,21 @@ function iteminfodisplay() {
     if (mouseX >= width * 0.60248 + itemcount * width * 0.026 && mouseX <= width * 0.60248 + itemcount * width * 0.026 + height * 0.0415 && mouseY >= height * 0.88 && mouseY <= height * 0.92145) {
       fill(0, 0, 0, 75);
       stroke(0, 97, 255);
-      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.18, 25);
+      rect(mouseX - width * 0.09, mouseY - height * 0.22, width * 0.18, height * 0.22, 25);
       fill(255);
       noStroke();
       textStyle(NORMAL);
       textSize(width / 100);
       currentItem = inventory[itemcount].itemID;
-      text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
+      text(inventory[itemcount].name, mouseX, mouseY - height * 0.2);
       textSize(width / 120);
-      text(texts.effect1, mouseX, mouseY - height * 0.11);
-      text(texts.effect2, mouseX, mouseY - height * 0.09);
-      text(texts.effect3, mouseX, mouseY - height * 0.07);
-      text(texts.effect4, mouseX, mouseY - height * 0.05);
-      text(texts.effect5, mouseX, mouseY - height * 0.03);
-      text(texts.effect6, mouseX, mouseY - height * 0.01);
+      text(texts.effect1, mouseX, mouseY - height * 0.175);
+      text(texts.effect2, mouseX, mouseY - height * 0.15);
+      text(texts.effect3, mouseX, mouseY - height * 0.125);
+      text(texts.effect4, mouseX, mouseY - height * 0.1);
+      text(texts.effect5, mouseX, mouseY - height * 0.075);
+      text(texts.effect6, mouseX, mouseY - height * 0.05);
+      text(texts.effect7, mouseX, mouseY - height * 0.025);
     }
   }
 
@@ -2445,20 +2457,21 @@ function iteminfodisplay() {
     if (mouseX >= width * 0.60248 + (itemcount - 3) * width * 0.026 && mouseX <= width * 0.60228 + (itemcount - 3) * width * 0.026 + height * 0.0415 && mouseY >= height * 0.922 && mouseY <= height * 0.96345) {
       fill(0, 0, 0, 75);
       stroke(0, 97, 255);
-      rect(mouseX - width * 0.08, mouseY - height * 0.17, width * 0.16, height * 0.18, 25);
+      rect(mouseX - width * 0.0, mouseY - height * 0.22, width * 0.18, height * 0.0, 25);
       fill(255);
       noStroke();
       textStyle(NORMAL);
       textSize(width / 100);
       currentItem = inventory[itemcount].itemID;
-      text(inventory[itemcount].name, mouseX, mouseY - height * 0.14);
+      text(inventory[itemcount].name, mouseX, mouseY - height * 0.2);
       textSize(width / 120);
-      text(texts.effect1, mouseX, mouseY - height * 0.11);
-      text(texts.effect2, mouseX, mouseY - height * 0.09);
-      text(texts.effect3, mouseX, mouseY - height * 0.07);
-      text(texts.effect4, mouseX, mouseY - height * 0.05);
-      text(texts.effect5, mouseX, mouseY - height * 0.03);
-      text(texts.effect6, mouseX, mouseY - height * 0.01);
+      text(texts.effect1, mouseX, mouseY - height * 0.175);
+      text(texts.effect2, mouseX, mouseY - height * 0.15);
+      text(texts.effect3, mouseX, mouseY - height * 0.125);
+      text(texts.effect4, mouseX, mouseY - height * 0.1);
+      text(texts.effect5, mouseX, mouseY - height * 0.075);
+      text(texts.effect6, mouseX, mouseY - height * 0.05);
+      text(texts.effect7, mouseX, mouseY - height * 0.025);
     }
   }
 
@@ -2863,6 +2876,7 @@ function itemDetails() {
     texts.effect4 = "";
     texts.effect5 = "";
     texts.effect6 = "";
+    texts.effect7 = "";
     texts.additionaltexts = "";
     texts.additionaltexts2 = "";
 
@@ -2871,28 +2885,29 @@ function itemDetails() {
     //Display the item information when selected
     if (currentItem !== 0 && shopSubstate) {
       purchaseButton = new Button(width * 0.6, height * 0.7, width * 0.2, height * 0.05, "Purchase (" + price + ")", 28, 0, purchaseItem, "assets/cursors/shop.cur");
-      image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.28, width * 0.06, width * 0.06);
-      image(images.buttonborder, width * 0.668, height * 0.2575, width * 0.063, width * 0.086);
+      image(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].icon, width * 0.67, height * 0.21, width * 0.06, width * 0.06);
+      image(images.buttonborder, width * 0.668, height * 0.1875, width * 0.063, width * 0.086);
       purchaseButton.run();
       noStroke();
       fill(0);
       textSize(width / 40);
       textStyle(BOLD);
-      text(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].name, width * 0.7, height * 0.24);
+      text(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].name, width * 0.7, height * 0.18);
     }
 
     if (shopSubstate) {
       textSize(width / 85);
       textStyle(NORMAL);
-      text(texts.effect1, width * 0.7, height * 0.45);
-      text(texts.effect2, width * 0.7, height * 0.48);
-      text(texts.effect3, width * 0.7, height * 0.51);
-      text(texts.effect4, width * 0.7, height * 0.54);
-      text(texts.effect5, width * 0.7, height * 0.57);
-      text(texts.effect6, width * 0.7, height * 0.6);
+      text(texts.effect1, width * 0.7, height * 0.4);
+      text(texts.effect2, width * 0.7, height * 0.43);
+      text(texts.effect3, width * 0.7, height * 0.46);
+      text(texts.effect4, width * 0.7, height * 0.49);
+      text(texts.effect5, width * 0.7, height * 0.52);
+      text(texts.effect6, width * 0.7, height * 0.55);
+      text(texts.effect7, width * 0.7, height * 0.58);
       textStyle(ITALIC);
-      text(texts.additionaltexts, width * 0.7, height * 0.65);
-      text(texts.additionaltexts2, width * 0.7, height * 0.68);
+      text(texts.additionaltexts, width * 0.7, height * 0.64);
+      text(texts.additionaltexts2, width * 0.7, height * 0.67);
     }
   }
 
@@ -2906,18 +2921,19 @@ function itemInfo() {
   if (currentItem === 1) {
     texts.effect1 = "Damage + 150";
     texts.effect2 = "Critical Strike Chance + 30% (Max 100%)";
-    texts.effect3 = "Critical Strike Damage + 20%";
+    texts.effect3 = "King's Bane (Legendary Passive): Critical"; 
+    texts.effect4 = "Strike Damage + 20%";
     texts.additionaltexts = "You are full of weaknesses";
     price = 3000;
   }
   //essence reaver
   if (currentItem === 2) {
-    texts.effect1 = "Damage + 80";
+    texts.effect1 = "Damage + 80   Mana + 200";
     texts.effect2 = "Mana Regeneration + 5 / Second";
-    texts.effect3 = "Mana + 200";
-    texts.effect4 = "Abilitie Cooldown - 10% (Max 50%)";
-    texts.effect5 = "Killing an enemy restores 2% of your";
-    texts.effect6 = "maximum mana";
+    texts.effect3 = "Abilitie Cooldown - 10% (Max 50%)";
+    texts.effect4 = "Soul Harvest (Legendary Passive):";
+    texts.effect5 = "Killing an enemy restores 2% of";
+    texts.effect6 = "your maximum mana";
     texts.additionaltexts = "The reaper of souls and";
     texts.additionaltexts2 = "harvestor essence";
     price = 3500;
@@ -2927,9 +2943,10 @@ function itemInfo() {
     texts.effect1 = "Damage + 40   Ability Power + 40";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
     texts.effect3 = "Speed + 10";
-    texts.effect4 = "Angelic Shift / Wanderer's Strike has a 1";
-    texts.effect5 = "second cooldown but deals 20% damage,";
-    texts.effect6 = "you are immune during your dash";
+    texts.effect4 = "Windrunner's Bless (Legendary Passive):";
+    texts.effect5 = "Angelic Shift / Wanderer's Strike deal 20%";
+    texts.effect6 = "damage but has a 1 second cooldown. You";
+    texts.effect7 = "are immund while casting the ability";
     texts.additionaltexts = "The blessed blade of the";
     texts.additionaltexts2 = "Windrunners";
     price = 3500;
@@ -2948,36 +2965,47 @@ function itemInfo() {
   if (currentItem === 5) {
     texts.effect1 = "Damage + 70";
     texts.effect2 = "Armor Penetration + 40%";
-    texts.effect3 = "Deal up to 20% increased damage to";
-    texts.effect4 = "damaged enemies. (deals maximum damage";
-    texts.effect5 = "when the enemy has 30% or less health)";
+    texts.effect3 = "Culling (Legendary Passive): Deals up";
+    texts.effect4 = "to 20% increased damage to damaged";
+    texts.effect5 = "enemies. (deals maximum damage when";
+    texts.effect6 = "the enemy are at 30% or less health)";
     texts.additionaltexts = "Lethality, at any cost";
     price = 2800;
   }
   //Frost Mourne
   if (currentItem === 6) {
     texts.effect1 = "Damage + 30";
-    texts.effect2 = "Heals for 15% of all damage Dealt";
-    texts.effect3 = "The casting time for Redemption /";
-    texts.effect4 = "Judgment is halved, they deal 10%";
-    texts.effect5 = "of the targets' current health as";
-    texts.effect6 = "bonus damage";
+    texts.effect2 = "Heals for 15% of all damage dealt";
+    texts.effect3 = "Haste (Passive): The casting time for";
+    texts.effect4 = "Redemption / Judgment is halved";
+    texts.effect5 = "Giantslayer (Legendary Passive): They";
+    texts.effect6 = "deal 10% of the targets' current";
+    texts.effect7 = "healthas bonus damage";
     texts.additionaltexts = "A mythical blade that drain souls";
     price = 3600;
   }
+  //rapid firecannon
   if (currentItem === 7) {
-    texts.effect1 = "Ability Cooldown - 20% (Max 70%)";
-    texts.effect2 = "Critical Strike Chance + 30% (Max 100%)";
-    texts.effect3 = "Speed + 25";
+    texts.effect1 = "Ability Cooldown - 20% (Max 50%)";
+    texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
+    texts.effect3 = "Speed + 10";
+    texts.effect4 = "Spray and Pray (Legendary Passive):";
+    texts.effect5 = "Each projectile fired with Mystic Shot /";
+    texts.effect6 = "Whirling Death has a 15% to fire an";
+    texts.effect7 = "additional time, dealing 25% damage";
     texts.additionaltexts = "Loaded and ready";
     price = 2500;
   }
+  //Thori'dal
   if (currentItem === 8) {
-    texts.effect1 = "Dealing Damage Generates Gold";
-    texts.effect2 = "Ability Cooldowns - 10% (Max 70%)";
-    texts.effect3 = "Mana + 200";
-    texts.effect4 = "Critical Strike Chance + 10% (Max 100%)";
-    texts.additionaltexts = "The wrath of gods";
+    texts.effect1 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect2 = "Mana + 200   Mana Regen + 2 / Sec";
+    texts.effect3 = "Critical Strike Chance + 10% (Max 100%)";
+    texts.effect4 = "Supernova (Legendary Active): Deals 1000";
+    texts.effect5 = "TRUE damage to ALL enemies (Cast with B,";
+    texts.effect6 = "60 seconds cooldown, no casting cost)";
+    texts.additionaltexts = "The wrath of gods can be beared";
+    texts.additionaltexts2 = "by no mortal";
     price = 2750;
   }
   if (currentItem === 9) {
@@ -3239,17 +3267,21 @@ function addStats() {
     castTime.q = castTime.q / 2;
     itemabilities.maxhpdmg = true;
   }
+  //rapid firecannon
   if (currentItem === 7) {
     stats.cdr += 20;
     stats.speed += 25;
     stats.crit += 30;
+    itemabilities.multishot = true;
   }
+  //Thori'dal
   if (currentItem === 8) {
-    stats.cdr += 10;
     stats.maxmana += 200;
     stats.mana += 200;
+    stats.manaregen += 2;
     stats.crit += 10;
-    //special ability dealing damage geneartes gold
+    stats.cdr += 20;
+    itemabilities.supernova = true;
   }
   if (currentItem === 9) {
     stats.cdr += 20;
@@ -3441,6 +3473,7 @@ function resetGame() {
     r : -500,
     ignite : -500,
     barrier : -500,
+    supernova : -500,
   };
   bolts = [];
   castTime = {
@@ -3453,8 +3486,10 @@ function resetGame() {
     infegde : false,
     manaharvest : false,
     quickdash : false,
-    cullling : false,
+    culling : false,
     maxhpdmg : false,
+    multishot : false,
+    supernova : false,
   };
   abilitycosts = {
     q : 15,
@@ -3509,6 +3544,7 @@ function resetGame() {
     effect4 : "",
     effect5 : "",
     effect6 : "",
+    effect7 : "",
     additionaltexts : "",
     additionaltexts2 : "",
   };
@@ -3645,8 +3681,20 @@ function keyTyped() {
       statsToggle = ! statsToggle;
     }
 
+    if ((key === "b"  || key === "B") && itemabilities.supernova && state === "game") {
+      for (let enemy of enemyMinions) {
+        enemy.health -= 1000;
+      }
+      abilitytiming.supernova = timer;
+      itemabilities.supernova = false;
+      if (volumeControl) {
+        sound.supernova.setVolume(0.3);
+        sound.supernova.play();
+      }
+    }
+
     //q ability
-    if (key === "q" || key === "Q") {
+    if ((key === "q" || key === "Q") && ! shopSubstate) {
       if (cdcharge.q < cds.q || castability.w || castability.e || castability.r || stats.mana < abilitycosts.q && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3675,7 +3723,7 @@ function keyTyped() {
     }
 
     //w ability
-    if (key === "w" || key === "W") {
+    if ((key === "w" || key === "W") && ! shopSubstate) {
       if (cdcharge.w < cds.w || castability.q || castability.e || castability.r || stats.mana < abilitycosts.w && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3706,7 +3754,7 @@ function keyTyped() {
     }
 
     //e ability
-    if (key === "e" || key === "E") {
+    if ((key === "e" || key === "E") && ! shopSubstate) {
       if (cdcharge.e < cds.e|| castability.q || castability.w || castability.r || stats.mana < abilitycosts.e && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3751,7 +3799,7 @@ function keyTyped() {
     }
 
     //r ability
-    if (key === "r" || key === "R") {
+    if ((key === "r" || key === "R") && ! shopSubstate) {
       if (cdcharge.r < cds.r || castability.q || castability.w || castability.e || stats.mana < abilitycosts.r && !rmode || stats.lvl < 6) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3779,7 +3827,7 @@ function keyTyped() {
     }
 
     //d summoner ability
-    if (key === "d" || key === "D") {
+    if ((key === "d" || key === "D") && ! shopSubstate) {
       if (cdcharge.d < cds.d) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -3809,7 +3857,7 @@ function keyTyped() {
     }
 
     //f summoner ability
-    if (key === "f" || key === "F") {
+    if ((key === "f" || key === "F") && ! shopSubstate) {
       if (cdcharge.f < cds.f) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);
@@ -4018,6 +4066,70 @@ function bolt1() {
     player.wsound1.setVolume(0.5);
     player.wsound1.play();
   }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 100) {
+      setTimeout(bolt1b, 250);
+    }
+  }
+}
+
+//fires the first or second multishot projectile
+function bolt1b() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - (charpos.x + charpos.width / 2);
+  y = mouseY - (charpos.y + charpos.height / 2);
+  theta = atan(x / y);
+  let vx = abs(width * 0.006 * sin(theta));
+  let vy = abs(width * 0.006 * cos(theta));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+
+  let damage;
+  if (rmode) {
+    damage = 30 + stats.ap * 1.25;
+  }
+  else {
+    damage = 15 + stats.ap;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  damage = damage * 0.25;
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound1.setVolume(0.5);
+    player.wsound1.play();
+  }
 }
 
 //fires the third projectile
@@ -4059,6 +4171,69 @@ function bolt2() {
   if (buffs.ignite) {
     damage = damage * 1.1;
   }
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound2.setVolume(0.5);
+    player.wsound2.play();
+  }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 100) {
+      setTimeout(bolt2b, 250);
+    }
+  }
+}
+
+//fires the third multishot projectile
+function bolt2b() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - charpos.x - charpos.width / 2;
+  y = mouseY - charpos.y - charpos.height / 2;
+  theta = atan(x / y);
+  let vx = abs(width * 0.006 * sin(theta));
+  let vy = abs(width * 0.006 * cos(theta));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+  let damage;
+  if (rmode) {
+    damage = (30 + stats.ap * 1.25) * 1.25;
+  }
+  else {
+    damage = (15 + stats.ap) * 1.25;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  damage = damage * 0.25;
 
   if (mouseX >= charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 

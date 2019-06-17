@@ -53,3 +53,17 @@
 - Completed combat animation and hitboxes
 - Math and Damage Calculation
 - Interaction with powerups and enemies
+
+
+#### Balance and Items
+##### 15-16 June 2019
+
+- Completed basic balance of powerupsa and combat
+- Introduced diverse abilities
+
+
+#### Beta Testing Feedback
+##### 15-16 June 2019
+
+- Completed basic balance of powerupsa and combat
+- Introduced diverse abilities

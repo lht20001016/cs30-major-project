@@ -503,16 +503,16 @@ class Item extends GameObject {
 //class for range attack cannon monsters, including basic functionality scripts
 class Cannons extends GameObject {
 
-  constructor(x, y, width, height, direction, damage, id) {
+  constructor(x, y, width, height, direction, id) {
     super(x, y, width, height);
-    this.health = 20 + sq(stats.lvl) * 1.5 + sq(inventory.length) * 5;
-    this.maxhp = 20 + sq(stats.lvl) * 1.5 + sq(inventory.length) * 5;
-    this.magicresist = 5 + stats.lvl * 0.5 + inventory.length;
-    this.armor = 5 + stats.lvl * 0.5 + inventory.length;
+    this.health = 20 + pow(inventory.length * 2, 3) + sq(stats.lvl) * 10;
+    this.maxhp = 20 + pow(inventory.length * 2, 3) + sq(stats.lvl) * 10;
+    this.magicresist = 5 + stats.lvl * 0.5 + pow(inventory.length, 1.75);
+    this.armor = 5 + stats.lvl * 0.5 + pow(inventory.length, 1.75);
     this.speed = width * 0.01;
     this.direction = direction;
     this.id = id;
-    this.damage = damage;
+    this.damage = stats.maxhp * 0.03 + sq(stats.armor * 2.5) + sq(stats.mr * 2.5);
 
     this.spawntime = timer;
 
@@ -579,7 +579,7 @@ class Cannons extends GameObject {
         textSize(width / 80);
       }
       noStroke();
-      text("- " + floor(damagevalue), this.x + this.width / 2, this.y - height * 0.05 * (millis() - this.starttime) / 750);
+      text("- " + ceil(damagevalue), this.x + this.width / 2, this.y - height * 0.05 * (millis() - this.starttime) / 750);
       strokeWeight(1);
 
     }
@@ -1671,7 +1671,7 @@ function spawnCannon() {
   
   enemyminionhitbox.push([]);
   let temp = random(0.1, 0.7);
-  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, 10 + stats.lvl * 2 + sq(inventory.length) * 1.5, enemyminionhitbox.length-1));
+  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, enemyminionhitbox.length-1));
 
 }
 
@@ -1711,7 +1711,7 @@ function minionFunctions() {
       //deleted and do damage if hit
       for(let m = cannonbolthitbox.length - 1; m >= 0; m--) {
         hit = collidePolyPoly(cannonbolthitbox[m], playerhitbox, true);
-        if (hit && ! castability.e) {
+        if (hit && ! (castability.e && itemabilities.quickdash)) {
           cannonbolthitbox.splice(m, 1);
 
           let temp = cannonbolts[m].damage;
@@ -1783,7 +1783,7 @@ function minionFunctions() {
           }
         }
         if (stats.lvl !== 18) {
-          stats.xp += 25;
+          stats.xp += 50;
         }
         stats.gold += 100;
         if (itemabilities.manaharvest) {
@@ -3582,7 +3582,7 @@ function addStats() {
   if (currentItem === 28) {
     stats.magicpen += 15;
     stats.ap += 60;
-    ststa.mr += 10;
+    stats.mr += 10;
     stats.maxhp += 300;
     stats.health += 300;
     stats.maxmana += 300;
@@ -4292,7 +4292,7 @@ function bolt1() {
 
   if (itemabilities.multishot) {
     let randomnum = random(0, 100);
-    if (randomnum <= 100) {
+    if (randomnum <= 15) {
       setTimeout(bolt1b, 250);
     }
   }
@@ -4553,7 +4553,7 @@ function bolt2() {
 
   if (itemabilities.multishot) {
     let randomnum = random(0, 100);
-    if (randomnum <= 100) {
+    if (randomnum <= 15) {
       setTimeout(bolt2b, 250);
     }
   }

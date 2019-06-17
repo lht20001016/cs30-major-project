@@ -65,6 +65,7 @@ let images;
 let sound;
 let items;
 let direction;
+let excessls;
 let playerdisplay;
 let qup = false;
 let eup = false;
@@ -850,6 +851,7 @@ function loadData() {
   enemyminionhitbox = [];
   qhitbox = [];
   ehitbox = [];
+  excessls = 0;
   abilitytiming = {
     r : -500,
     ignite : -500,
@@ -912,6 +914,14 @@ function loadData() {
     maxhpdmg : false,
     multishot : false,
     supernova : false,
+    lightningbolt : false,
+    hurricane : false,
+    tripleedmg : false,
+    morertimer : false,
+    nocrit : false,
+    lichbane : false,
+    maxhpmagicdmg : false,
+    movespeed : false,
   };
   tstatus = false;
   invins = false;
@@ -1505,15 +1515,15 @@ function playerhitboxes() {
         //e damage
         let damage;
         if (rmode) {
-          if (stats.ap * 0.2 > stats.ad * 0.1) {
-            damage = stats.ap * 0.2;
+          if (stats.ap * 0.5 > stats.ad * 0.3) {
+            damage = 15 + stats.ap * 0.5;
           }
           else {
-            damage = stats.ad * 0.1;
+            damage = 15 + stats.ad * 0.3;
           }
         }
         else {
-          damage = 10 + stats.ap * 0.1;
+          damage = 10 + stats.ap * 0.25;
         }
         if (buffs.holyfire) {
           damage = damage * 1.1;
@@ -1524,10 +1534,16 @@ function playerhitboxes() {
         if (itemabilities.quickdash) {
           damage = damage * 0.2;
         }
-
+        if (itemabilities.maxhpmagicdmg) {
+          damage = damage + enemyMinions[k].maxhp * 0.1;
+        }
         if (itemabilities.culling) {
           let dmgmultiplier1 = (enemyMinions[k].maxhp - enemyMinions[k].health) / enemyMinions[k].maxhp;
           damage = damage + damage * (0.2 * (dmgmultiplier1 / 70));
+        }
+
+        if (itemabilities.tripleedmg) {
+          damage = damage * 3;
         }
 
         damage = damage * ((100 - enemyMinions[k].magicresist) / 100);
@@ -1564,6 +1580,11 @@ function determineVelocity() {
     x : abs(width * 0.002 * sin(theta)) * (1 + stats.speed / 100),
     y : abs(width * 0.002 * cos(theta)) * (1 + stats.speed / 100),
   };
+  if (itemabilities.movespeed) {
+    let ratio1 = (stats.maxhp - stats.health) / stats.maxhp;
+    velocity.x = velocity.x + velocity.x * ratio1;
+    velocity.y = velocity.y + velocity.y * ratio1;
+  }
   if (x < 0) {
     velocity.x = velocity.x * -1;
   }
@@ -1652,7 +1673,7 @@ function minionFunctions() {
         
       }
 
-      //delete fi out of screen
+      //delete if out of screen
       if (cannonbolthitbox[cannonbolts[i].id][0].x > width * 1.2 ||
         cannonbolthitbox[cannonbolts[i].id][0].x < width * - 0.2 ||
         cannonbolthitbox[cannonbolts[i].id][0].y > height * 1.2 ||
@@ -1822,6 +1843,14 @@ function moveBolts() {
           damage = damage + damage * (0.2 * (dmgmultiplier1 / 70));
         }
 
+        if (itemabilities.hurricane) {
+          damage = damage * 0.65;
+        }
+
+        if (itemabilities.maxhpmagicdmg) {
+          damage = damage + enemyMinions[k].maxhp * 0.1;
+        }
+
         damage = damage * ((100 - enemyMinions[m].magicresist) / 100);
   
         enemyMinions[m].health -= damage;
@@ -1901,7 +1930,12 @@ function castingAbilities() {
     }
 
     //times ultimate
-    if (millis() - abilitytiming.r >= 20000 && abilitytiming.r !== -500) {
+    let temp1 = 20000;
+    if (itemabilities.morertimer) {
+      temp1 = 30000;
+    }
+
+    if (millis() - abilitytiming.r >= temp1 && abilitytiming.r !== -500) {
       rmode = false;
       stats.crit -= 10;
       abilitytiming.r = -500;
@@ -1969,8 +2003,17 @@ function characterStatus() {
     if (stats.speed >= 100) {
       stats.speed = 60;
     }
-    if (stats.lifesteal >= 30) {
-      stats.lifesteal = 30;
+    if (! itemabilities.lichbane) {
+      if (stats.lifesteal >= 30) {
+        excessls += stats.lifesteal - 30;
+        stats.lifesteal = 30;
+      }
+    }
+    else {
+      stats.hpregen = 0;
+    }
+    if (itemabilities.nocrit) {
+      stats.crit = 0;
     }
 
     //components of the UI
@@ -2457,7 +2500,7 @@ function iteminfodisplay() {
     if (mouseX >= width * 0.60248 + (itemcount - 3) * width * 0.026 && mouseX <= width * 0.60228 + (itemcount - 3) * width * 0.026 + height * 0.0415 && mouseY >= height * 0.922 && mouseY <= height * 0.96345) {
       fill(0, 0, 0, 75);
       stroke(0, 97, 255);
-      rect(mouseX - width * 0.0, mouseY - height * 0.22, width * 0.18, height * 0.0, 25);
+      rect(mouseX - width * 0.09, mouseY - height * 0.22, width * 0.18, height * 0.18, 25);
       fill(255);
       noStroke();
       textStyle(NORMAL);
@@ -2597,7 +2640,7 @@ function abilityDesc() {
     if (!rmode) {
       texts.effect1 = "Angelic Shift (" + abilitycosts.e + ")";
       texts.effect2 = "Shift across space with immense speed, cutting through up to one enemy in your";
-      texts.effect3 = "path, it takes damage equal to 10 + 10% of your Ability Power";
+      texts.effect3 = "path, it takes damage equal to 10 + 25% of your Ability Power";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
       texts.additionaltexts2 = "You see nothing";
@@ -2605,7 +2648,7 @@ function abilityDesc() {
     else {
       texts.effect1 = "Wanderer's Strike";
       texts.effect2 = "Shift across space with immense speed, cutting through up to one enemy in your";
-      texts.effect3 = "path, it takes damage equal to 10 + 20% of your Ability Power or 10% of your Damage";
+      texts.effect3 = "path, it takes damage equal to 15 + 50% of your Ability Power or 30% of our Damage";
       texts.effect4 = "(whichever is greater)";
       texts.effect6 = "Active Ability";
       texts.additionaltexts = "Cooldown: " + str(cds.e) + " seconds";
@@ -2618,7 +2661,11 @@ function abilityDesc() {
 
     rect(width * 0.3, height * 0.52, width * 0.375, height * 0.27, 8);
     texts.effect1 = "Tempest (" + abilitycosts.r + ")";
-    texts.effect2 = "For 20 seconds, your abilities are empowered and costs no mana:";
+    let anum = 20;
+    if (itemabilities.morertimer) {
+      anum = 30;
+    }
+    texts.effect2 = "For " + anum + " seconds, your abilities are empowered and costs no mana:";
     texts.effect3 = "Q - Judgment: Cooldown reduced, deals bonus damage as TRUE damage";
     texts.effect4 = "W - Orbs of Agony: Cooldown reduced, ememies hit takes increased damage";
     texts.effect5 = "E - Wanderer's Strike: Cooldown reduced, deals increased damage";
@@ -2942,11 +2989,11 @@ function itemInfo() {
   if (currentItem === 3) {
     texts.effect1 = "Damage + 40   Ability Power + 40";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
-    texts.effect3 = "Speed + 10";
+    texts.effect3 = "Speed + 10 (Max 60)";
     texts.effect4 = "Windrunner's Bless (Legendary Passive):";
     texts.effect5 = "Angelic Shift / Wanderer's Strike deal 20%";
     texts.effect6 = "damage but has a 1 second cooldown. You";
-    texts.effect7 = "are immund while casting the ability";
+    texts.effect7 = "are immune while casting the ability";
     texts.additionaltexts = "The blessed blade of the";
     texts.additionaltexts2 = "Windrunners";
     price = 3500;
@@ -2975,12 +3022,12 @@ function itemInfo() {
   //Frost Mourne
   if (currentItem === 6) {
     texts.effect1 = "Damage + 30";
-    texts.effect2 = "Heals for 15% of all damage dealt";
+    texts.effect2 = "Heals for 15% of all damage dealt ?(Max 30%)";
     texts.effect3 = "Haste (Passive): The casting time for";
     texts.effect4 = "Redemption / Judgment is halved";
     texts.effect5 = "Giantslayer (Legendary Passive): They";
-    texts.effect6 = "deal 10% of the targets' current";
-    texts.effect7 = "healthas bonus damage";
+    texts.effect6 = "deal 10% of the targets' maxiumum";
+    texts.effect7 = "health as bonus damage";
     texts.additionaltexts = "A mythical blade that drain souls";
     price = 3600;
   }
@@ -2988,7 +3035,7 @@ function itemInfo() {
   if (currentItem === 7) {
     texts.effect1 = "Ability Cooldown - 20% (Max 50%)";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
-    texts.effect3 = "Speed + 10";
+    texts.effect3 = "Speed + 10 (Max 60)";
     texts.effect4 = "Spray and Pray (Legendary Passive):";
     texts.effect5 = "Each projectile fired with Mystic Shot /";
     texts.effect6 = "Whirling Death has a 15% to fire an";
@@ -3008,92 +3055,124 @@ function itemInfo() {
     texts.additionaltexts2 = "by no mortal";
     price = 2750;
   }
+  //Satikk Shiv
   if (currentItem === 9) {
-    texts.effect1 = "Ability Cooldown - 20% (Max 70%)";
+    texts.effect1 = "Ability Cooldown - 20% (Max 50%)";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
-    texts.effect3 = "Speed + 10";
-    texts.effect4 = "Abilities can Shock Enemies";
+    texts.effect3 = "Mana + 200   Mana Regen +2";
+    texts.effect4 = "Supersonic (Legendary Passive):";
+    texts.effect5 = "Mystic Shot / Whirling Death's projectile";
+    texts.effect6 = "speed is increased";
     texts.additionaltexts = "Forged with lightning and thunder";
     price = 2500;
   }
+  //Runnan's Hurricane
   if (currentItem === 10) {
-    texts.effect1 = "Damage + 40";
-    texts.effect2 = "Ability Cooldowns - 10% (Max 70%)";
-    texts.effect3 = "Critical Strike Chance + 10% (Max 100%)";
-    texts.effect4 = "Attacks Have a Small Chance";
-    texts.effect5 = "to deal Double Damage";
-    texts.additionaltexts = "An utter devastation";
+    texts.effect1 = "Speed + 20";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect3 = "Critical Strike Chance + 30% (Max 100%)";
+    texts.effect4 = "Perpetual Storm (Passive):";
+    texts.effect5 = "Each shot of Mystic Shot / Whirling Death";
+    texts.effect6 = "fires three projectiles that fan out, each";
+    texts.effect7 = "dealing 65% damage";
+    texts.additionaltexts = "Embrace yourselves, for the the";
+    texts.additionaltexts2 = "hour of devastation";
     price = 2800;
   }
+  //phantom dancer
   if (currentItem === 11) {
-    texts.effect1 = "Speed + 20 (Max 80)";
-    texts.effect2 = "Ability Cooldowns - 20% (Max 70%)";
-    texts.effect3 = "Critical Strike Chance + 20% (Max 100%)";
-    texts.effect4 = "(IN PROGRESS) Go Invisible";
+    texts.effect1 = "Speed + 30 (Max 60)";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect3 = "Critical Strike Chance + 30% (Max 100%)";
+    texts.effect4 = "Spectral Waltz (Passive): The casting time";
+    texts.effect5 = "for Angelic Shift / Wanderer's Strike is halved";
+    texts.effect6 = "Sweeping Agony (Legendary Passive): Their damage";
+    texts.effect7 = "is tripled (before defensive stats are applied)";
     texts.additionaltexts = "The unseen blade is the deadliest";
     price = 2800;
   }
-
+  //Nashor's Tooth
   if (currentItem === 12) {
     texts.effect1 = "Ability Power + 80";
-    texts.effect2 = "Ability Cooldowns - 20% (Max 70%)";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
     texts.effect3 = "Critical Strike Chance + 20%";
-    texts.additionaltexts = "The tooth of an ancient beast";
+    texts.effect4 = "Sparkling Tempest (Legendary Passive):";
+    texts.effect5 = "The duration of Temptest is extended to";
+    texts.effect6 = "30 seconds.";
+    texts.additionaltexts = "The tooth of an ancient beast,";
+    texts.additionaltexts2 = "mystical powers glow from within";
     price = 3000;
   }
+  //Luden's Echo
   if (currentItem === 13) {
-    texts.effect1 = "Ability Power + 100";
-    texts.effect2 = "Mana + 400";
-    texts.effect3 = "Ability Cooldowns - 20% (Max 70%)";
+    texts.effect1 = "Ability Power + 120";
+    texts.effect2 = "Mana + 400   Mana Regen + 5";
+    texts.effect3 = "Ability Cooldowns - 10% (Max 50%)";
+    texts.effect4 = "Heals for 15% of all damage dealt";
+    texts.effect5 = "(Max 30%)";
     texts.additionaltexts = "The staff of an ancient archmage";
     price = 3200;
   }
+  //Rabadon's Deathcap
   if (currentItem === 14) {
     texts.effect1 = "Ability Power + 150";
-    texts.effect2 = "Ability Power Increased by 20%";
+    texts.effect2 = "Descend Into Madness (Legendary Passive):";
+    texts.effect3 = "When you purchase this item, increase your";
+    texts.effect4 = "ability power by 30%, you CANNOT critical";
+    texts.effect5 = "strike this game";
     texts.additionaltexts = "Descend into madness...";
     price = 4000;
   }
+  //Void Staff
   if (currentItem === 15) {
     texts.effect1 = "Ability Power + 80";
     texts.effect2 = "Magic Penetration + 40%";
-    texts.additionaltexts = "Dispel and destroy";
+    texts.additionaltexts = "Counterspell is the extraction of";
+    texts.additionaltexts2 = "essence from magic";
     price = 3000;
   }
+  //Lich Bane
   if (currentItem === 16) {
-    texts.effect1 = "You Have 50 Points of Attack Damage";
-    texts.effect2 = "Ability Power + 200";
+    texts.effect1 = "Mana + 300   Mana Regen + 5";
+    texts.effect2 = "Ability Power + 100";
     texts.effect3 = "Speed + 10";
-    texts.effect4 = "Your Abilities Have a Chance to Heal You";
-    texts.effect5 = "Loses 5 Health / Second";
+    texts.effect4 = "You heal for 20% of all damage dealt";
+    texts.effect5 = "Curse's Blessings (Legendary Passive):";
+    texts.effect6 = "The healing limit from damage of 50% is";
+    texts.effect7 = "removed, but you don't regenerate health";
     texts.additionaltexts = "The curse was never lifted...";
     price = 3800;
   }
+  //Liandry's Torment
   if (currentItem === 17) {
-    texts.effect1 = "Ability Power + 60";
+    texts.effect1 = "Ability Power + 70";
     texts.effect2 = "Magic Penetration + 15%";
-    texts.effect3 = "Health + 250";
-    texts.effect4 = "Spell Burn the Target Equal to 1%";
-    texts.effect5 = "of it's Maximum Health";
+    texts.effect3 = "Health + 300";
+    texts.effect4 = "Cry of the Carnarium (Legendary Passive):";
+    texts.effect5 = "Mystic Shot / Whirling Death and Angelic Dash";
+    texts.effect6 = "/ Wanderer's Strike deals bonus damage";
+    texts.effect7 = "equal to 10% of the target's maximum health";
     texts.additionaltexts = "It's truely an honor, isn't it?";
     texts.additionaltexts2 = "to be remembered? Pity you";
     price = 2800;
   }
-
+  //Hextect Gunblade
   if (currentItem === 18) {
-    texts.effect1 = "Damage + 40";
-    texts.effect2 = "Ability Power + 80";
-    texts.effect3 = "Heals for 5% of All Damage Dealt";
-    texts.effect4 = "Mana + 150";
+    texts.effect1 = "Damage + 70";
+    texts.effect2 = "Ability Power + 70";
+    texts.effect3 = "Heals for 5% of all damage dealt";
+    texts.effect4 = "Mana + 150   Health + 250";
     texts.additionaltexts = "The only way to stop war is war";
     price = 3600;
   }
+  //Dead Man's Plate
   if (currentItem === 19) {
-    texts.effect1 = "Armor + 40";
+    texts.effect1 = "Armor + 20   Health Regen + 5";
     texts.effect2 = "Health + 400";
-    texts.effect3 = "You Gain Increased Speed Based";
-    texts.effect4 = "on Missing Health";
-    texts.effect5 = "(Up to a Maximum of 30)";
+    texts.effect3 = "Tramaple Over Dead (Legendary Passive):";
+    texts.effect4 = "Gain extra movement speed based on missing";
+    texts.effect5 = "health (Up to a Maximum of 30%, works";
+    texts.effect6 = "separately with the movement speed stat)";
     texts.additionaltexts = "There is one way you are";
     texts.additionaltexts2 = "getting this armor from me...";
     price = 3500;
@@ -3283,67 +3362,91 @@ function addStats() {
     stats.cdr += 20;
     itemabilities.supernova = true;
   }
+  //stattik shiv
   if (currentItem === 9) {
     stats.cdr += 20;
     stats.crit += 20;
-    stats.speed += 10;
-    //special ability shock kenemies
+    stats.maxmana += 200;
+    stats.mana += 200;
+    itemabilities.lightningbolt = true;
   }
+  //Runnan's Hurricane
   if (currentItem === 10) {
-    stats.ad += 40;
-    stats.cdr += 10;
-    stats.crit += 10;
-    //special ability chance to double dmg
-  }
-  if (currentItem === 11) {
     stats.speed += 20;
     stats.cdr += 20;
-    stats.crit += 20;
-    //go invisible
+    stats.crit += 30;
+    itemabilities.hurricane = true;
   }
+  //Phantom Dancer
+  if (currentItem === 11) {
+    stats.speed += 30;
+    stats.cdr += 20;
+    stats.crit += 30;
+    castTime.e = castTime.e / 2;
+    itemabilities.tripleedmg = true;
+  }
+  //nashors tooth
   if (currentItem === 12) {
     stats.ap += 80;
     stats.cdr += 20;
     stats.crit += 20;
+    itemabilities.morertimer = true;
   }
+  //Luden's Echo
   if (currentItem === 13) {
-    stats.ap += 100;
+    stats.ap += 120;
     stats.maxmana += 400;
     stats.mana += 400;
-    stats.cdr += 20;
+    stats.cdr += 10;
+    stats.lifesteal += 15;
   }
+  //rabadon's Deathcap
   if (currentItem === 14) {
     stats.ap += 150;
-    //special ability +20% total ap
+    stats.ap = stats.ap * 1.3;
+    itemabilities.nocrit = true;
   }
+  //void staff
   if (currentItem === 15){
     stats.ap += 80;
     stats.magicpen += 40;
   }
+  //lich bane
   if (currentItem === 16) {
-    stats.ap += 200;
+    stats.ap += 100;
     stats.speed += 10;
-    //health regen is always -5, ad is always 50, special ability heal you
+    stats.maxmana += 300;
+    state.mana += 300;
+    stats.manaregen += 5;
+    stats.lifesteal += 20;
+    stats.lifesteal += excessls;
+    itemabilities.lichbane = true;
   }
+  //Liandry's Torment
   if (currentItem === 17) {
     stats.ap += 60;
     stats.magicpen += 15;
     stats.maxhp += 250;
     stats.health += 250;
-    //special ability burn 1% maximum health 
+    itemabilities.maxhpmagicdmg = true;
   }
+  //Hextech Gunblade
   if (currentItem === 18) {
-    stats.ad += 40;
-    stats.ap += 80;
+    stats.ad += 70;
+    stats.ap += 70;
     stats.maxmana += 150;
     stats.mana += 150;
-    //special ability heal 5%
+    stats.maxhp += 250;
+    stats.health += 250;
+    stats.lifesteal += 5;
   }
+  //Dead Man's Plate
   if (currentItem === 19) {
-    stats.armor += 40;
+    stats.armor += 20;
     stats.maxhp += 400;
     stats.health += 400;
-    //gain increased speed (up to 30%) based on missing hp
+    stats.hpregen += 5;
+    itemabilities.movespeed = true;
   }
   if (currentItem === 20) {
     stats.armor += 30;
@@ -3455,6 +3558,7 @@ function resetGame() {
   tstatus = false;
   statsToggle = false;
   rmode = false;
+  excessls = 0;
   cannonbolts = [];
   cannonbolthitbox = [];
   bolthitbox = [];
@@ -3467,7 +3571,7 @@ function resetGame() {
     ignite : false,
     angelicshield : false,
     holyfire : false,
-    haste : false,    
+    haste : false,   
   };
   abilitytiming = {
     r : -500,
@@ -3490,6 +3594,14 @@ function resetGame() {
     maxhpdmg : false,
     multishot : false,
     supernova : false,
+    lightningbolt : false,
+    hurricane : false,
+    tripleedmg : false,
+    morertimer : false,
+    nocrit : false,
+    lichbane : false,
+    maxhpmagicdmg : false,
+    movespeed : false,
   };
   abilitycosts = {
     q : 15,
@@ -4022,8 +4134,12 @@ function bolt1() {
   x = mouseX - (charpos.x + charpos.width / 2);
   y = mouseY - (charpos.y + charpos.height / 2);
   theta = atan(x / y);
-  let vx = abs(width * 0.006 * sin(theta));
-  let vy = abs(width * 0.006 * cos(theta));
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta));
+  let vy = abs(ratio1 * cos(theta));
   if (x < 0) {
     vx = vx * -1;
   }
@@ -4067,6 +4183,11 @@ function bolt1() {
     player.wsound1.play();
   }
 
+  if (itemabilities.hurricane) {
+    bolt1c();
+    bolt1d();
+  }
+
   if (itemabilities.multishot) {
     let randomnum = random(0, 100);
     if (randomnum <= 100) {
@@ -4084,8 +4205,12 @@ function bolt1b() {
   x = mouseX - (charpos.x + charpos.width / 2);
   y = mouseY - (charpos.y + charpos.height / 2);
   theta = atan(x / y);
-  let vx = abs(width * 0.006 * sin(theta));
-  let vy = abs(width * 0.006 * cos(theta));
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta));
+  let vy = abs(ratio1 * cos(theta));
   if (x < 0) {
     vx = vx * -1;
   }
@@ -4130,6 +4255,141 @@ function bolt1b() {
     player.wsound1.setVolume(0.5);
     player.wsound1.play();
   }
+
+  if (itemabilities.hurricane) {
+    bolt1c();
+    bolt1d();
+  }
+}
+
+//Runnan's Hurrican ability
+function bolt1c() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - (charpos.x + charpos.width / 2);
+  y = mouseY - (charpos.y + charpos.height / 2);
+  theta = atan(x / y);
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta + radians(10)));
+  let vy = abs(ratio1 * cos(theta + radians(10)));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+  let damage;
+  if (rmode) {
+    damage = 30 + stats.ap * 1.25;
+  }
+  else {
+    damage = 15 + stats.ap;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound1.setVolume(0.5);
+    player.wsound1.play();
+  }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 15) {
+      setTimeout(bolt1b, 250);
+    }
+  }
+}
+
+//Runnan's Hurrican ability
+function bolt1d() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - (charpos.x + charpos.width / 2);
+  y = mouseY - (charpos.y + charpos.height / 2);
+  theta = atan(x / y);
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta - radians(10)));
+  let vy = abs(ratio1 * cos(theta - radians(10)));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+  let damage;
+  if (rmode) {
+    damage = 30 + stats.ap * 1.25;
+  }
+  else {
+    damage = 15 + stats.ap;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound1.setVolume(0.5);
+    player.wsound1.play();
+  }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 15) {
+      setTimeout(bolt1b, 250);
+    }
+  }
 }
 
 //fires the third projectile
@@ -4141,8 +4401,12 @@ function bolt2() {
   x = mouseX - charpos.x - charpos.width / 2;
   y = mouseY - charpos.y - charpos.height / 2;
   theta = atan(x / y);
-  let vx = abs(width * 0.006 * sin(theta));
-  let vy = abs(width * 0.006 * cos(theta));
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta));
+  let vy = abs(ratio1 * cos(theta));
   if (x < 0) {
     vx = vx * -1;
   }
@@ -4191,6 +4455,11 @@ function bolt2() {
       setTimeout(bolt2b, 250);
     }
   }
+
+  if (itemabilities.hurricane) {
+    bolt2c();
+    bolt2d();
+  }
 }
 
 //fires the third multishot projectile
@@ -4202,8 +4471,12 @@ function bolt2b() {
   x = mouseX - charpos.x - charpos.width / 2;
   y = mouseY - charpos.y - charpos.height / 2;
   theta = atan(x / y);
-  let vx = abs(width * 0.006 * sin(theta));
-  let vy = abs(width * 0.006 * cos(theta));
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta));
+  let vy = abs(ratio1 * cos(theta));
   if (x < 0) {
     vx = vx * -1;
   }
@@ -4246,6 +4519,141 @@ function bolt2b() {
   if (volumeControl) {
     player.wsound2.setVolume(0.5);
     player.wsound2.play();
+  }
+
+  if (itemabilities.hurricane) {
+    bolt2c();
+    bolt2d();
+  }
+}
+
+//fires the third projectile
+function bolt2c() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - charpos.x - charpos.width / 2;
+  y = mouseY - charpos.y - charpos.height / 2;
+  theta = atan(x / y);
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta + radians(10)));
+  let vy = abs(ratio1 * cos(theta + radians(10)));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+  let damage;
+  if (rmode) {
+    damage = (30 + stats.ap * 1.25) * 1.25;
+  }
+  else {
+    damage = (15 + stats.ap) * 1.25;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound2.setVolume(0.5);
+    player.wsound2.play();
+  }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 15) {
+      setTimeout(bolt2b, 250);
+    }
+  }
+}
+
+//fires the third projectile
+function bolt2d() {
+
+  let x;
+  let y;
+  let theta;
+  x = mouseX - charpos.x - charpos.width / 2;
+  y = mouseY - charpos.y - charpos.height / 2;
+  theta = atan(x / y);
+  let ratio1 = width * 0.006;
+  if (itemabilities.lightningbolt) {
+    ratio1 = ratio1 * 1.8;
+  }
+  let vx = abs(ratio1 * sin(theta - radians(10)));
+  let vy = abs(ratio1 * cos(theta - radians(10)));
+  if (x < 0) {
+    vx = vx * -1;
+  }
+  if (y < 0) {
+    vy = vy * -1;
+  }
+
+  if (theta > 0) {
+    theta = PI / 2 - theta;
+  }
+  else if (theta < 0) {
+    theta = 3 * PI / 2 - theta;
+  }
+
+  let damage;
+  if (rmode) {
+    damage = (30 + stats.ap * 1.25) * 1.25;
+  }
+  else {
+    damage = (15 + stats.ap) * 1.25;
+  }
+
+  if (buffs.holyfire) {
+    damage = damage * 1.1;
+  }
+  if (buffs.ignite) {
+    damage = damage * 1.1;
+  }
+
+  if (mouseX >= charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  else if (mouseX < charpos.x + charpos.width / 2) {
+    bolthitbox.push([]); 
+    bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 0, damage, 0, vx, vy, theta, bolthitbox.length - 1));
+  }
+  if (volumeControl) {
+    player.wsound2.setVolume(0.5);
+    player.wsound2.play();
+  }
+
+  if (itemabilities.multishot) {
+    let randomnum = random(0, 100);
+    if (randomnum <= 15) {
+      setTimeout(bolt2b, 250);
+    }
   }
 }
 

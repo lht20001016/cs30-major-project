@@ -20,6 +20,7 @@ let summonerD;
 let summonerDicon;
 let summonerF;
 let summonerFicon;
+let roastatcounter;
 let allSummoners;
 let currentTime;
 let castTime;
@@ -44,7 +45,6 @@ let velocity;
 let destinationpos;
 let timer;
 let abilitytiming;
-let invins;
 let soundOn;
 let soundOff;
 let player;
@@ -852,6 +852,7 @@ function loadData() {
   qhitbox = [];
   ehitbox = [];
   excessls = 0;
+  roastatcounter = 0;
   abilitytiming = {
     r : -500,
     ignite : -500,
@@ -871,9 +872,9 @@ function loadData() {
     haste : false,
   };
   abilitycosts = {
-    q : 15,
-    w : 35,
-    e : 10,
+    q : 30,
+    w : 50,
+    e : 15,
     r : 100,
     d : 0,
     f : 0,
@@ -922,9 +923,14 @@ function loadData() {
     lichbane : false,
     maxhpmagicdmg : false,
     movespeed : false,
+    autodefensematrix : false,
+    stasis : false,
+    apabsorb : false,
+    gainstats : false,
+    roastats : false,
+    manavortex : false,
   };
   tstatus = false;
-  invins = false;
   loadCount = 0;
   rmode = false;
   statsToggle = false;
@@ -1001,6 +1007,18 @@ function itemEffects() {
   if (abilitytiming.supernova !== -500 && timer - abilitytiming.supernova >= 60) {
     abilitytiming.supernova = -500;
     itemabilities.supernova = true;
+  }
+
+  //stasis
+  if (stats.health <= 0 && itemabilities.stasis) {
+    stats.health = stats.maxhp / 2;
+    itemabilities.stasis = false;
+  }
+
+  if (timer % 20 === 0 && frameCount % 60 === 5 && itemabilities.roastats && roastatcounter < 15) {
+    stats.armor++;
+    stats.mr++;
+    roastatcounter++;
   }
 
 }
@@ -1706,7 +1724,26 @@ function minionFunctions() {
 
           temp = temp * ((100 - stats.mr) / 100);
 
+          if (itemabilities.autodefensematrix) {
+            let dodgenum = random(0, 100);
+            if (dodgenum <= 20) {
+              temp = 0;
+            }
+          }
+
+          if (itemabilities.apabsorb) {
+            let randomnum2 = random(0, 100);
+            if (randomnum2 <= 30) {
+              stats.ap += 1;
+            }
+          }
+
           stats.health -= temp;
+
+          if (itemabilities.manavortex) {
+            stats.mana += temp / 2;
+          }
+
           cannonbolts.splice(m, 1);
 
           if (volumeControl) {
@@ -3022,7 +3059,7 @@ function itemInfo() {
   //Frost Mourne
   if (currentItem === 6) {
     texts.effect1 = "Damage + 30";
-    texts.effect2 = "Heals for 15% of all damage dealt ?(Max 30%)";
+    texts.effect2 = "Heals for 15% of all damage dealt (Max 30%)";
     texts.effect3 = "Haste (Passive): The casting time for";
     texts.effect4 = "Redemption / Judgment is halved";
     texts.effect5 = "Giantslayer (Legendary Passive): They";
@@ -3086,8 +3123,8 @@ function itemInfo() {
     texts.effect3 = "Critical Strike Chance + 30% (Max 100%)";
     texts.effect4 = "Spectral Waltz (Passive): The casting time";
     texts.effect5 = "for Angelic Shift / Wanderer's Strike is halved";
-    texts.effect6 = "Sweeping Agony (Legendary Passive): Their damage";
-    texts.effect7 = "is tripled (before defensive stats are applied)";
+    texts.effect6 = "Sweeping Agony (Legendary Passive):";
+    texts.effect7 = "Their deal triple damage";
     texts.additionaltexts = "The unseen blade is the deadliest";
     price = 2800;
   }
@@ -3096,9 +3133,9 @@ function itemInfo() {
     texts.effect1 = "Ability Power + 80";
     texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
     texts.effect3 = "Critical Strike Chance + 20%";
-    texts.effect4 = "Sparkling Tempest (Legendary Passive):";
+    texts.effect4 = "Brewing Tempest (Legendary Passive):";
     texts.effect5 = "The duration of Temptest is extended to";
-    texts.effect6 = "30 seconds.";
+    texts.effect6 = "30 seconds";
     texts.additionaltexts = "The tooth of an ancient beast,";
     texts.additionaltexts2 = "mystical powers glow from within";
     price = 3000;
@@ -3177,96 +3214,118 @@ function itemInfo() {
     texts.additionaltexts2 = "getting this armor from me...";
     price = 3500;
   }
+  //Randuin's Omen
   if (currentItem === 20) {
-    texts.effect1 = "Armor + 30";
-    texts.effect2 = "Health + 450";
-    texts.effect3 = "-30% From Critical Strikes";
+    texts.effect1 = "Armor + 20   Health Regen +5";
+    texts.effect2 = "Health + 450   Mana + 200";
+    texts.effect3 = "Autodefense Matrix (Legendary Passive):";
+    texts.effect4 = "You have a 20% chance to avoid a Cannon";
+    texts.effect5 = "minion's lightning bolt attack";
     texts.additionaltexts = "I have no weaknesses";
     price = 3500;
   }
+  //Thornmail
   if (currentItem === 21) {
-    texts.effect1 = "Health + 250";
-    texts.effect2 = "Armor + 80";
-    texts.effect3 = "Reflect 5% of Physical Damage Taken";
+    texts.effect1 = "Health + 800";
+    texts.effect2 = "Armor + 40";
     texts.additionaltexts = "How did he even put it on in the first place?";
     price = 3500;
   }
+  //Sunfire Cape
   if (currentItem === 22) {
     texts.effect1 = "Health + 500";
-    texts.effect2 = "Health Renegeration + 8 / Second";
+    texts.effect2 = "Health Regen + 15";
     texts.additionaltexts = "It embodies all possible meanings of";
     texts.additionaltexts2 = "the word 'indestructible'";
     price = 4000;
   }
+  //Zhonyas's Hourglass
   if (currentItem === 23) {
-    texts.effect1 = "Ability Power + 50";
-    texts.effect2 = "Armor + 40";
-    texts.effect3 = "Upon Taking Lethal Damage, Prevent Death";
-    texts.effect4 = "and Return to 500 or 20% Maximum Health";
-    texts.effect5 = "(Whichever is Greater, Works Once)";
+    texts.effect1 = "Ability Power + 80";
+    texts.effect2 = "Armor + 10";
+    texts.effect3 = "Rewind Time (Legendary Passive):";
+    texts.effect4 = "When you take lethal damage, instead";
+    texts.effect5 = "restore 50% of your maiximum health";
+    texts.effect6 = "and destroy all enemies (works once)";
     texts.additionaltexts = "Even time bends to my will";
     price = 3500;
   }
+  //Thunderfury
   if (currentItem === 24) {
-    texts.effect1 = "Damage + 60";
-    texts.effect2 = "Armor + 30";
-    texts.effect3 = "Magic Peneration + 20%";
-    texts.additionaltexts = "Sharp and energetic";
+    texts.effect1 = "Damage + 60   Armor + 10";
+    texts.effect2 = "Armor Penetration + 20% (Max 80%)";
+    texts.effect3 = "Magic Peneration + 20% (Max 80%)";
+    texts.effect4 = "Health + 350   Mana + 200";
+    texts.additionaltexts = "The blessed blade of the";
+    texts.additionaltexts2 = "windseeker";
     price = 3300;
   }
+  //Abyssal Mask
   if (currentItem === 25) {
-    texts.effect1 = "Health + 350";
-    texts.effect2 = "Magic Resist + 45";
+    texts.effect1 = "Health + 450";
+    texts.effect2 = "Magic Resist + 20";
     texts.effect3 = "Mana + 250";
-    texts.effect4 = "Mana Regeneration + 4 / Second";
+    texts.effect4 = "Mana Regen + 4 / Second";
+    texts.effect5 = "Absorb Magic(Legendary Passive):";
+    texts.effect6 = "Taking magic damage has a 30% chance";
+    texts.effect7 = "to increase you ability power by 1";
     texts.additionaltexts = "Who am I? None of your business";
     price = 4000;
   }
+  //Spirit Visage
   if (currentItem === 26) {
-    texts.effect1 = "Health + 450";
-    texts.effect2 = "Mana + 250";
+    texts.effect1 = "Health + 350   Mana + 250";
+    texts.effect2 = "Magic Resist + 15";
     texts.effect3 = "Mana Regeneration + 2 / Second";
     texts.effect4 = "Health Regeneration + 4 / Second";
-    texts.effect5 = "Magic Resist + 55";
-    texts.effect6 = "Improve Healing of all Sources by 20";
-    texts.additionaltexts = "Blessed by the kings of the court";
-    texts.additionaltexts2 = "and maintained by the purest magic";
+    texts.effect5 = "Fusion (Legendary Passive): Casting";
+    texts.effect6 = "a summoner spell grants you 30 Health,";
+    texts.effect7 = "5 Damage, and 5 Ability Power";
+    texts.additionaltexts = "Blessed by the kings and";
+    texts.additionaltexts2 = "maintained by the purest magic";
     price = 3800;
   }
+  //Adaptive helm
   if (currentItem === 27) {
-    texts.effect1 = "Health + 250";
-    texts.effect2 = "Mana + 200";
-    texts.effect3 = "Mana Regeneration + 5 / Second";
-    texts.effect4 = "Gain Armor and Magic Resist Over Time,";
-    texts.effect5 = "up to a Maximum of 30 for Each";
-    texts.additionaltexts = "Flexible yet strong";
+    texts.effect1 = "Health + 250   Mana + 200";
+    texts.effect2 = "Mana Regeneration + 5 / Second";
+    texts.effect3 = "Armor + 5   Magic Resist + 5";
+    texts.effect4 = "Targeted Evolution (Legendary Passive):";
+    texts.effect5 = "Gain 1 Armor and Magic Resist every 20";
+    texts.effect6 = "seconds, up to a maximum for 15 each";
+    texts.additionaltexts = "Practice makes perfect";
     price = 3500;
   }
+  //Banshee's Veil
   if (currentItem === 28) {
-    texts.effect1 = "Magic Penetration + 10%";
-    texts.effect2 = "Ability Power + 65";
-    texts.effect3 = "Magic Resist + 35";
-    texts.effect4 = "10% Chance to Prevent Spells";
+    texts.effect1 = "Magic Penetration + 15% (Max 80%)";
+    texts.effect2 = "Ability Power + 60";
+    texts.effect3 = "Magic Resist + 10";
+    texts.effect4 = "Health + 300  Mana + 300";
     texts.additionaltexts = "It was destined to doom once the";
     texts.additionaltexts2 = "secret was unveiled...";
     price = 3600;
   }
+  //Hex Drinker
   if (currentItem === 29) {
     texts.effect1 = "Damage + 60";
-    texts.effect2 = "Magic Resist + 40";
-    texts.effect3 = "Prevent 15% of Magic Damage Taken";
-    texts.additionaltexts = "It feasts upon magic";
+    texts.effect2 = "Magic Resist + 20";
+    texts.effect3 = "Heal for 10% of all damage dealt";
+    texts.effect4 = "Mana Vortex (Legendary Passive):";
+    texts.effect5 = "When you take magic damage, restore";
+    texts.effect6 = "half as much as mana";
+    texts.additionaltexts = "To feast upon magic";
     price = 3300;
   }
-
+  //Trinity Force
   if (currentItem === 30) {
     texts.effect1 = "Health + 300   Mana + 200";
-    texts.effect2 = "Speed + 20   Magic Resist + 30";
-    texts.effect3 = "Armor + 30   Armor Peneration + 20%";
-    texts.effect4 = "Magic Penetration + 20%";
+    texts.effect2 = "Armor Peneration + 10%   Damage + 60";
+    texts.effect3 = "Ability Power + 60   Speed + 10";
+    texts.effect4 = "Magic Penetration + 10%";
     texts.effect5 = "Ability Cooldowns - 20%";
     texts.effect6 = "Critical Strike Chance + 20%";
-    texts.additionaltexts = "A true display of skill";
+    texts.additionaltexts = "Power overwhelming";
     price = 5000;
   }
 
@@ -3448,91 +3507,115 @@ function addStats() {
     stats.hpregen += 5;
     itemabilities.movespeed = true;
   }
+  //randuin's Omen
   if (currentItem === 20) {
-    stats.armor += 30;
+    stats.armor += 20;
+    stats.hpregen += 5;
     stats.maxhp += 450;
     stats.health += 450;
-    //special ability -30% from crits
+    stats.maxmana += 200;
+    stats.mana += 200;
+    itemabilities.autodefensematrix = true;
   }
+  //Thornmail
   if (currentItem === 21) {
-    stats.maxhp += 250;
-    stats.health += 250;
-    stats.armor += 80;
-    //special ability reflect 5% Physical damage
+    stats.maxhp += 800;
+    stats.health += 800;
+    stats.armor += 40;
   }
+  //Sunfire Cape
   if (currentItem === 22) {
     stats.maxhp += 500;
     stats.health += 500;
-    stats.hpregen += 8;
+    stats.hpregen += 15;
   }
+  //zhonya's hourglass
   if (currentItem === 23) {
-    stats.ap += 50;
-    stats.armor += 40;
-    //GA effect
+    stats.ap += 80;
+    stats.armor += 10;
+    itemabilities.stasis = true;
   }
+  //Thunderfury
   if (currentItem === 24) {
     stats.ad += 60;
-    stats.armor += 30;
+    stats.armor += 10;
     stats.magicpen += 20;
-  }
-  if (currentItem === 25) {
+    stats.armorpen += 20;
     stats.maxhp += 350;
     stats.health += 350;
-    stats.mr += 45;
+    stats.maxmana = 200;
+    stats.mana += 200;
+  }
+  //abyssal msk
+  if (currentItem === 25) {
+    stats.maxhp += 450;
+    stats.health += 450;
+    stats.mr += 20;
     stats.maxmana += 250;
     stats.mana += 250;
     stats.manaregen += 4;
+    itemabilities.apabsorb = true;
   }
+  //spirit visage
   if (currentItem === 26) {
-    stats.maxhp += 450;
-    stats.health += 450;
+    stats.maxhp += 350;
+    stats.health += 350;
     stats.maxmana += 250;
     stats.mana += 250;
     stats.manaregen += 2;
     stats.hpregen += 4;
-    stats.mr += 55;
-    //special ablity improve healing
+    stats.mr += 15;
+    itemabilities.gainstats = true;
   }
+  //adaptive helm
   if (currentItem === 27) {
     stats.maxhp += 250;
     stats.health += 250;
     stats.maxmana += 200;
     stats.mana += 200;
     stats.manaregen += 5;
-    //gain armor and magic resist over time up to 30 of each
+    stats.armor += 5;
+    stats.mr += 5;
+    itemabilities.roastats = true;
   }
+  //Banshee's Veil
   if (currentItem === 28) {
-    stats.magicpen += 10;
-    stats.ap += 65;
-    stats.mr += 35;
-    //10% to prevent spells
+    stats.magicpen += 15;
+    stats.ap += 60;
+    ststa.mr += 10;
+    stats.maxhp += 300;
+    stats.health += 300;
+    stats.maxmana += 300;
+    stats.mana += 300;
   }
+  //hex drinker
   if (currentItem === 29) {
     stats.ad += 60;
-    stats.mr += 40;
-    //special ability prevent 15% all magic damage
+    stats.mr += 20;
+    stats.lifesteal += 10;
+    itemabilities.manavortex = true;
   }
+  //trinity force
   if (currentItem === 30) {
     stats.maxhp += 300;
     stats.health += 300;
     stats.maxmana += 200;
     stats.mana += 200;
-    stats.speed += 20;
-    stats.mr += 30;
-    stats.armor += 30;
-    stats.armorpen += 20;
-    stats.magicpen += 20;
+    stats.speed += 10;
+    stats.armorpen += 10;
+    stats.magicpen += 10;
     stats.cdr += 20;
     stats.crit += 20;
+    stats.ad += 60;
+    stats.ap += 60;
   }
-
 }
 
 //responsible for resetting and cleaning up the game after it is done
 function gameOverYet() {
 
   //Dies if health falls below 0
-  if (state === "game" && stats.health <= 0) {
+  if (state === "game" && stats.health <= 0 && ! itemabilities.stasis) {
     state = "gameover";
     if (volumeControl) {
       sound.gameover.setVolume(0.1);
@@ -3559,6 +3642,7 @@ function resetGame() {
   statsToggle = false;
   rmode = false;
   excessls = 0;
+  roastatcounter = 0;
   cannonbolts = [];
   cannonbolthitbox = [];
   bolthitbox = [];
@@ -3602,11 +3686,17 @@ function resetGame() {
     lichbane : false,
     maxhpmagicdmg : false,
     movespeed : false,
+    autodefensematrix : false,
+    stasis : false,
+    apabsorb : false,
+    gainstats : false,
+    roastats : false,
+    manavortex : false,
   };
   abilitycosts = {
-    q : 15,
-    w : 35,
-    e : 10,
+    q : 30,
+    w : 50,
+    e : 15,
     r : 100,
     d : 0,
     f : 0,
@@ -3948,6 +4038,12 @@ function keyTyped() {
       }
       else {
         cdcharge.d = 0;
+        if (itemabilities.gainstats) {
+          stats.maxhp += 30;
+          stats.health += 30;
+          stats.ad += 5;
+          stats.ap += 5;
+        }
         if (summonerD === 1) {
           castignite();
           abilitytiming.ignite = millis();
@@ -3978,6 +4074,12 @@ function keyTyped() {
       }
       else{
         cdcharge.f = 0;
+        if (itemabilities.gainstats) {
+          stats.maxhp += 30;
+          stats.health += 30;
+          stats.ad += 5;
+          stats.ap += 5;
+        }
         if (summonerF === 1) {
           castignite();
           abilitytiming.ignite = millis();

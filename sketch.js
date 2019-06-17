@@ -15,6 +15,7 @@ let purchaseButton;
 let selectSummoner;
 let selectSummoner2;
 let hit = false;
+let itemabilities;
 let summonerD;
 let summonerDicon;
 let summonerF;
@@ -102,6 +103,7 @@ function setup() {
 function draw() {
 
   drawBackground();
+  passiveEffects();
   showCursor();
   showMenus();
   showShop();
@@ -132,7 +134,7 @@ function setAssets() {
   soundOn = loadImage("assets/pictures/soundon.png");
   soundOff = loadImage("assets/pictures/soundoff.png");
   volumeControl = true;
-  files = 106;
+  files = 107;
 
 }
 
@@ -255,6 +257,7 @@ function loadFiles() {
     whit : loadSound("assets/sounds/whit.wav", itemLoaded),
     holyfire : loadImage("assets/pictures/character/holyfire.png", itemLoaded),
     angelicshield : loadImage("assets/pictures/character/angelicshield.png", itemLoaded),
+    haste : loadImage("assets/pictures/character/haste.png", itemLoaded),
   };
 
 }
@@ -500,18 +503,18 @@ class Cannons extends GameObject {
 
   constructor(x, y, width, height, direction, damage, id) {
     super(x, y, width, height);
-    this.health = 20 + sq(stats.lvl) * 2;
-    this.maxhp = 20 + sq(stats.lvl) * 2;
-    this.magicresist = 10 + stats.lvl;
-    this.armor = 15 + stats.lvl;
+    this.health = 20 + sq(stats.lvl) * 1.5 + sq(inventory.length) * 5;
+    this.maxhp = 20 + sq(stats.lvl) * 1.5 + sq(inventory.length) * 5;
+    this.magicresist = 5 + stats.lvl * 0.5 + inventory.length;
+    this.armor = 5 + stats.lvl * 0.5 + inventory.length;
     this.speed = width * 0.01;
     this.direction = direction;
     this.id = id;
+    this.damage = damage;
 
     this.spawntime = timer;
 
     //damage display portion
-    this.damage = damage;
     this.showdamage = false;
     this.damagedisplay = false;
     this.critdmg = false;
@@ -530,7 +533,7 @@ class Cannons extends GameObject {
     noStroke();
     fill(255);
     textSize(width / 120);
-    text(ceil(this.health) + "/" + this.maxhp, this.x + this.width / 2, this.y - height * 0.0195);
+    text(ceil(this.health) + "/" + ceil(this.maxhp), this.x + this.width / 2, this.y - height * 0.0195);
 
   }
 
@@ -711,12 +714,12 @@ class Summoners extends GameObject {
 //function called when all the loading is done, initializing buttons
 function createButtons() {
 
-  openShopButton = new Button(width * 0.35, height * (13/24), width * 0.3, height / 8, "Loadout", 36, 0, openShop, "assets/cursors/shop.cur");
-  shopToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Done", 36, 0, shopToMenu, "assets/cursors/shop.cur");
-  gameoverToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Return To Menu", 36, 0, gmToMenu, "assets/cursors/gotomenu.cur");
-  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 12, [0, 0, 0], openInGameShopMenu, "assets/cursors/shop.cur");
-  selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", 28, 0, selecttoD, "assets/cursors/gotomenu.cur");
-  selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", 28, 0, selecttoF, "assets/cursors/gotomenu.cur");
+  openShopButton = new Button(width * 0.35, height * (13/24), width * 0.3, height / 8, "Loadout", width / 55, 0, openShop, "assets/cursors/shop.cur");
+  shopToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Done", width / 55, 0, shopToMenu, "assets/cursors/shop.cur");
+  gameoverToMenuButton = new Button(width * 0.35, height * 0.85, width * 0.3, height * 0.1, "Return To Menu", width / 55, 0, gmToMenu, "assets/cursors/gotomenu.cur");
+  openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 0, 0, openInGameShopMenu, "assets/cursors/shop.cur");
+  selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", width / 70, 0, selecttoD, "assets/cursors/gotomenu.cur");
+  selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", width / 70, 0, selecttoF, "assets/cursors/gotomenu.cur");
 
 }
 
@@ -861,6 +864,7 @@ function loadData() {
     ignite : false,
     angelicshield : false,
     holyfire : false,    
+    haste : false,
   };
   abilitycosts = {
     q : 15,
@@ -898,6 +902,13 @@ function loadData() {
     e : 420,
     r : 50,
   };
+  itemabilities = {
+    infegde : false,
+    manaharvest : false,
+    quickdash : false,
+    culling : false,
+    maxhpdmg : false,
+  };
   tstatus = false;
   invins = false;
   loadCount = 0;
@@ -923,6 +934,7 @@ function loadData() {
     lvlupxp : 100,
     lvl : 1,
     gold : 100000,
+    lifesteal : 0,
   };
   texts = {
     effect1 : "",
@@ -961,6 +973,15 @@ function itemLoaded() {
 //function drawing the background
 function drawBackground() {
   background(bg);
+}
+
+function passiveEffects() {
+
+  //stormrazor static ability
+  if (itemabilities.quickdash) {
+    cds.e = 1;
+  }
+
 }
 
 //basic game cursor, called here to be overwritten later if needed
@@ -1407,6 +1428,9 @@ function playerhitboxes() {
         if (rmode) {
           damage = stats.ad * 1.2;
         }
+        if (itemabilities.maxhpdmg) {
+          damage = damage + enemyMinions[k].health * 0.1;
+        }
         if (buffs.holyfire) {
           damage = damage * 1.1;
         }
@@ -1421,6 +1445,9 @@ function playerhitboxes() {
           else {
             damage = damage * 2;
           }
+          if (itemabilities.infedge) {
+            damage = damage * 1.2;
+          }
           if (enemyMinions[k].health - damage <= 0) {
             stats.ad += 1;
           }
@@ -1432,10 +1459,18 @@ function playerhitboxes() {
           }
         }
 
+        if (itemabilities.culling) {
+          let dmgmultiplier1 = (enemyMinions[k].maxhp - enemyMinions[k].health) / enemyMinions[k].maxhp;
+          damage = damage + damage * (0.2 * (dmgmultiplier1 / 70));
+        }
         
         damage = damage * ((100 - enemyMinions[k].armor) / 100);
 
         enemyMinions[k].health -= damage;
+
+        let healamount = damage * (stats.lifesteal / 100);
+        stats.health += healamount;
+
         enemyMinions[k].damagetaken = damage;
         enemyMinions[k].critdmg = crit;
         enemyMinions[k].showdamage = true;
@@ -1475,10 +1510,22 @@ function playerhitboxes() {
         if (buffs.ignite) {
           damage = damage * 1.1;
         }
+        if (itemabilities.quickdash) {
+          damage = damage * 0.2;
+        }
+
+        if (itemabilities.culling) {
+          let dmgmultiplier1 = (enemyMinions[k].maxhp - enemyMinions[k].health) / enemyMinions[k].maxhp;
+          damage = damage + damage * (0.2 * (dmgmultiplier1 / 70));
+        }
 
         damage = damage * ((100 - enemyMinions[k].magicresist) / 100);
         
         enemyMinions[k].health -= damage;
+
+        let healamount = damage * (stats.lifesteal / 100);
+        stats.health += healamount;
+
         enemyMinions[k].damagetaken = damage;
         enemyMinions[k].critdmg = false;
         enemyMinions[k].showdamage = true;
@@ -1547,7 +1594,6 @@ function updateTimer() {
     textSize(24); 
     stroke(255, 255, 255);
     fill(0, 255, 180);
-    text(timer, width / 15, height / 10);
     if (!shopSubstate && frameCount % 60 === 0) {
       timer++;
       minionsSpawn();
@@ -1560,7 +1606,7 @@ function minionsSpawn() {
 
   let temp = random(0, 100);
   if (enemyMinions.length !== 0) {
-    if (temp <= 5) {
+    if (temp <= 5 + stats.lvl * 0.5 + sq(inventory.length) * 0.5) {
       spawnCannon();
     }
   }
@@ -1575,7 +1621,7 @@ function spawnCannon() {
   
   enemyminionhitbox.push([]);
   let temp = random(0.1, 0.7);
-  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, 10 + stats.lvl * 5, enemyminionhitbox.length-1));
+  enemyMinions.push(new Cannons(width * 0.95, height * temp, width * 0.06, height * 0.1, 0, 10 + stats.lvl * 2 + sq(inventory.length) * 1.5, enemyminionhitbox.length-1));
 
 }
 
@@ -1615,7 +1661,7 @@ function minionFunctions() {
       //deleted and do damage if hit
       for(let m = cannonbolthitbox.length - 1; m >= 0; m--) {
         hit = collidePolyPoly(cannonbolthitbox[m], playerhitbox, true);
-        if (hit) {
+        if (hit && ! castability.e) {
           cannonbolthitbox.splice(m, 1);
 
           let temp = cannonbolts[m].damage;
@@ -1668,9 +1714,12 @@ function minionFunctions() {
           }
         }
         if (stats.lvl !== 18) {
-          stats.xp += 35;
+          stats.xp += 25;
         }
-        stats.gold += 65;
+        stats.gold += 100;
+        if (itemabilities.manaharvest) {
+          stats.mana += 0.02 * stats.maxmana;
+        }
       }
     }
 
@@ -1752,11 +1801,23 @@ function moveBolts() {
           else {
             damage = damage * 2.25;
           }
+          if (itemabilities.infedge) {
+            damage = damage * 1.2;
+          }
+        }
+
+        if (itemabilities.culling) {
+          let dmgmultiplier1 = (enemyMinions[m].maxhp - enemyMinions[m].health) / enemyMinions[m].maxhp;
+          damage = damage + damage * (0.2 * (dmgmultiplier1 / 70));
         }
 
         damage = damage * ((100 - enemyMinions[m].magicresist) / 100);
   
         enemyMinions[m].health -= damage;
+
+        let healamount = damage * (stats.lifesteal / 100);
+        stats.health += healamount;
+
         enemyMinions[m].damagetaken = damage;
         enemyMinions[m].critdmg = crit;
         enemyMinions[m].showdamage = true;
@@ -1897,6 +1958,9 @@ function characterStatus() {
     if (stats.speed >= 100) {
       stats.speed = 60;
     }
+    if (stats.lifesteal >= 30) {
+      stats.lifesteal = 30;
+    }
 
     //components of the UI
     blankbars();
@@ -1944,6 +2008,7 @@ function levelUp() {
     stats.lvl += 1;
     if (stats.lvl === 6) {
       stats.speed += 20;
+      buffs.haste = true;
     }
     else if (stats.lvl === 12) {
       buffs.angelicshield = true;
@@ -2120,7 +2185,20 @@ function displaybuffs() {
     noFill();
     rect(width * 0.34, height * 0.8, width * 0.0145, width * 0.0145);
     image(images.ignite, width * 0.34, height * 0.8, width * 0.015, width * 0.015);
-  }
+    if (mouseX >= width * 0.34 && mouseX <= width * 0.355 && mouseY >= height * 0.8 && mouseY <= height * 0.83) {
+      fill(0, 0, 0, 75);
+      rect(mouseX - width * 0.075, mouseY - height * 0.2, width * 0.15, height * 0.15, 25);
+      noStroke();
+      fill(226, 20, 20);
+      textSize(width / 75);
+      text("Ignite", mouseX, mouseY - height * 0.165);
+      fill(255);
+      textSize(width / 120);
+      text("This unit is dealing 10%", mouseX, mouseY - height * 0.125);
+      text("increased damage, this unit's", mouseX, mouseY - height * 0.105);
+      text("critical strikes deal 125% damage", mouseX, mouseY - height * 0.085);
+    } 
+  } 
 
   if (buffs.barrier) {
     stroke(0, 97, 255);
@@ -2128,6 +2206,38 @@ function displaybuffs() {
     noFill();
     rect(width * 0.36, height * 0.8, width * 0.0145, width * 0.0145);
     image(images.barrier, width * 0.36, height * 0.8, width * 0.015, width * 0.015);
+    if (mouseX >= width * 0.36 && mouseX <= width * 0.375 && mouseY >= height * 0.8 && mouseY <= height * 0.83) {
+      fill(0, 0, 0, 75);
+      rect(mouseX - width * 0.075, mouseY - height * 0.2, width * 0.15, height * 0.15, 25);
+      noStroke();
+      fill(225, 258, 53);
+      textSize(width / 75);
+      text("Barrier", mouseX, mouseY - height * 0.165);
+      fill(255);
+      textSize(width / 120);
+      text("This unit is taking 15%", mouseX, mouseY - height * 0.125);
+      text("reduced damage", mouseX, mouseY - height * 0.105);
+    } 
+  }
+
+  if (buffs.haste) {
+    stroke(0, 97, 255);
+    strokeWeight(3);
+    noFill();
+    rect(width * 0.61, height * 0.8, width * 0.0145, width * 0.0145);
+    image(player.haste, width * 0.61, height * 0.8, width * 0.015, width * 0.015);    
+    if (mouseX >= width * 0.61 && mouseX <= width * 0.625 && mouseY >= height * 0.8 && mouseY <= height * 0.83) {
+      fill(0, 0, 0, 75);
+      rect(mouseX - width * 0.075, mouseY - height * 0.2, width * 0.15, height * 0.15, 25);
+      noStroke();
+      fill(0, 97, 255);
+      textSize(width / 75);
+      text("Haste", mouseX, mouseY - height * 0.165);
+      fill(255);
+      textSize(width / 120);
+      text("This unit has + 20", mouseX, mouseY - height * 0.125);
+      text("movement speed", mouseX, mouseY - height * 0.105);
+    } 
   }
 
   if (buffs.angelicshield) {
@@ -2136,6 +2246,18 @@ function displaybuffs() {
     noFill();
     rect(width * 0.63, height * 0.8, width * 0.0145, width * 0.0145);
     image(player.angelicshield, width * 0.63, height * 0.8, width * 0.015, width * 0.015);
+    if (mouseX >= width * 0.63 && mouseX <= width * 0.645 && mouseY >= height * 0.8 && mouseY <= height * 0.83) {
+      fill(0, 0, 0, 75);
+      rect(mouseX - width * 0.075, mouseY - height * 0.2, width * 0.15, height * 0.15, 25);
+      noStroke();
+      fill(0, 97, 255);
+      textSize(width / 75);
+      text("Angelic Shield", mouseX, mouseY - height * 0.165);
+      fill(255);
+      textSize(width / 120);
+      text("This unit is taking 10%", mouseX, mouseY - height * 0.125);
+      text("reduced damage", mouseX, mouseY - height * 0.105);
+    } 
   }
 
   if (buffs.holyfire) {
@@ -2143,11 +2265,22 @@ function displaybuffs() {
     strokeWeight(3);
     noFill();
     rect(width * 0.65, height * 0.8, width * 0.0145, width * 0.0145);
-    image(player.holyfire, width * 0.65, height * 0.8, width * 0.015, width * 0.015);
+    image(player.holyfire, width * 0.65, height * 0.8, width * 0.015, width * 0.015);    
+    if (mouseX >= width * 0.65 && mouseX <= width * 0.665 && mouseY >= height * 0.8 && mouseY <= height * 0.83) {
+      fill(0, 0, 0, 75);
+      rect(mouseX - width * 0.075, mouseY - height * 0.2, width * 0.15, height * 0.15, 25);
+      noStroke();
+      fill(0, 97, 255);
+      textSize(width / 75);
+      text("Holy Fire", mouseX, mouseY - height * 0.165);
+      fill(255);
+      textSize(width / 120);
+      text("This unit is dealing 10%", mouseX, mouseY - height * 0.125);
+      text("increased damage", mouseX, mouseY - height * 0.105);
+    } 
   }
 
 }
-
 
 //recharging abilities
 function rechargeAbilities() {
@@ -2433,9 +2566,9 @@ function abilityDesc() {
       texts.additionaltexts2 = "Purer than the holy fire and stronger than the sacred blade";
     }
     else {
-      texts.effect1 = "Orbs of Agony";
-      texts.effect2 = "Fires three orbs from your character, enemies hit takes damage equal to";
-      texts.effect3 = "30 + 1.25 * Ability Power, the third orb deals 125% damage";
+      texts.effect1 = "Whirling Death";
+      texts.effect2 = "Fires three protectiles from your character, enemies hit takes damage equal to";
+      texts.effect3 = "30 + 1.25 * Ability Power, the third one deals 125% damage";
       texts.effect4 = "(Can Critically Strike)";
       texts.effect5 = "Passive: Gain + 10% Critical Strike Chance";
       texts.effect6 = "Active Ability";
@@ -2700,7 +2833,7 @@ function inGameShopDisplay() {
       }
     }
 
-    textSize(64);
+    textSize(width / 30);
     fill(111, 242, 24);
     stroke(15, 66, 32);
     text("Shop", width * 0.7, height * 0.08);
@@ -2743,13 +2876,13 @@ function itemDetails() {
       purchaseButton.run();
       noStroke();
       fill(0);
-      textSize(36);
+      textSize(width / 40);
       textStyle(BOLD);
       text(inGameShop[ceil(currentItem / 6) - 1][(currentItem - 1) % 6].name, width * 0.7, height * 0.24);
     }
 
     if (shopSubstate) {
-      textSize(20);
+      textSize(width / 85);
       textStyle(NORMAL);
       text(texts.effect1, width * 0.7, height * 0.45);
       text(texts.effect2, width * 0.7, height * 0.48);
@@ -2769,52 +2902,66 @@ function itemDetails() {
 //info of every item (name is already added during creation of items)
 function itemInfo() {
 
+  //infinity edge
   if (currentItem === 1) {
-    texts.effect1 = "Damage + 100";
-    texts.effect2 = "Critical Strike Chance + 30%";
+    texts.effect1 = "Damage + 150";
+    texts.effect2 = "Critical Strike Chance + 30% (Max 100%)";
     texts.effect3 = "Critical Strike Damage + 20%";
-    texts.additionaltexts = "MASSIVELY enhance critical strikes";
+    texts.additionaltexts = "You are full of weaknesses";
+    price = 3000;
   }
+  //essence reaver
   if (currentItem === 2) {
-    texts.effect1 = "Damage + 70";
+    texts.effect1 = "Damage + 80";
     texts.effect2 = "Mana Regeneration + 5 / Second";
     texts.effect3 = "Mana + 200";
-    texts.effect4 = "Abilities Cooldown - 20% (Max 70%)";
-    texts.additionaltexts = "Legend has it that this blade was the";
-    texts.additionaltexts2 = "harvestor of essence";
+    texts.effect4 = "Abilitie Cooldown - 10% (Max 50%)";
+    texts.effect5 = "Killing an enemy restores 2% of your";
+    texts.effect6 = "maximum mana";
+    texts.additionaltexts = "The reaper of souls and";
+    texts.additionaltexts2 = "harvestor essence";
     price = 3500;
   }
+  //Stormrazor
   if (currentItem === 3) {
-    texts.effect1 = "Damage + 40";
-    texts.effect2 = "Critical Chance + 30% (Max 100%)";
-    texts.effect3 = "Speed + 20";
-    texts.effect4 = "Abilities Cooldown - 20% (Max 70%)";
-    texts.additionaltexts = "From the depth of the tempest";
+    texts.effect1 = "Damage + 40   Ability Power + 40";
+    texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
+    texts.effect3 = "Speed + 10";
+    texts.effect4 = "Angelic Shift / Wanderer's Strike has a 1";
+    texts.effect5 = "second cooldown but deals 20% damage,";
+    texts.effect6 = "you are immune during your dash";
+    texts.additionaltexts = "The blessed blade of the";
+    texts.additionaltexts2 = "Windrunners";
     price = 3500;
   }
+  //starfire spellblade
   if (currentItem === 4) {
-
-    texts.effect1 = "Damage + 50";
-    texts.effect2 = "Ability Power + 80";
-    texts.effect3 = "Mana + 400";
-    texts.effect4 = "Deals Increased Damaged to";
-    texts.effect5 = "Low Health Targets";
+    texts.effect1 = "Damage + 50   Ability Power + 80";
+    texts.effect2 = "Mana + 200   Health + 200";
+    texts.effect3 = "Armor / Magic Penetration + 25% (Max 80%)";
+    texts.effect4 = "You heal for 15% of all damage dealt";
+    texts.effect5 = "(Max 30%)";
     texts.additionaltexts = "The lost blade of the Archangel";
     price = 3600;
   }
+  //last whisper
   if (currentItem === 5) {
-    texts.effect1 = "Damage + 40";
+    texts.effect1 = "Damage + 70";
     texts.effect2 = "Armor Penetration + 40%";
-    texts.additionaltexts = "Lethal, through any armor";
+    texts.effect3 = "Deal up to 20% increased damage to";
+    texts.effect4 = "damaged enemies. (deals maximum damage";
+    texts.effect5 = "when the enemy has 30% or less health)";
+    texts.additionaltexts = "Lethality, at any cost";
     price = 2800;
   }
-
+  //Frost Mourne
   if (currentItem === 6) {
     texts.effect1 = "Damage + 30";
-    texts.effect2 = "Heals for 10% of Damage Dealt";
-    texts.effect3 = "Ability Cooldown - 10% (Max 70%)";
-    texts.effect4 = "Attacks Deal Additional Damage Equals";
-    texts.effect5 = "to 2% of the Target's Current Health";
+    texts.effect2 = "Heals for 15% of all damage Dealt";
+    texts.effect3 = "The casting time for Redemption /";
+    texts.effect4 = "Judgment is halved, they deal 10%";
+    texts.effect5 = "of the targets' current health as";
+    texts.effect6 = "bonus damage";
     texts.additionaltexts = "A mythical blade that drain souls";
     price = 3600;
   }
@@ -3048,39 +3195,49 @@ function purchaseItem() {
 //stats added for each item
 function addStats() {
 
+  //infinity edge
   if (currentItem === 1) {
-    stats.ad += 100;
+    stats.ad += 150;
     stats.crit += 30;
-    //special ability +20 crit damage
+    itemabilities.infedge = true;
   }
+  //essence reaver
   if (currentItem === 2) {
-    stats.ad += 70;
+    stats.ad += 80;
     stats.manaregen += 5;
     stats.maxmana += 200;
     stats.mana += 200;
-    stats.cdr += 20;
+    stats.cdr += 10;
   }
+  //Stormrazor
   if (currentItem === 3) {
     stats.ad += 40;
-    stats.crit += 30;
-    stats.speed += 20;
-    stats.cdr += 20;
+    stats.ap += 40;
+    stats.speed += 10;
+    itemabilities.quickdash = true;
   }
+  //starfire spellblade
   if (currentItem === 4) {
     stats.ad += 50;
     stats.ap += 80;
     stats.maxmana += 400;
     stats.mana += 400;
-    //special ability does increased dmg to low hp targets
+    stats.maxhp += 200;
+    stats.health += 200;
+    stats.lifesteal += 15;
   }
+  //last whisper
   if (currentItem === 5) {
     stats.armorpen += 40;
-    stats.ad += 40;
+    stats.ad += 70;
+    itemabilities.culling = true;
   }
+  //Frost Mourne
   if (currentItem === 6){
     stats.ad += 30;
-    stats.cdr += 10;
-    //special ability heals for 10% AND does 2% current HP
+    stats.lifesteal += 15;
+    castTime.q = castTime.q / 2;
+    itemabilities.maxhpdmg = true;
   }
   if (currentItem === 7) {
     stats.cdr += 20;
@@ -3277,7 +3434,8 @@ function resetGame() {
     barrier : false,
     ignite : false,
     angelicshield : false,
-    holyfire : false,    
+    holyfire : false,
+    haste : false,    
   };
   abilitytiming = {
     r : -500,
@@ -3290,6 +3448,13 @@ function resetGame() {
     w : 200,
     e : 425,
     r : 50,
+  };
+  itemabilities = {
+    infegde : false,
+    manaharvest : false,
+    quickdash : false,
+    cullling : false,
+    maxhpdmg : false,
   };
   abilitycosts = {
     q : 15,
@@ -3335,6 +3500,7 @@ function resetGame() {
     lvlupxp : 100,
     lvl : 1,
     gold : 100000,
+    lifesteal : 0,
   };
   texts = {
     effect1 : "",
@@ -3540,7 +3706,7 @@ function keyTyped() {
     }
 
     //e ability
-    if (key === "e" || key == "E") {
+    if (key === "e" || key === "E") {
       if (cdcharge.e < cds.e|| castability.q || castability.w || castability.r || stats.mana < abilitycosts.e && !rmode) {
         if (volumeControl) {
           sound.gameover.setVolume(0.1);

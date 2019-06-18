@@ -1,12 +1,3 @@
-//STILL TO DO
-
-// - GAME DISCRIPTION
-// - BALANCE ITEMS
-// - commenting
-// - WIN CON?
-
-
-//define variables to be used
 let loadCount;
 let openShopButton;
 let shopToMenuButton;
@@ -2428,7 +2419,7 @@ function healthbar(){
   stroke(255);
   fill(0);
   textSize(width / 120);
-  text(floor(stats.health) + " / " + stats.maxhp, width * 0.465, height * 0.965);
+  text(floor(stats.health) + " / " + stats.maxhp, width * 0.465, height * 0.968);
 
 }
 
@@ -2628,42 +2619,42 @@ function rechargeAbilities() {
 
   if (! shopSubstate) {
     if (cdcharge.q > cds.q) {
-      cdcharge.q === cds.q;
+      cdcharge.q = cds.q;
     }
     else {
       cdcharge.q += 1 / 60;
     }
 
     if (cdcharge.w > cds.w) {
-      cdcharge.w === cds.w;
+      cdcharge.w = cds.w;
     }
     else {
       cdcharge.w += 1 / 60;
     }
 
     if (cdcharge.e > cds.e) {
-      cdcharge.e === cds.e;
+      cdcharge.e = cds.e;
     }
     else {
       cdcharge.e += 1 / 60;
     }
 
     if (cdcharge.r > cds.r) {
-      cdcharge.r === cds.r;
+      cdcharge.r = cds.r;
     }
     else {
       cdcharge.r += 1 / 60;
     }
 
     if (cdcharge.d > cds.d) {
-      cdcharge.d === cds.d;
+      cdcharge.d = cds.d;
     }
     else {
       cdcharge.d += 1 / 60;
     }
 
     if (cdcharge.f > cds.f) {
-      cdcharge.f === cds.f;
+      cdcharge.f = cds.f;
     }
     else {
       cdcharge.f += 1 / 60;

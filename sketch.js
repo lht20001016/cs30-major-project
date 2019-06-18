@@ -11,6 +11,11 @@ let loadCount;
 let openShopButton;
 let shopToMenuButton;
 let gameoverToMenuButton;
+let summonerspells;
+let characterabilities;
+let characterstats;
+let itemshopdesc;
+let gameplay;
 let purchaseButton;
 let selectSummoner;
 let selectSummoner2;
@@ -47,6 +52,7 @@ let timer;
 let abilitytiming;
 let soundOn;
 let soundOff;
+let instructionstate;
 let player;
 let bg;
 let summoners;
@@ -58,6 +64,8 @@ let globalMouse;
 let openInGameShop;
 let stats;
 let price;
+let instructions;
+let instructionsexit;
 let translatecount;
 let rmode;
 let texts;
@@ -104,6 +112,7 @@ function setup() {
 function draw() {
 
   drawBackground();
+  instructionScreen();
   itemEffects();
   showCursor();
   showMenus();
@@ -505,8 +514,8 @@ class Cannons extends GameObject {
 
   constructor(x, y, width, height, direction, id) {
     super(x, y, width, height);
-    this.health = 20 + pow(inventory.length * 2, 3) + sq(stats.lvl) * 10;
-    this.maxhp = 20 + pow(inventory.length * 2, 3) + sq(stats.lvl) * 10;
+    this.health = 20 + sq(stats.lvl) + 100 * inventory.length;
+    this.maxhp = 20 + sq(stats.lvl) + 100 * inventory.length;
     this.magicresist = 5 + stats.lvl * 0.5 + pow(inventory.length, 1.75);
     this.armor = 5 + stats.lvl * 0.5 + pow(inventory.length, 1.75);
     this.speed = width * 0.01;
@@ -722,6 +731,13 @@ function createButtons() {
   openInGameShop = new Button(width * 0.603, height * 0.9675, width * 0.099, height * 0.025, "", 0, 0, openInGameShopMenu, "assets/cursors/shop.cur");
   selectSummoner = new Button(width * 0.625, height * 0.7, width * 0.1, height * 0.05, "Equip to D", width / 70, 0, selecttoD, "assets/cursors/gotomenu.cur");
   selectSummoner2 = new Button(width * 0.775, height * 0.7, width * 0.1, height * 0.05, "Equip to F", width / 70, 0, selecttoF, "assets/cursors/gotomenu.cur");
+  instructions = new Button(width * 0.9, height * 0.1, width * 0.06, height * 0.06, "Help", width / 70, 0, openIns, "assets/cursors/gotomenu.cur");
+  instructionsexit = new Button(width * 0.06, height * 0.1, width * 0.06, height * 0.06, "Back", width / 70, 0, closeIns, "assets/cursors/gotomenu.cur");
+  summonerspells = new Button(width * 0.04, height * 0.3, width * 0.1, height * 0.06, "Summoners", width / 70, 0, summsdesc, "assets/cursors/gotomenu.cur");
+  characterabilities = new Button(width * 0.04, height * 0.4, width * 0.1, height * 0.06, "Abilities", width / 70, 0, charabdesc, "assets/cursors/gotomenu.cur");
+  characterstats = new Button(width * 0.04, height * 0.5, width * 0.1, height * 0.06, "Stats", width / 70, 0, charstatsdesc, "assets/cursors/gotomenu.cur");
+  itemshopdesc = new Button(width * 0.04, height * 0.6, width * 0.1, height * 0.06, "Items", width / 70, 0, itemshopdescs, "assets/cursors/gotomenu.cur");
+  gameplay = new Button(width * 0.04, height * 0.7, width * 0.1, height * 0.06, "Gameplay", width / 70, 0, gameplaydesc, "assets/cursors/gotomenu.cur");
 
 }
 
@@ -836,6 +852,64 @@ function selecttoF() {
 
 }
 
+function openIns() {
+  state = "instruction";
+  if (volumeControl) {
+    sound.openstore.setVolume(0.05);
+    sound.openstore.play();
+  }
+  instructionstate = 0;
+}
+
+function closeIns() {
+  state = "menu";
+  if (volumeControl) {
+    sound.closestore.setVolume(0.05);
+    sound.closestore.play();
+  }
+  instructionstate = 0;
+}
+
+function summsdesc() {
+  instructionstate = 1;
+  if (volumeControl) {
+    sound.clickItem.setVolume(0.1);
+    sound.clickItem.play();
+  }
+}
+
+function charabdesc() {
+  instructionstate = 2;
+  if (volumeControl) {
+    sound.clickItem.setVolume(0.1);
+    sound.clickItem.play();
+  }
+}
+
+function charstatsdesc() {
+  instructionstate = 3;
+  if (volumeControl) {
+    sound.clickItem.setVolume(0.1);
+    sound.clickItem.play();
+  }
+}
+
+function itemshopdescs() {
+  instructionstate = 4;
+  if (volumeControl) {
+    sound.clickItem.setVolume(0.1);
+    sound.clickItem.play();
+  }
+}
+
+function gameplaydesc() {
+  instructionstate = 5;
+  if (volumeControl) {
+    sound.clickItem.setVolume(0.1);
+    sound.clickItem.play();
+  }
+}
+
 //assign initial values and default stats to variables and arrays
 function loadData() {
 
@@ -844,6 +918,7 @@ function loadData() {
   currentItem = 0;
   currentSummoner = 0;
   translatecount = 0;
+  instructionstate = 0;
   cannonbolts = [];
   cannonbolthitbox = [];
   bolthitbox = [];
@@ -996,11 +1071,135 @@ function drawBackground() {
   background(bg);
 }
 
+function instructionScreen () {
+  
+  if (state === "instruction") {
+    instructionsexit.run();
+    summonerspells.run();
+    characterabilities.run();
+    characterstats.run();
+    itemshopdesc.run();
+    gameplay.run();
+
+    if (instructionstate === 1) {
+      fill(198, 211, 255, 165);
+      stroke(0, 92, 255);
+      rect(width * 0.17, height * 0.02, width * 0.75, height * 0.9);
+      textSize(width / 30);
+      fill(0);
+      stroke(15, 66, 32);
+      text("Summoner Spells", width * 0.52, height * 0.08);
+
+      textAlign(LEFT);
+      textSize(width / 100);
+      text("Summoner Spells are basic abilities that can be equipped to any character. They have a diverse range of effects that will aid all styles of gameplay.", width * 0.2, height * 0.2);
+      text("They can be seen in the Loadout menu, visible in the main menu. Any character may equip two of these abiliteis at once, binded to keys D and F respectively.", width * 0.2, height * 0.23);
+      text("The default summoners spells equipped without customization is Flash for D key and Heal for F key, you may click on the icon of these abilities to see", width * 0.2, height * 0.26);
+      text("their effects. After equipping these abilities, they will appear to in the UI for you to use. Hovering over them will display their cooldown and effects.", width * 0.2, height * 0.29);
+      textAlign(CENTER);
+    }
+
+    
+    if (instructionstate === 2) {
+      fill(198, 211, 255, 165);
+      stroke(0, 92, 255);
+      rect(width * 0.17, height * 0.02, width * 0.75, height * 0.9);
+      textSize(width / 30);
+      fill(0);
+      stroke(15, 66, 32);
+      text("Character Abilities", width * 0.52, height * 0.08);
+
+      textAlign(LEFT);
+      textSize(width / 100);
+      text("Each character has four abilities, binded to keys Q, W, E, and R respectively. Generally, Q ability is a low cooldown damaging ability, while W ability is", width * 0.2, height * 0.2);
+      text("a higher cooldown damaging ability with more damage and syngergy potential with items. The E ability will traditionally provide some utility to the player", width * 0.2, height * 0.23);
+      text("while R, the ultimate ability, provides a game changing effect for a very long cooldown. It becomes available at level 6.", width * 0.2, height * 0.26);
+      text("While in game, you may hover your mouse over each ability icon to read their effects and damage values.", width * 0.2, height * 0.29);
+      text("Aim the abilities with your mouse, for example, if a projectile was to be fired, it would be fired to the direction of your mouse. If a melee attack is to", width * 0.2, height * 0.32);
+      text("be performed, the character will slash to the direction of the mouse.", width * 0.2, height * 0.35);
+      textAlign(CENTER);
+    }
+
+    if (instructionstate === 3) {
+      fill(198, 211, 255, 165);
+      stroke(0, 92, 255);
+      rect(width * 0.17, height * 0.02, width * 0.75, height * 0.9);
+      textSize(width / 30);
+      fill(0);
+      stroke(15, 66, 32);
+      text("Character Stats", width * 0.52, height * 0.08);
+
+      textAlign(LEFT);
+      textSize(width / 100);
+      text("Each character has different stats with synergize with its abilities. They are introduced below:", width * 0.2, height * 0.2);
+      text("Attack Damage: Increases the damage of a character's physical damage abilities (melee attacks)", width * 0.2, height * 0.23);
+      text("Ability Power: Increases the damage of a character's magical damage abilities (spell attacks)", width * 0.2, height * 0.26);
+      text("Armor(Max 50): Increases the resistance of the character to enemy physical damage abilities (melee attacks)", width * 0.2, height * 0.29);
+      text("Magic Resist(Max 50): Increases the resistance of the character to enemy magical damage abilities (spell attacks)", width * 0.2, height * 0.32);
+      text("Armor Penetration(Max 80%): Increases the effectiveness of a character's physical damage abilities through enemy Armor", width * 0.2, height * 0.35);
+      text("Magic Penetration(Max 80%): Increases the effectiveness of a character's magical damage abilities through enemy Magic Resist", width * 0.2, height * 0.38);
+      text("Speed(Max 60): Increases the movement speed of a character", width * 0.2, height * 0.41);
+      text("Critical Strike Chance(Max 100%, additional Crit stats does not stack): Increases the chances of a character's certain abilities to do double damage", width * 0.2, height * 0.44);
+      text("Cooldown Reduction(Max 70%): Decreases the cooldowns of a character's abilities", width * 0.2, height * 0.47);
+      text("Health Regeneration: Increases the rate at which a character naturally regenerates health", width * 0.2, height * 0.5);
+      text("Mana Regeneration: Increases the rate at which a character naturally regenerates mana", width * 0.2, height * 0.53);
+      text("Lifesteal(Max 30%): Increases the amount of life a character gains by doing damage", width * 0.2, height * 0.56);
+      textAlign(CENTER);
+    }
+
+    if (instructionstate === 4) {
+      fill(198, 211, 255, 165);
+      stroke(0, 92, 255);
+      rect(width * 0.17, height * 0.02, width * 0.75, height * 0.9);
+      textSize(width / 30);
+      fill(0);
+      stroke(15, 66, 32);
+      text("Powerup and Items", width * 0.52, height * 0.08);
+
+      textAlign(LEFT);
+      textSize(width / 100);
+      text("Items can be bought using in game gold, earned through killing enemies.", width * 0.2, height * 0.2);
+      text("Each item has its unique property ands gives unique stats and abilities.", width * 0.2, height * 0.23);
+      text("A passive ability implies that the ability is applied upon purchase and work automatically, while an active ability implies the player may", width * 0.2, height * 0.26);
+      text("activate that ability according to its instruction.", width * 0.2, height * 0.29);
+      text("A legendary ability implies that purchasing multiples of that item would grant that ability ONCE.", width * 0.2, height * 0.32);
+      text("Please refer to the stats page for the effect of each stat.", width * 0.2, height * 0.35);
+      text("Items purchase would be placed in your inventory, located to the right side in the user interface, hovering your mouse over them will", width * 0.2, height * 0.38);
+      text("display their stats and any abilities that they are granting you.", width * 0.2, height * 0.41);
+      text("Critical Strike Chance(Max 100%, additional Crit stats does not stack): Increases the chances of a character's certain abilities to do double damage", width * 0.2, height * 0.44);
+      text("You may purchase up to six items, they cannot be deleted after purchase", width * 0.2, height * 0.47);
+      textAlign(CENTER);
+    }
+
+    if (instructionstate === 5) {
+      fill(198, 211, 255, 165);
+      stroke(0, 92, 255);
+      rect(width * 0.17, height * 0.02, width * 0.75, height * 0.9);
+      textSize(width / 30);
+      fill(0);
+      stroke(15, 66, 32);
+      text("Gameplay", width * 0.52, height * 0.08);
+
+      textAlign(LEFT);
+      textSize(width / 100);
+      text("The goal of this game to to reach the maximum level and become powerful.", width * 0.2, height * 0.2);
+      text("Defeating enemies will grant you experience, which is shown in the UI as a purple bar.", width * 0.2, height * 0.23);
+      text("Once you have enough experience points, you will level up, gaining stats.", width * 0.2, height * 0.26);
+      text("Defeating enemies will grant you gold, which you can use to purchase items.", width * 0.2, height * 0.29);
+      text("The difficulty of the game will scale as you progress through, and a proper mix of items, stats, and abilities will increase your chance to win.", width * 0.2, height * 0.32);
+      textAlign(CENTER);
+    }
+
+  }
+
+}
+
 function itemEffects() {
 
   //stormrazor static ability
   if (itemabilities.quickdash) {
-    cds.e = 1;
+    cds.e = 0.75;
+    abilitycosts.e = 0;
   }
 
   //supernova recharge
@@ -1013,6 +1212,10 @@ function itemEffects() {
   if (stats.health <= 0 && itemabilities.stasis) {
     stats.health = stats.maxhp / 2;
     itemabilities.stasis = false;
+    if (volumeControl) {
+      sound.gameover.setVolume(0.3);
+      sound.gameover.play();
+    }
   }
 
   if (timer % 20 === 0 && frameCount % 60 === 5 && itemabilities.roastats && roastatcounter < 15) {
@@ -1020,6 +1223,13 @@ function itemEffects() {
     stats.mr++;
     roastatcounter++;
   }
+
+  cds.q = round(300 * ((100 - stats.cdr) / 100)) / 100;
+  cds.w = round(800 * ((100 - stats.cdr) / 100)) / 100;
+  if (! itemabilities.quickdash) {
+    cds.e = round(500 * ((100 - stats.cdr) / 100)) / 100;
+  }
+  cds.r = round(8000 * ((100 - stats.cdr) / 100)) / 100;
 
 }
 
@@ -1073,6 +1283,7 @@ function showMenus() {
     if (loadCount === files) {
       
       openShopButton.run();
+      instructions.run();
       textSize(55);
       text("Start", width / 2, height * (27/32));
 
@@ -1409,6 +1620,27 @@ function characterPosition() {
     //display
     image(playerdisplay, charpos.x, charpos.y, charpos.width, charpos.height);
 
+    //Character Bars
+    stroke(0);
+    noFill();
+    rect(charpos.x, charpos.y - height * 0.03, charpos.width, height * 0.018);
+    fill(249, 22, 26);
+    rect(charpos.x, charpos.y - height * 0.03, charpos.width * (stats.health / stats.maxhp), height * 0.018);
+    noStroke();
+    fill(255);
+    textSize(width / 120);
+    text(ceil(stats.health) + "/" + ceil(stats.maxhp), charpos.x + charpos.width / 2, charpos.y - height * 0.0195);
+
+    stroke(0);
+    noFill();
+    rect(charpos.x, charpos.y - height * 0.012, charpos.width, height * 0.012);
+    fill(21, 157, 253);
+    rect(charpos.x, charpos.y - height * 0.012, charpos.width * (stats.mana / stats.maxmana), height * 0.012);
+    noStroke();
+    fill(255);
+    textSize(width / 150);
+    text(ceil(stats.mana) + "/" + ceil(stats.maxmana), charpos.x + charpos.width / 2, charpos.y - height * 0.004);
+
     //hitboxes
     playerhitboxes();
 
@@ -1656,7 +1888,7 @@ function minionsSpawn() {
 
   let temp = random(0, 100);
   if (enemyMinions.length !== 0) {
-    if (temp <= 5 + stats.lvl * 0.5 + sq(inventory.length) * 0.5) {
+    if (temp <= 10 + stats.lvl * 0.5 + sq(inventory.length)) {
       spawnCannon();
     }
   }
@@ -1682,8 +1914,10 @@ function minionFunctions() {
 
     for(let i = cannonbolts.length - 1; i >= 0; i--) {
 
-      cannonbolts[i].display();
-      cannonbolts[i].hitbox();
+      if (cannonbolts[i] !== undefined) {
+        cannonbolts[i].display();
+        cannonbolts[i].hitbox();
+      }
 
       if (! shopSubstate) {
 
@@ -2025,8 +2259,8 @@ function characterStatus() {
     if (stats.armor >= 50) {
       stats.armor = 50;
     }
-    if (stats.cdr >= 50) {
-      stats.cdr = 50;
+    if (stats.cdr >= 70) {
+      stats.cdr = 70;
     }
     if (stats.mr >= 50) {
       stats.mr = 50;
@@ -2037,7 +2271,7 @@ function characterStatus() {
     if (stats.armorpen >= 80) {
       stats.armorpen = 80;
     }
-    if (stats.speed >= 100) {
+    if (stats.speed >= 60) {
       stats.speed = 60;
     }
     if (! itemabilities.lichbane) {
@@ -2095,7 +2329,7 @@ function levelUp() {
   
   if (stats.xp >= stats.lvlupxp && stats.lvl <= 17) {
     stats.xp -= stats.lvlupxp;
-    stats.lvlupxp += 50;
+    stats.lvlupxp += 75;
     stats.lvl += 1;
     if (stats.lvl === 6) {
       stats.speed += 20;
@@ -2144,6 +2378,22 @@ function blankbars() {
   noStroke();
   rect(width * 0.315, height * 0.875, width * 0.03, height * 0.1);
 
+  image(items.zhonyasHourglass.icon, width * 0.684, height * 0.884, width * 0.02, height * 0.035);
+
+  if (! itemabilities.stasis) {
+    fill(0, 0, 0, 200);
+    rect(width * 0.684, height * 0.884, width * 0.02, height * 0.035);
+  }
+
+  image(items.thoridal.icon, width * 0.684, height * 0.925, width * 0.02, height * 0.035);
+
+
+  if (! itemabilities.supernova) {
+    fill(0, 0, 0, 200);
+    rect(width * 0.684, height * 0.925, width * 0.02, height * 0.035);
+  }
+
+
 }
 
 //hp bar
@@ -2178,7 +2428,7 @@ function healthbar(){
   stroke(255);
   fill(0);
   textSize(width / 120);
-  text(floor(stats.health) + " / " + stats.maxhp, width * 0.465, height * 0.969);
+  text(floor(stats.health) + " / " + stats.maxhp, width * 0.465, height * 0.965);
 
 }
 
@@ -2198,7 +2448,7 @@ function manabar() {
   stroke(255);
   fill(0);
   textSize(width / 120);
-  text(floor(stats.mana) + " / " + stats.maxmana, width * 0.465, height * 0.989);
+  text(floor(stats.mana) + " / " + stats.maxmana, width * 0.465, height * 0.985);
 
 }
 
@@ -2932,7 +3182,7 @@ function inGameShopDisplay() {
 
     textSize(width / 30);
     fill(111, 242, 24);
-    stroke(15, 66, 32);
+    stroke(0);
     text("Shop", width * 0.7, height * 0.08);
     
     //freeze buff timing
@@ -3005,8 +3255,8 @@ function itemInfo() {
   if (currentItem === 1) {
     texts.effect1 = "Damage + 150";
     texts.effect2 = "Critical Strike Chance + 30% (Max 100%)";
-    texts.effect3 = "King's Bane (Legendary Passive): Critical"; 
-    texts.effect4 = "Strike Damage + 20%";
+    texts.effect3 = "King's Bane (Legendary Passive):"; 
+    texts.effect4 = "Critical Strike Damage + 20%";
     texts.additionaltexts = "You are full of weaknesses";
     price = 3000;
   }
@@ -3014,13 +3264,13 @@ function itemInfo() {
   if (currentItem === 2) {
     texts.effect1 = "Damage + 80   Mana + 200";
     texts.effect2 = "Mana Regeneration + 5 / Second";
-    texts.effect3 = "Abilitie Cooldown - 10% (Max 50%)";
+    texts.effect3 = "Abilitie Cooldown - 10% (Max 70%)";
     texts.effect4 = "Soul Harvest (Legendary Passive):";
     texts.effect5 = "Killing an enemy restores 2% of";
     texts.effect6 = "your maximum mana";
     texts.additionaltexts = "The reaper of souls and";
     texts.additionaltexts2 = "harvestor essence";
-    price = 3500;
+    price = 2600;
   }
   //Stormrazor
   if (currentItem === 3) {
@@ -3028,12 +3278,12 @@ function itemInfo() {
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
     texts.effect3 = "Speed + 10 (Max 60)";
     texts.effect4 = "Windrunner's Bless (Legendary Passive):";
-    texts.effect5 = "Angelic Shift / Wanderer's Strike deal 20%";
-    texts.effect6 = "damage but has a 1 second cooldown. You";
+    texts.effect5 = "Your E ablity deal 20% damage but has a";
+    texts.effect6 = "0.75 second cooldown. It costs 0 mana. You";
     texts.effect7 = "are immune while casting the ability";
     texts.additionaltexts = "The blessed blade of the";
     texts.additionaltexts2 = "Windrunners";
-    price = 3500;
+    price = 2800;
   }
   //starfire spellblade
   if (currentItem === 4) {
@@ -3043,7 +3293,7 @@ function itemInfo() {
     texts.effect4 = "You heal for 15% of all damage dealt";
     texts.effect5 = "(Max 30%)";
     texts.additionaltexts = "The lost blade of the Archangel";
-    price = 3600;
+    price = 3000;
   }
   //last whisper
   if (currentItem === 5) {
@@ -3054,7 +3304,7 @@ function itemInfo() {
     texts.effect5 = "enemies. (deals maximum damage when";
     texts.effect6 = "the enemy are at 30% or less health)";
     texts.additionaltexts = "Lethality, at any cost";
-    price = 2800;
+    price = 3000;
   }
   //Frost Mourne
   if (currentItem === 6) {
@@ -3066,11 +3316,11 @@ function itemInfo() {
     texts.effect6 = "deal 10% of the targets' maxiumum";
     texts.effect7 = "health as bonus damage";
     texts.additionaltexts = "A mythical blade that drain souls";
-    price = 3600;
+    price = 2900;
   }
   //rapid firecannon
   if (currentItem === 7) {
-    texts.effect1 = "Ability Cooldown - 20% (Max 50%)";
+    texts.effect1 = "Ability Cooldown - 20% (Max 70%)";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
     texts.effect3 = "Speed + 10 (Max 60)";
     texts.effect4 = "Spray and Pray (Legendary Passive):";
@@ -3078,11 +3328,11 @@ function itemInfo() {
     texts.effect6 = "Whirling Death has a 15% to fire an";
     texts.effect7 = "additional time, dealing 25% damage";
     texts.additionaltexts = "Loaded and ready";
-    price = 2500;
+    price = 2300;
   }
   //Thori'dal
   if (currentItem === 8) {
-    texts.effect1 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect1 = "Ability Cooldowns - 20% (Max 70%)";
     texts.effect2 = "Mana + 200   Mana Regen + 2 / Sec";
     texts.effect3 = "Critical Strike Chance + 10% (Max 100%)";
     texts.effect4 = "Supernova (Legendary Active): Deals 1000";
@@ -3090,11 +3340,11 @@ function itemInfo() {
     texts.effect6 = "60 seconds cooldown, no casting cost)";
     texts.additionaltexts = "The wrath of gods can be beared";
     texts.additionaltexts2 = "by no mortal";
-    price = 2750;
+    price = 2800;
   }
   //Satikk Shiv
   if (currentItem === 9) {
-    texts.effect1 = "Ability Cooldown - 20% (Max 50%)";
+    texts.effect1 = "Ability Cooldown - 20% (Max 70%)";
     texts.effect2 = "Critical Strike Chance + 20% (Max 100%)";
     texts.effect3 = "Mana + 200   Mana Regen +2";
     texts.effect4 = "Supersonic (Legendary Passive):";
@@ -3106,7 +3356,7 @@ function itemInfo() {
   //Runnan's Hurricane
   if (currentItem === 10) {
     texts.effect1 = "Speed + 20";
-    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 70%)";
     texts.effect3 = "Critical Strike Chance + 30% (Max 100%)";
     texts.effect4 = "Perpetual Storm (Passive):";
     texts.effect5 = "Each shot of Mystic Shot / Whirling Death";
@@ -3119,7 +3369,7 @@ function itemInfo() {
   //phantom dancer
   if (currentItem === 11) {
     texts.effect1 = "Speed + 30 (Max 60)";
-    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 70%)";
     texts.effect3 = "Critical Strike Chance + 30% (Max 100%)";
     texts.effect4 = "Spectral Waltz (Passive): The casting time";
     texts.effect5 = "for Angelic Shift / Wanderer's Strike is halved";
@@ -3131,24 +3381,24 @@ function itemInfo() {
   //Nashor's Tooth
   if (currentItem === 12) {
     texts.effect1 = "Ability Power + 80";
-    texts.effect2 = "Ability Cooldowns - 20% (Max 50%)";
-    texts.effect3 = "Critical Strike Chance + 20%";
+    texts.effect2 = "Ability Cooldowns - 20% (Max 70%)";
+    texts.effect3 = "Critical Strike Chance + 20% (Max 100%)";
     texts.effect4 = "Brewing Tempest (Legendary Passive):";
     texts.effect5 = "The duration of Temptest is extended to";
     texts.effect6 = "30 seconds";
     texts.additionaltexts = "The tooth of an ancient beast,";
     texts.additionaltexts2 = "mystical powers glow from within";
-    price = 3000;
+    price = 2700;
   }
   //Luden's Echo
   if (currentItem === 13) {
     texts.effect1 = "Ability Power + 120";
     texts.effect2 = "Mana + 400   Mana Regen + 5";
-    texts.effect3 = "Ability Cooldowns - 10% (Max 50%)";
+    texts.effect3 = "Ability Cooldowns - 10% (Max 70%)";
     texts.effect4 = "Heals for 15% of all damage dealt";
     texts.effect5 = "(Max 30%)";
     texts.additionaltexts = "The staff of an ancient archmage";
-    price = 3200;
+    price = 3000;
   }
   //Rabadon's Deathcap
   if (currentItem === 14) {
@@ -3158,12 +3408,12 @@ function itemInfo() {
     texts.effect4 = "ability power by 30%, you CANNOT critical";
     texts.effect5 = "strike this game";
     texts.additionaltexts = "Descend into madness...";
-    price = 4000;
+    price = 3200;
   }
   //Void Staff
   if (currentItem === 15) {
     texts.effect1 = "Ability Power + 80";
-    texts.effect2 = "Magic Penetration + 40%";
+    texts.effect2 = "Magic Penetration + 40% (Max 80)";
     texts.additionaltexts = "Counterspell is the extraction of";
     texts.additionaltexts2 = "essence from magic";
     price = 3000;
@@ -3172,18 +3422,18 @@ function itemInfo() {
   if (currentItem === 16) {
     texts.effect1 = "Mana + 300   Mana Regen + 5";
     texts.effect2 = "Ability Power + 100";
-    texts.effect3 = "Speed + 10";
+    texts.effect3 = "Speed + 10 (Max 60)";
     texts.effect4 = "You heal for 20% of all damage dealt";
     texts.effect5 = "Curse's Blessings (Legendary Passive):";
     texts.effect6 = "The healing limit from damage of 50% is";
     texts.effect7 = "removed, but you don't regenerate health";
     texts.additionaltexts = "The curse was never lifted...";
-    price = 3800;
+    price = 3100;
   }
   //Liandry's Torment
   if (currentItem === 17) {
     texts.effect1 = "Ability Power + 70";
-    texts.effect2 = "Magic Penetration + 15%";
+    texts.effect2 = "Magic Penetration + 15% (Max 80%)";
     texts.effect3 = "Health + 300";
     texts.effect4 = "Cry of the Carnarium (Legendary Passive):";
     texts.effect5 = "Mystic Shot / Whirling Death and Angelic Dash";
@@ -3191,20 +3441,20 @@ function itemInfo() {
     texts.effect7 = "equal to 10% of the target's maximum health";
     texts.additionaltexts = "It's truely an honor, isn't it?";
     texts.additionaltexts2 = "to be remembered? Pity you";
-    price = 2800;
+    price = 2900;
   }
   //Hextect Gunblade
   if (currentItem === 18) {
     texts.effect1 = "Damage + 70";
     texts.effect2 = "Ability Power + 70";
-    texts.effect3 = "Heals for 5% of all damage dealt";
+    texts.effect3 = "Heals for 5% of all damage dealt (Max 30%)";
     texts.effect4 = "Mana + 150   Health + 250";
     texts.additionaltexts = "The only way to stop war is war";
-    price = 3600;
+    price = 2500;
   }
   //Dead Man's Plate
   if (currentItem === 19) {
-    texts.effect1 = "Armor + 20   Health Regen + 5";
+    texts.effect1 = "Armor + 20 (Max 50)   Health Regen + 5";
     texts.effect2 = "Health + 400";
     texts.effect3 = "Tramaple Over Dead (Legendary Passive):";
     texts.effect4 = "Gain extra movement speed based on missing";
@@ -3212,24 +3462,24 @@ function itemInfo() {
     texts.effect6 = "separately with the movement speed stat)";
     texts.additionaltexts = "There is one way you are";
     texts.additionaltexts2 = "getting this armor from me...";
-    price = 3500;
+    price = 2800;
   }
   //Randuin's Omen
   if (currentItem === 20) {
-    texts.effect1 = "Armor + 20   Health Regen +5";
+    texts.effect1 = "Armor + 20 (Max 50)   Health Regen +5";
     texts.effect2 = "Health + 450   Mana + 200";
     texts.effect3 = "Autodefense Matrix (Legendary Passive):";
     texts.effect4 = "You have a 20% chance to avoid a Cannon";
     texts.effect5 = "minion's lightning bolt attack";
     texts.additionaltexts = "I have no weaknesses";
-    price = 3500;
+    price = 2800;
   }
   //Thornmail
   if (currentItem === 21) {
     texts.effect1 = "Health + 800";
-    texts.effect2 = "Armor + 40";
+    texts.effect2 = "Armor + 40 (Max 50)";
     texts.additionaltexts = "How did he even put it on in the first place?";
-    price = 3500;
+    price = 2600;
   }
   //Sunfire Cape
   if (currentItem === 22) {
@@ -3237,45 +3487,45 @@ function itemInfo() {
     texts.effect2 = "Health Regen + 15";
     texts.additionaltexts = "It embodies all possible meanings of";
     texts.additionaltexts2 = "the word 'indestructible'";
-    price = 4000;
+    price = 2500;
   }
   //Zhonyas's Hourglass
   if (currentItem === 23) {
     texts.effect1 = "Ability Power + 80";
-    texts.effect2 = "Armor + 10";
+    texts.effect2 = "Armor + 10 (Max 50)";
     texts.effect3 = "Rewind Time (Legendary Passive):";
     texts.effect4 = "When you take lethal damage, instead";
     texts.effect5 = "restore 50% of your maiximum health";
     texts.effect6 = "and destroy all enemies (works once)";
     texts.additionaltexts = "Even time bends to my will";
-    price = 3500;
+    price = 3200;
   }
   //Thunderfury
   if (currentItem === 24) {
-    texts.effect1 = "Damage + 60   Armor + 10";
+    texts.effect1 = "Damage + 60   Armor + 10 (Max 50)";
     texts.effect2 = "Armor Penetration + 20% (Max 80%)";
     texts.effect3 = "Magic Peneration + 20% (Max 80%)";
     texts.effect4 = "Health + 350   Mana + 200";
     texts.additionaltexts = "The blessed blade of the";
     texts.additionaltexts2 = "windseeker";
-    price = 3300;
+    price = 2800;
   }
   //Abyssal Mask
   if (currentItem === 25) {
     texts.effect1 = "Health + 450";
-    texts.effect2 = "Magic Resist + 20";
+    texts.effect2 = "Magic Resist + 20 (Max 50)";
     texts.effect3 = "Mana + 250";
     texts.effect4 = "Mana Regen + 4 / Second";
     texts.effect5 = "Absorb Magic(Legendary Passive):";
     texts.effect6 = "Taking magic damage has a 30% chance";
     texts.effect7 = "to increase you ability power by 1";
     texts.additionaltexts = "Who am I? None of your business";
-    price = 4000;
+    price = 3000;
   }
   //Spirit Visage
   if (currentItem === 26) {
     texts.effect1 = "Health + 350   Mana + 250";
-    texts.effect2 = "Magic Resist + 15";
+    texts.effect2 = "Magic Resist + 15 (Max 50)";
     texts.effect3 = "Mana Regeneration + 2 / Second";
     texts.effect4 = "Health Regeneration + 4 / Second";
     texts.effect5 = "Fusion (Legendary Passive): Casting";
@@ -3283,50 +3533,50 @@ function itemInfo() {
     texts.effect7 = "5 Damage, and 5 Ability Power";
     texts.additionaltexts = "Blessed by the kings and";
     texts.additionaltexts2 = "maintained by the purest magic";
-    price = 3800;
+    price = 2900;
   }
   //Adaptive helm
   if (currentItem === 27) {
     texts.effect1 = "Health + 250   Mana + 200";
     texts.effect2 = "Mana Regeneration + 5 / Second";
-    texts.effect3 = "Armor + 5   Magic Resist + 5";
+    texts.effect3 = "Armor / Magic Resist + 5 (Max 50)";
     texts.effect4 = "Targeted Evolution (Legendary Passive):";
     texts.effect5 = "Gain 1 Armor and Magic Resist every 20";
     texts.effect6 = "seconds, up to a maximum for 15 each";
     texts.additionaltexts = "Practice makes perfect";
-    price = 3500;
+    price = 2400;
   }
   //Banshee's Veil
   if (currentItem === 28) {
     texts.effect1 = "Magic Penetration + 15% (Max 80%)";
     texts.effect2 = "Ability Power + 60";
-    texts.effect3 = "Magic Resist + 10";
+    texts.effect3 = "Magic Resist + 10 (Max 50)";
     texts.effect4 = "Health + 300  Mana + 300";
     texts.additionaltexts = "It was destined to doom once the";
     texts.additionaltexts2 = "secret was unveiled...";
-    price = 3600;
+    price = 2400;
   }
   //Hex Drinker
   if (currentItem === 29) {
     texts.effect1 = "Damage + 60";
-    texts.effect2 = "Magic Resist + 20";
-    texts.effect3 = "Heal for 10% of all damage dealt";
+    texts.effect2 = "Magic Resist + 20 (Max 50)";
+    texts.effect3 = "Heal for 10% of all damage dealt (Max 30%)";
     texts.effect4 = "Mana Vortex (Legendary Passive):";
     texts.effect5 = "When you take magic damage, restore";
     texts.effect6 = "half as much as mana";
     texts.additionaltexts = "To feast upon magic";
-    price = 3300;
+    price = 2600;
   }
   //Trinity Force
   if (currentItem === 30) {
-    texts.effect1 = "Health + 300   Mana + 200";
-    texts.effect2 = "Armor Peneration + 10%   Damage + 60";
-    texts.effect3 = "Ability Power + 60   Speed + 10";
-    texts.effect4 = "Magic Penetration + 10%";
-    texts.effect5 = "Ability Cooldowns - 20%";
-    texts.effect6 = "Critical Strike Chance + 20%";
+    texts.effect1 = "Health + 300   Mana + 200   Damage + 60";
+    texts.effect2 = "Armor Peneration + 10% (Max 80%)";
+    texts.effect3 = "Ability Power + 60   Speed + 10 (Max 60)";
+    texts.effect4 = "Magic Penetration + 10% (Max 80%)";
+    texts.effect5 = "Ability Cooldowns - 20% (MaX 70%)";
+    texts.effect6 = "Critical Strike Chance + 20% (Max 100%)";
     texts.additionaltexts = "Power overwhelming";
-    price = 5000;
+    price = 3500;
   }
 
 }
@@ -3380,6 +3630,7 @@ function addStats() {
     stats.ad += 40;
     stats.ap += 40;
     stats.speed += 10;
+    cdcharge.e = 0;
     itemabilities.quickdash = true;
   }
   //starfire spellblade

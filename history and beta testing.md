@@ -65,5 +65,23 @@
 #### Beta Testing Feedback
 ##### 15-16 June 2019
 
-- Completed basic balance of powerupsa and combat
-- Introduced diverse abilities
+- Certain item balance were off
+- Minions scale too fast early and too slow late
+- Some item abilities did not work as intended
+- Critical Strike would reduce damage
+- Some UI improvements could be made
+- HP / Mana bar numbers should be higher
+- Items were generally too expensive
+- It is too hard to level up
+
+#### Beta Testing Changes
+##### 15-16 June 2019
+
+- Rebalanced Items
+- Reworked minion scaling
+- Bugfixes around items and gameplay
+- Fixed Critical Strike damage
+- Added health and mana bars
+- Added indicators for item abilities
+- Re-priced items
+- Re-adjusted experience caps for each level

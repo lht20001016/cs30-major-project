@@ -321,6 +321,7 @@ function loadSummoners() {
 
   summoners = {
 
+    //all summoner spells
     ignite : new Summoners (width * 0.475, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/ignite.wav"), loadImage("assets/pictures/ignite.png"),"assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 1),
     clarity : new Summoners (width * 0.1, height * 0.4, width * 0.1, height * 0.2, loadSound("assets/sounds/clarity.mp3"), loadImage("assets/pictures/clarity.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 2),
     heal : new Summoners (width * 0.225, height * 0.1, width * 0.1, height * 0.2, loadSound("assets/sounds/heal.wav"), loadImage("assets/pictures/heal.png"), "assets/cursors/gotomenu.cur", [53, 0, 96], [255, 10, 218], 3),
@@ -329,6 +330,7 @@ function loadSummoners() {
 
   };
 
+  //placed in a list to iterate
   allSummoners = [summoners.ignite, summoners.clarity, summoners.heal, summoners.barrier, summoners.flash];
 
 }
@@ -559,6 +561,7 @@ class Cannons extends GameObject {
     enemyminionhitbox[this.id][3] = createVector(hitx, hity + hitheight);
   }
 
+  //displays any damage taken
   showdmg(crit, damagevalue) {
 
     if (this.showdamage) {
@@ -843,6 +846,7 @@ function selecttoF() {
 
 }
 
+//open instructions
 function openIns() {
   state = "instruction";
   if (volumeControl) {
@@ -852,6 +856,7 @@ function openIns() {
   instructionstate = 0;
 }
 
+//close instructions
 function closeIns() {
   state = "menu";
   if (volumeControl) {
@@ -861,6 +866,7 @@ function closeIns() {
   instructionstate = 0;
 }
 
+//set summer spells description
 function summsdesc() {
   instructionstate = 1;
   if (volumeControl) {
@@ -869,6 +875,7 @@ function summsdesc() {
   }
 }
 
+//set abilities description
 function charabdesc() {
   instructionstate = 2;
   if (volumeControl) {
@@ -877,6 +884,7 @@ function charabdesc() {
   }
 }
 
+//set stats description
 function charstatsdesc() {
   instructionstate = 3;
   if (volumeControl) {
@@ -885,6 +893,7 @@ function charstatsdesc() {
   }
 }
 
+//set items description
 function itemshopdescs() {
   instructionstate = 4;
   if (volumeControl) {
@@ -893,6 +902,7 @@ function itemshopdescs() {
   }
 }
 
+//set gameplay description
 function gameplaydesc() {
   instructionstate = 5;
   if (volumeControl) {
@@ -1062,9 +1072,11 @@ function drawBackground() {
   background(bg);
 }
 
+//instructions menu
 function instructionScreen () {
   
   if (state === "instruction") {
+    //run instruction categories
     instructionsexit.run();
     summonerspells.run();
     characterabilities.run();
@@ -1072,6 +1084,7 @@ function instructionScreen () {
     itemshopdesc.run();
     gameplay.run();
 
+    //summoner spells
     if (instructionstate === 1) {
       fill(198, 211, 255, 165);
       stroke(0, 92, 255);
@@ -1090,7 +1103,7 @@ function instructionScreen () {
       textAlign(CENTER);
     }
 
-    
+    //abilities
     if (instructionstate === 2) {
       fill(198, 211, 255, 165);
       stroke(0, 92, 255);
@@ -1111,6 +1124,7 @@ function instructionScreen () {
       textAlign(CENTER);
     }
 
+    //stats
     if (instructionstate === 3) {
       fill(198, 211, 255, 165);
       stroke(0, 92, 255);
@@ -1138,6 +1152,7 @@ function instructionScreen () {
       textAlign(CENTER);
     }
 
+    //Items
     if (instructionstate === 4) {
       fill(198, 211, 255, 165);
       stroke(0, 92, 255);
@@ -1162,6 +1177,7 @@ function instructionScreen () {
       textAlign(CENTER);
     }
 
+    //gameplay
     if (instructionstate === 5) {
       fill(198, 211, 255, 165);
       stroke(0, 92, 255);
@@ -1185,6 +1201,7 @@ function instructionScreen () {
 
 }
 
+//static effect of items
 function itemEffects() {
 
   //stormrazor static ability
@@ -1209,12 +1226,14 @@ function itemEffects() {
     }
   }
 
+  //adaptive helm gives stats overtime
   if (timer % 20 === 0 && frameCount % 60 === 5 && itemabilities.roastats && roastatcounter < 15) {
     stats.armor++;
     stats.mr++;
     roastatcounter++;
   }
 
+  //block responsible for cooldown reduction application
   cds.q = round(300 * ((100 - stats.cdr) / 100)) / 100;
   cds.w = round(800 * ((100 - stats.cdr) / 100)) / 100;
   if (! itemabilities.quickdash) {
@@ -1240,6 +1259,7 @@ function showMenus() {
     rectMode(CORNER);
     image(titlepic, width * 0.2, height * 0.1, width * 0.6, height * 0.15);
     
+    //icons and cursors
     noStroke();
     if (loadCount < files) {
       fill(65, 155, 255, 155);
@@ -1266,6 +1286,7 @@ function showMenus() {
     }
     
 
+    //loading bar and menu buttons when finished loading
     fill(0);
     textSize(32);
     if (loadCount < files) {
@@ -1287,8 +1308,8 @@ function showMenus() {
 function showShop() {
   if (state === "shop") {
 
+    //shop buttons
     shopToMenuButton.run();
-
     summoners.ignite.run();
     summoners.heal.run();
     summoners.clarity.run();
@@ -1297,7 +1318,7 @@ function showShop() {
 
     if (currentSummoner !== 0) {
 
-
+      //display text variables
       texts.effect1 = "";
       texts.effect2 = "";
       texts.effect3 = "";
@@ -1308,6 +1329,7 @@ function showShop() {
     
       summonerInfo();
 
+      //display the text
       fill(232, 199, 227);
       strokeWeight(5);
       stroke(86, 5, 74);
@@ -2083,6 +2105,7 @@ function moveBolts() {
 
       if (hit) {
       
+        //apply various abilities
         let temp = random(0, 100);
         let damage = bolts[a].damage;
         let crit = false;
@@ -2196,7 +2219,6 @@ function castingAbilities() {
     if (itemabilities.morertimer) {
       temp1 = 30000;
     }
-
     if (millis() - abilitytiming.r >= temp1 && abilitytiming.r !== -500) {
       rmode = false;
       stats.crit -= 10;
@@ -2322,6 +2344,7 @@ function levelUp() {
     stats.xp -= stats.lvlupxp;
     stats.lvlupxp += 75;
     stats.lvl += 1;
+    //apply passive abilities
     if (stats.lvl === 6) {
       stats.speed += 20;
       buffs.haste = true;
@@ -2509,6 +2532,7 @@ function cooldowns() {
 
 }
 
+//buff icons that lets the user know what active buffs they are affected by
 function displaybuffs() {
 
   if (buffs.ignite) {
@@ -2804,6 +2828,7 @@ function abilityInfoDisplay() {
   fill(0, 0, 0, 64);
   stroke(0, 97, 255);
 
+  //text to be displayed
   texts.effect1 = "";
   texts.effect2 = "";
   texts.effect3 = "";
@@ -2815,6 +2840,7 @@ function abilityInfoDisplay() {
 
   abilityDesc();
 
+  //display text
   fill(255);
   strokeWeight(2);
   textSize(width / 50);
@@ -3109,6 +3135,7 @@ function abilityicons() {
   let eability;
   let rability;
 
+  //passive
   if (stats.lvl < 6) {
     passiveability = player.passiveicon;
   }
@@ -3119,6 +3146,7 @@ function abilityicons() {
     passiveability = player.passive2icon;
   }
 
+  //others
   if (!rmode) {
     qability = player.qicon;
     wability = player.wicon;
@@ -3133,6 +3161,7 @@ function abilityicons() {
 
   rability= player.ricon;
 
+  //draw ability icons and their mana costs
   image(passiveability, width * 0.35, height * 0.8825, width * 0.0245, height * 0.04);
   image(qability, width * 0.3785, height * 0.8825, width * 0.0325, height * 0.0525);
   image(wability, width * 0.417, height * 0.8825, width * 0.0325, height * 0.0525);
@@ -3151,6 +3180,7 @@ function abilityicons() {
 
 }
 
+//display summoner spells in game UI
 function summonericons() {
 
   image(summonerDicon, width * 0.532, height * 0.8825, width * 0.024, height * 0.0393);
@@ -3195,6 +3225,7 @@ function itemDetails() {
 
   if (state === "game") {
 
+    //text to be displayed
     texts.effect1 = "";
     texts.effect2 = "";
     texts.effect3 = "";
@@ -3875,7 +3906,7 @@ function gameOverYet() {
 
 }
 
-//called everytime the game is reset, reset sounds, arrays, and assigns the default value to all relavent variables
+//called everytime the game is reset, reset sounds, arrays, and assigns the default value to all relavent variables, similar to loadData at the beginning with slight differences
 function resetGame() {
 
   shopSubstate = false;
@@ -4121,10 +4152,12 @@ function keyTyped() {
       }
     }
 
+    //stat menu toggle
     if ((key === "c"  || key === "C") && state === "game") {
       statsToggle = ! statsToggle;
     }
 
+    //supernova ability
     if ((key === "b"  || key === "B") && itemabilities.supernova && state === "game") {
       for (let enemy of enemyMinions) {
         enemy.health -= 1000;
@@ -4472,6 +4505,7 @@ function castflash() {
 //fires the first or second projectile
 function bolt1() {
 
+  //calculate angle and velocity and damage of projectile
   let x;
   let y;
   let theta;
@@ -4514,6 +4548,7 @@ function bolt1() {
     damage = damage * 1.1;
   }
 
+  //push projectile and trigger abilities
   if (mouseX >= charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.03, height * 0.08, 1, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
@@ -4606,7 +4641,7 @@ function bolt1b() {
   }
 }
 
-//Runnan's Hurrican ability
+//Runnan's Hurrican ability fire replicate shots
 function bolt1c() {
 
   let x;
@@ -4671,7 +4706,7 @@ function bolt1c() {
   }
 }
 
-//Runnan's Hurrican ability
+//Runnan's Hurrican ability fire replicate shots
 function bolt1d() {
 
   let x;
@@ -4739,6 +4774,7 @@ function bolt1d() {
 //fires the third projectile
 function bolt2() {
 
+  //calculate angle and velocity and damage of projectile
   let x;
   let y;
   let theta;
@@ -4780,6 +4816,7 @@ function bolt2() {
     damage = damage * 1.1;
   }
 
+  //push projectile and trigger abilities
   if (mouseX >= charpos.x + charpos.width / 2) {
     bolthitbox.push([]); 
     bolts.push(new Bolt(charpos.x + charpos.width / 2, charpos.y + charpos.height / 2, width * 0.035, height * 0.08, 2, 1, damage, 0, vx, vy, theta, bolthitbox.length - 1));
@@ -4871,7 +4908,7 @@ function bolt2b() {
   }
 }
 
-//fires the third projectile
+//fires the third projectile fire replicate shots
 function bolt2c() {
 
   let x;
@@ -4936,7 +4973,7 @@ function bolt2c() {
   }
 }
 
-//fires the third projectile
+//fires the third projectile fire replicate shots
 function bolt2d() {
 
   let x;

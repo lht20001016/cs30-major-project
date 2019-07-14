@@ -514,7 +514,7 @@ class Cannons extends GameObject {
     this.speed = width * 0.01;
     this.direction = direction;
     this.id = id;
-    this.damage = stats.maxhp * 0.03 + sq(stats.armor * 2.5) + sq(stats.mr * 2.5);
+    this.damage = 20 + sq(stats.lvl) * 0.1 + 10 * inventory.length;
 
     this.spawntime = timer;
 
@@ -1932,7 +1932,7 @@ function minionFunctions() {
         cannonbolts[i].hitbox();
       }
 
-      if (! shopSubstate) {
+      if (! shopSubstate && cannonbolts[i] !== undefined) {
 
         cannonbolts[i].run();
         
@@ -2077,8 +2077,11 @@ function moveBolts() {
 
   for (let k = bolts.length - 1; k >= 0; k--) {
 
-    bolts[k].display();
-    bolts[k].hitbox();
+    if (bolts[k] !== undefined) {
+      bolts[k].display();
+      bolts[k].hitbox();
+    }
+
 
     if (! shopSubstate) {
       bolts[k].move();
@@ -2133,7 +2136,7 @@ function moveBolts() {
         }
 
         if (itemabilities.maxhpmagicdmg) {
-          damage = damage + enemyMinions[k].maxhp * 0.1;
+          damage = damage + enemyMinions[m].maxhp * 0.1;
         }
 
         damage = damage * ((100 - enemyMinions[m].magicresist) / 100);
